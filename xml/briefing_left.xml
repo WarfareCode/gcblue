@@ -1,0 +1,4 @@
+<Window>
+  <Button X="5" Y="5" Width="65" Height="15" Caption="Skip" Command="120"/>
+  <TextBox TopMargin="30" BottomMargin="50" Wrap="60" FontSize="14"/>
+</Window>

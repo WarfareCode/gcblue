@@ -1,0 +1,7 @@
+<Model File="f-16.tvm"/>
+<Info Author="Guido Militello" Notes="updated apr 2008"/>
+<Smoke X="0.0" Z="-5.9" Y="0.0"/>
+<Launcher X="-4.8" Z="-2.5" Y="0.0"/>
+<Launcher X="4.8" Z="2.5" Y="0.0"/>
+
+

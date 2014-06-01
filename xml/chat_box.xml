@@ -1,0 +1,9 @@
+<Window>
+  <Button X="10" Y="5" Width="35" Height="15" Caption="ALL" Command="10" FontSize="10" Alpha="0.5"/>
+  <Button X="50" Y="5" Width="35" Height="15" Caption="TEAM" Command="20" FontSize="10" Alpha="0.5"/>
+  <ChatBox X="10" Y="25" Width="450" Height="235" FontSize="14.0" Wrap="70" DrawBorder="1"/>
+  <ChatEntry X="10" Y="260" Width="450" Height="16" BarX="0.0" BarY="1.0" BarWidth="450.0" BarHeight="14.0" Caption="" FontSize="12.0"  DrawBorder="1"/>
+  <Button X="450" Y="2" Width="16" Height="16" Command="86" Caption="">
+    <Image Off="close.png" On="close.png" />
+  </Button>
+</Window>

@@ -1,0 +1,6 @@
+<Model File="rah-66.tvm"/>
+<Info Author="Marcelo Caceres" Notes="RAH-66 Comanche Helicopter, missing PILOTBOD.bmp texture"/>
+<Animation Object="rotor" Type="Rotor" AxisX="0.0" AxisY="0" AxisZ="1" AngleRate="9.0"/>
+
+
+

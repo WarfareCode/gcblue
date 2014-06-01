@@ -1,0 +1,12 @@
+<Model File="mark46mod5.tvm"/>
+<Info Author="Raven" Notes="Mark 46 Mod 5 lightweight torpedo"/>
+<Submodel File="mark46prop.tvm" Object="propl_a" X="0" Y="0" Z="-1.10" Yaw="0" Pitch="0" Roll="0"/>
+<Submodel File="mark46prop.tvm" Object="propl_b" X="0" Y="0" Z="-1.16" Yaw="0" Pitch="0" Roll="0"/>
+
+<Animation Object="propl_a" Type="Rotor" AxisX="0" AxisY="0" AxisZ="1" AngleRate="12"/>
+<Animation Object="propl_b" Type="Rotor" AxisX="0" AxisY="0" AxisZ="1" AngleRate="12"/>
+
+<Smoke X="0.0" Z="-2" Y="0.0"/>
+
+
+

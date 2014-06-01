@@ -1,0 +1,6 @@
+<Model File="guppy.tvm"/>
+<Info Author="TLAM-Strike" Notes="Used for ROC Hai Shih submarine"/>
+<Animation Object="Object04" Type="Propeller" AzisX="0" AxisY="1" AxisZ="0" AngleRate="0.07"/>
+<Animation Object="Object03" Type="Propeller" AzisX="0" AxisY="1" AxisZ="0" AngleRate="-0.07"/>
+
+

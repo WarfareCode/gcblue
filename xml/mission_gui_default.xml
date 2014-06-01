@@ -1,0 +1,7 @@
+<Window Width="420" Height="260" >
+  <Button X="402" Y="2" Width="16" Height="16" Command="86" Caption="">
+    <Image Off="close.png" On="close.png" />
+  </Button>
+  <Mission SlotSize="16" StrikeX="26" StrikeY="170" StrikeSpacing="24" />
+  <StartTime X="10" Y="50" Width="180" Height="17" BarX="2.0" BarY="1.0" BarWidth="176.0" BarHeight="15.0" FontSize="14.0" Caption=""/>
+</Window>

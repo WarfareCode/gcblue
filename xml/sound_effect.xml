@@ -1,0 +1,32 @@
+<sound_config>
+    <effect name="Explosion" file="Explosion.wav" max_count="99" time_interval="1.0" />
+    <effect name="Implosion" file="Implosion.wav" max_count="99" time_interval="1.0" />
+    <effect name="ShortBeep" file="ShortBeep.wav" max_count="99" time_interval="1.0" />
+    <effect name="MissileLaunch" file="MissileLaunch.wav" max_count="99" time_interval="1.0" />
+    <effect name="TwoBeeps" file="TwoBeeps.wav" max_count="99" time_interval="1.0" />
+    <effect name="consolebeep" file="consolebeep.wav" max_count="99" time_interval="1.0" />
+    <effect name="Beep2" file="Beep2.wav" max_count="99" time_interval="1.0" />
+    <effect name="RejectBeep" file="RejectBeep.wav" max_count="99" time_interval="1.0" />
+    <effect name="Ping" file="Ping.wav" max_count="5" time_interval="60.0" />
+    <effect name="Ping2" file="Ping2.wav" max_count="99" time_interval="1.0" />
+    <effect name="radarping" file="radarping.wav" max_count="99" time_interval="1.0" />
+    <effect name="LowBeep" file="LowBeep.wav" max_count="99" time_interval="1.0" />
+    <effect name="Bloop" file="Bloop.wav" max_count="99" time_interval="1.0" />
+    <effect name="NoisyBeepLow" file="NoisyBeepLow.wav" max_count="99" time_interval="1.0" />
+    <effect name="Thuck" file="Thuck.wav" max_count="99" time_interval="1.0" />
+    <effect name="Explosion2" file="Explosion2.wav" max_count="99" time_interval="1.0" />
+    <effect name="Welcome" file="NavyWhistle.wav" max_count="99" time_interval="1.0" />
+    <effect name="jetlaunch" file="jetlaunch.wav" max_count="99" time_interval="1.0" />
+    <effect name="MutedBeep" file="MutedBeep.wav" max_count="99" time_interval="1.0" />
+    <effect name="intercom" file="intercom.wav" max_count="99" time_interval="1.0" />
+    <effect name="fslide" file="fslide.wav" max_count="99" time_interval="1.0" />
+	<effect name="NavalGun1" file="NavalGun1.wav" max_count="99" time_interval="1.0" />
+	<effect name="helolaunch" file="helolaunch.wav" max_count="99" time_interval="1.0" />
+	<effect name="radar_on" file="radar_on.wav" max_count="99" time_interval="1.0" />
+	<effect name="radar_off" file="radar_off.wav" max_count="99" time_interval="1.0" />
+    <effect name="torpedo_launch" file="torpedo_launch.wav" max_count="99" time_interval="1.0" />
+    <effect name="shishding" file="shishding.wav" max_count="99" time_interval="1.0" />
+    <effect name="Gatling" file="gatling.wav" max_count="99" time_interval="1.0" />
+    <effect name="Alarm" file="alarm.wav" max_count="10" time_interval="300.0" />
+    <effect name="Boom" file="33637__herbertboland__cinematicboomnorm.wav" max_count="99" time_interval="300.0" />
+</sound_config>

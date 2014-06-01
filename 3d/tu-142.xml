@@ -1,0 +1,10 @@
+<Model File="tu-142-body.tvm"/>
+<Info Author="Guido Militello" Notes="updated APR2008"/>
+<Submodel File="tu-95-prop.tvm" Object="prop1" X="-5.87"  Y="-0.89" Z="5.66"  Yaw="0" Pitch="0" Roll="0"/>
+<Submodel File="tu-95-prop.tvm" Object="prop2" X="5.97"   Y="-0.87" Z="5.66" Yaw="0" Pitch="0" Roll="0"/>
+<Submodel File="tu-95-prop.tvm" Object="prop3" X="-12.03" Y="-0.93" Z="1.50"  Yaw="0" Pitch="0" Roll="0"/>
+<Submodel File="tu-95-prop.tvm" Object="prop4" X="12.16"  Y="-0.93" Z="1.50"  Yaw="0" Pitch="0" Roll="0"/>
+<Animation Object="prop1" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="9"/>
+<Animation Object="prop2" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="9"/>
+<Animation Object="prop3" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="-9"/>
+<Animation Object="prop4" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="-9"/>

@@ -1,0 +1,5 @@
+<Model File="zwaardvis-body.tvm"/>
+<Info Author="TLAM-Strike" Notes=""/>
+<Submodel File="zwaardvis-prop.tvm" Object="prop" X="0" Y="-3.38" Z="-32.2" Yaw="0" Pitch="0" Roll="0"/>
+<Animation Object="prop" Type="Propeller" AzisX="0" AxisY="0" AxisZ="1" AngleRate="0.07"/>
+<Smoke X="0.0" Z="-31.7" Y="-3.4"/>

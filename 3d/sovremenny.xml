@@ -1,0 +1,8 @@
+<Model File="t42b1ar1.tvm"/>
+<Info Author="Marcelo Caceres" Notes="Using as stand-in for Sovremenny model. Type 42 Batch 1 model"/>
+<Animation Object="nav_radar1" Type="Sensor" SensorIndex="0" AxisX="0" AxisY="0" AxisZ="1" AngleRate="0.2"/>
+<Animation Object="nav_radar2" Type="Sensor" SensorIndex="1" AxisX="0" AxisY="0" AxisZ="1" AngleRate="0.2"/>
+<Animation Object="996_radar" Type="Sensor" SensorIndex="2" AxisX="0" AxisY="0" AxisZ="1" AngleRate="0.2"/>
+<Animation Object="prop_l" Type="Propeller" AxisX="0.0" AxisY="1" AxisZ="0" AngleRate="1.0"/>
+<Animation Object="prop_r" Type="Propeller" AxisX="0.0" AxisY="1" AxisZ="0" AngleRate="1.0"/>
+<!-- Launcher info, temporary values -->

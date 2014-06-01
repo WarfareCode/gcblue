@@ -1,0 +1,975 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseD|Win32">
+      <Configuration>ReleaseD</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseD|x64">
+      <Configuration>ReleaseD</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>BlueII</ProjectName>
+    <ProjectGuid>{76C3883D-96DD-4A32-91C5-2ADA4CA505E7}</ProjectGuid>
+    <RootNamespace>GCblue</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseD|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseD|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseD|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseD|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>Debug\</OutDir>
+    <IntDir>Debug\</IntDir>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>D:\Python27\libs;D:\libogg-1.3.1\libs;D:\libvorbis-1.3.3\libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\TV3D65;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>D:\Python27\libs;D:\libogg-1.3.1\libs;D:\libvorbis-1.3.3\libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\TV3D65;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>Release\</OutDir>
+    <IntDir>Release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseD|Win32'">
+    <OutDir>$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseD|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/Zm500 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>include/sim;include/graphics;include/common;include/scriptinterface;include/database;include;D:\wxWidgets-3.0.0\include\msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;__WINDOWS__;__WXMSW__;__WXDEBUG__;WXDEBUG=1;__WIN95__;__WIN32__;WINVER=0x0400;STRICT;_WIN32_IMPLEMENTATION;TIXML_USE_STL;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader />
+      <PrecompiledHeaderFile>stdwx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>Debug/gcblue.pch</PrecompiledHeaderOutputFile>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DisableSpecificWarnings>4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>C:\projects\gcblue\GCblue\include;include;$(WXWIN)\include;$(WXWIN)\contrib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ShowProgress>false</ShowProgress>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>python27.lib;boost_python-vc110-mt-gd-1_55.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wxmsw30ud_adv.lib;wxmsw30ud_core.lib;wxbase30ud.lib;wxbase30ud_net.lib;wxbase30ud_xml.lib;wxzlibd.lib;wxpngd.lib;wxjpegd.lib;wxtiffd.lib;wxexpatd.lib;sqlited.lib;libogg_static_debug.lib;libvorbis_static.lib;libvorbisfile_static.lib;OpenAL32.lib;ALut.lib;oalpp_gcbd.lib;TV3D65.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ShowProgress>NotSet</ShowProgress>
+      <OutputFile>$(ProjectDir)/bin/BlueIId.exe</OutputFile>
+      <IgnoreSpecificDefaultLibraries>libcd.lib;libcid.lib;msvcrt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>D:\blue\bin\BlueIId.pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalOptions>/Zm500 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>include/sim;include/graphics;include/common;include/scriptinterface;include/database;include;D:\wxWidgets-3.0.0\include\msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;__WINDOWS__;__WXMSW__;__WXDEBUG__;WXDEBUG=1;__WIN95__;__WIN32__;WINVER=0x0400;STRICT;_WIN32_IMPLEMENTATION;TIXML_USE_STL;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderFile>stdwx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>Debug/gcblue.pch</PrecompiledHeaderOutputFile>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>C:\projects\gcblue\GCblue\include;include;$(WXWIN)\include;$(WXWIN)\contrib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ShowProgress>false</ShowProgress>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>python27.lib;boost_python-vc110-mt-gd-1_55.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wxmsw30ud_adv.lib;wxmsw30ud_core.lib;wxbase30ud.lib;wxbase30ud_net.lib;wxbase30ud_xml.lib;wxzlibd.lib;wxpngd.lib;wxjpegd.lib;wxtiffd.lib;wxexpatd.lib;sqlited.lib;libogg_static_debug.lib;libvorbis_static.lib;libvorbisfile_static.lib;OpenAL32.lib;ALut.lib;oalpp_gcbd.lib;TV3D65.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ShowProgress>NotSet</ShowProgress>
+      <OutputFile>$(ProjectDir)/bin/BlueIId.exe</OutputFile>
+      <IgnoreSpecificDefaultLibraries>libcd.lib;libcid.lib;msvcrt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>D:\blue\bin\BlueIId.pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/Zm500 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>include;include/sim;include/scriptinterface;include/common;include/graphics;include/database;D:\wxWidgets-2.9.4\contrib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;__WINDOWS__;__WXMSW__;__WIN95__;__WIN32__;WINVER=0x0400;STRICT;_WIN32_IMPLEMENTATION;TIXML_USE_STL;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>C:\projects\gcblue\GCblue\include;include;$(WXWIN)\include;$(WXWIN)\contrib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>boost_python-vc110-1_55.lib;python27.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wxmsw30u_core.lib;wxbase30u.lib;wxbase30u_net.lib;wxbase30u_xml.lib;wxmsw30u_adv.lib;wxzlib.lib;wxpng.lib;wxjpeg.lib;wxtiff.lib;wxexpat.lib;sqlite.lib;OpenAL32.lib;ALut.lib;oalpp_gcb.lib;libogg_static.lib;libvorbis_static.lib;libvorbisfile_static.lib;TV3D65.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(ProjectDir)/bin/$(ProjectName).exe</OutputFile>
+      <IgnoreSpecificDefaultLibraries>libc.lib;libci.lib;msvcrtd.lib;msvcp110d.lib;msvcr110d.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapFileName>$(ProjectDir)/bin/blue.map</MapFileName>
+      <MapExports>true</MapExports>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration />
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalOptions>/Zm500 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>include;include/sim;include/scriptinterface;include/common;include/graphics;include/database;D:\wxWidgets-2.9.4\contrib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;__WINDOWS__;__WXMSW__;__WIN95__;__WIN32__;WINVER=0x0400;STRICT;_WIN32_IMPLEMENTATION;TIXML_USE_STL;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>C:\projects\gcblue\GCblue\include;include;$(WXWIN)\include;$(WXWIN)\contrib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>boost_python-vc110-1_55.lib;python27.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wxmsw30u_core.lib;wxbase30u.lib;wxbase30u_net.lib;wxbase30u_xml.lib;wxmsw30u_adv.lib;wxzlib.lib;wxpng.lib;wxjpeg.lib;wxtiff.lib;wxexpat.lib;sqlite.lib;OpenAL32.lib;ALut.lib;oalpp_gcb.lib;libogg_static.lib;libvorbis_static.lib;libvorbisfile_static.lib;TV3D65.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(ProjectDir)/bin/$(ProjectName).exe</OutputFile>
+      <IgnoreSpecificDefaultLibraries>libc.lib;libci.lib;msvcrtd.lib;msvcp110d.lib;msvcr110d.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapFileName>$(ProjectDir)/bin/blue.map</MapFileName>
+      <MapExports>true</MapExports>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseD|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/Zm500 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>include;include/sim;include/scriptinterface;include/common;include/graphics;include/database;D:\wxMSW-2.8.9\contrib\include;D:\wxMSW-2.8.9\lib\vc_lib\msw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;__WINDOWS__;__WXMSW__;__WIN95__;__WIN32__;WINVER=0x0400;STRICT;_WIN32_IMPLEMENTATION;TIXML_USE_STL;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>C:\projects\gcblue\GCblue\include;include;$(WXWIN)\include;$(WXWIN)\contrib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>boost_python-vc90-mt-1_35.lib;python25.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wxmsw28_core.lib;wxbase28.lib;wxbase28_net.lib;wxzlib.lib;wxpng.lib;wxjpeg.lib;wxtiff.lib;sqlite.lib;OpenAL32.lib;ALut.lib;oalpp_gcb.lib;ogg_static.lib;vorbis_static.lib;vorbisfile_static.lib;TV3D65.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(ProjectDir)/bin/$(ProjectName).exe</OutputFile>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>libc.lib;libci.lib;msvcrtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapFileName>$(ProjectDir)/bin/blue.map</MapFileName>
+      <MapExports>true</MapExports>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration />
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseD|x64'">
+    <ClCompile>
+      <AdditionalOptions>/Zm500 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>include;include/sim;include/scriptinterface;include/common;include/graphics;include/database;D:\wxMSW-2.8.9\contrib\include;D:\wxMSW-2.8.9\lib\vc_lib\msw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;__WINDOWS__;__WXMSW__;__WIN95__;__WIN32__;WINVER=0x0400;STRICT;_WIN32_IMPLEMENTATION;TIXML_USE_STL;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>C:\projects\gcblue\GCblue\include;include;$(WXWIN)\include;$(WXWIN)\contrib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>boost_python-vc90-mt-1_35.lib;python25.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wxmsw28_core.lib;wxbase28.lib;wxbase28_net.lib;wxzlib.lib;wxpng.lib;wxjpeg.lib;wxtiff.lib;sqlite.lib;OpenAL32.lib;ALut.lib;oalpp_gcb.lib;ogg_static.lib;vorbis_static.lib;vorbisfile_static.lib;TV3D65.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(ProjectDir)/bin/$(ProjectName).exe</OutputFile>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>libc.lib;libci.lib;msvcrtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapFileName>$(ProjectDir)/bin/blue.map</MapFileName>
+      <MapExports>true</MapExports>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\common\AError.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\common\math_constants.cpp" />
+    <ClCompile Include="src\common\nsNav.cpp" />
+    <ClCompile Include="src\common\randfn.cpp" />
+    <ClCompile Include="src\common\simmath.cpp" />
+    <ClCompile Include="src\stdwx.cpp" />
+    <ClCompile Include="src\common\tcFile.cpp" />
+    <ClCompile Include="src\common\tcFloatCompressor.cpp" />
+    <ClCompile Include="src\common\tcGameStream.cpp" />
+    <ClCompile Include="src\common\tcObjStream.cpp" />
+    <ClCompile Include="src\common\tcOggStreamer.cpp" />
+    <ClCompile Include="src\common\tcOptions.cpp" />
+    <ClCompile Include="src\common\tcRect.cpp" />
+    <ClCompile Include="src\common\tcSound.cpp" />
+    <ClCompile Include="src\common\tcSoundConsole.cpp" />
+    <ClCompile Include="src\common\tcStream.cpp" />
+    <ClCompile Include="src\common\tcString.cpp" />
+    <ClCompile Include="src\common\tinystr.cpp" />
+    <ClCompile Include="src\common\tinyxml.cpp" />
+    <ClCompile Include="src\common\tinyxmlerror.cpp" />
+    <ClCompile Include="src\common\tinyxmlparser.cpp" />
+    <ClCompile Include="src\common\util.cpp" />
+    <ClCompile Include="src\graphics\ObjectUpdater.cpp" />
+    <ClCompile Include="src\graphics\tc3DModel.cpp" />
+    <ClCompile Include="src\graphics\tc3DTerrain.cpp" />
+    <ClCompile Include="src\graphics\tc3DViewer.cpp" />
+    <ClCompile Include="src\graphics\tc3DWindow2.cpp" />
+    <ClCompile Include="src\graphics\tcAARBrowsePanel.cpp" />
+    <ClCompile Include="src\graphics\tcAARInfoWindow.cpp" />
+    <ClCompile Include="src\graphics\tcAARViewer.cpp" />
+    <ClCompile Include="src\graphics\tcAIPanel.cpp" />
+    <ClCompile Include="src\graphics\tcAircraftInfoPopup.cpp" />
+    <ClCompile Include="src\graphics\tcAltitudeBarControl.cpp" />
+    <ClCompile Include="src\graphics\tcAreaEditObject.cpp" />
+    <ClCompile Include="src\graphics\tcBoundingBox.cpp" />
+    <ClCompile Include="src\graphics\tcBriefingView.cpp" />
+    <ClCompile Include="src\graphics\tcButton.cpp" />
+    <ClCompile Include="src\graphics\tcChatBox.cpp" />
+    <ClCompile Include="src\graphics\tcConsoleBox.cpp" />
+    <ClCompile Include="src\graphics\tcContainerGui.cpp" />
+    <ClCompile Include="src\graphics\tcContainerItem.cpp" />
+    <ClCompile Include="src\graphics\tcControl.cpp" />
+    <ClCompile Include="src\graphics\tcCreditView.cpp" />
+    <ClCompile Include="src\graphics\tcDatabaseBrowsePanel.cpp" />
+    <ClCompile Include="src\graphics\tcDatabaseInfoPanel.cpp" />
+    <ClCompile Include="src\graphics\tcDatabaseInfoWindow.cpp" />
+    <ClCompile Include="src\graphics\tcDatabaseViewer.cpp" />
+    <ClCompile Include="src\graphics\tcDatumEditObject.cpp" />
+    <ClCompile Include="src\graphics\tcDisplayModes.cpp" />
+    <ClCompile Include="src\graphics\tcDisplaySettingsView.cpp" />
+    <ClCompile Include="src\graphics\tcDraggableWindow.cpp" />
+    <ClCompile Include="src\graphics\tcDraggedIconDisplay.cpp" />
+    <ClCompile Include="src\graphics\tcDragStatus.cpp" />
+    <ClCompile Include="src\graphics\tcEditBox.cpp" />
+    <ClCompile Include="src\graphics\tcEntityContainerItem.cpp" />
+    <ClCompile Include="src\graphics\tcEventManager.cpp" />
+    <ClCompile Include="src\graphics\tcFIFO.cpp" />
+    <ClCompile Include="src\graphics\tcFlightPortGui.cpp" />
+    <ClCompile Include="src\graphics\tcFont.cpp" />
+    <ClCompile Include="src\graphics\tcFormationObject.cpp" />
+    <ClCompile Include="src\graphics\tcGameOutcomePopup.cpp" />
+    <ClCompile Include="src\graphics\tcGameView.cpp" />
+    <ClCompile Include="src\graphics\tcGeometry.cpp" />
+    <ClCompile Include="src\graphics\tcGoalAreaEditObject.cpp" />
+    <ClCompile Include="src\graphics\tcHookInfo.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='ReleaseD|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='ReleaseD|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\graphics\tcLauncherContainerItem.cpp" />
+    <ClCompile Include="src\graphics\tcLauncherPopup.cpp" />
+    <ClCompile Include="src\graphics\tcListBox.cpp" />
+    <ClCompile Include="src\graphics\tcMapAlertObject.cpp" />
+    <ClCompile Include="src\graphics\tcMapMissionObject.cpp" />
+    <ClCompile Include="src\graphics\tcMapObject.cpp" />
+    <ClCompile Include="src\graphics\tcMapOverlay.cpp" />
+    <ClCompile Include="src\graphics\tcMapView.cpp" />
+    <ClCompile Include="src\graphics\tcMessageCenter.cpp" />
+    <ClCompile Include="src\graphics\tcMessageChannel.cpp" />
+    <ClCompile Include="src\graphics\tcMessageInterface.cpp" />
+    <ClCompile Include="src\graphics\tcMissionGui.cpp" />
+    <ClCompile Include="src\graphics\tcMPGameView.cpp" />
+    <ClCompile Include="src\graphics\tcNetworkView.cpp" />
+    <ClCompile Include="src\graphics\tcNumberWidget.cpp" />
+    <ClCompile Include="src\graphics\tcOOBView.cpp" />
+    <ClCompile Include="src\graphics\tcOptionsView.cpp" />
+    <ClCompile Include="src\graphics\tcOptionsView2.cpp" />
+    <ClCompile Include="src\graphics\tcPanel.cpp" />
+    <ClCompile Include="src\graphics\tcPlatformAreaEditObject.cpp" />
+    <ClCompile Include="src\graphics\tcPlatformDebugPopup.cpp" />
+    <ClCompile Include="src\graphics\tcPlatformGui.cpp" />
+    <ClCompile Include="src\graphics\tcPopupControl.cpp" />
+    <ClCompile Include="src\graphics\tcPopupMessage.cpp" />
+    <ClCompile Include="src\graphics\tcPopupText.cpp" />
+    <ClCompile Include="src\graphics\tcRadioButton.cpp" />
+    <ClCompile Include="src\graphics\tcRandomBoxObject.cpp" />
+    <ClCompile Include="src\graphics\tcRegistered.cpp" />
+    <ClCompile Include="src\graphics\tcScenarioBrowsePanel.cpp" />
+    <ClCompile Include="src\graphics\tcScenarioDialog.cpp" />
+    <ClCompile Include="src\graphics\tcScenarioInfoWindow.cpp" />
+    <ClCompile Include="src\graphics\tcScenarioSelectView.cpp" />
+    <ClCompile Include="src\graphics\tcScrollBar.cpp" />
+    <ClCompile Include="src\graphics\tcSky.cpp" />
+    <ClCompile Include="src\graphics\tcSkyModel.cpp" />
+    <ClCompile Include="src\graphics\tcSlider.cpp" />
+    <ClCompile Include="src\graphics\tcSonarInfoPopup.cpp" />
+    <ClCompile Include="src\graphics\tcStartView.cpp" />
+    <ClCompile Include="src\graphics\tcStaticText.cpp" />
+    <ClCompile Include="src\graphics\tcStoresContainerItem.cpp" />
+    <ClCompile Include="src\graphics\tcStoresGui.cpp" />
+    <ClCompile Include="src\graphics\tcTabbedWindow.cpp" />
+    <ClCompile Include="src\graphics\tcTabHeader.cpp" />
+    <ClCompile Include="src\graphics\tcTacticalMapView.cpp" />
+    <ClCompile Include="src\graphics\tcTerrainTextureFactory.cpp" />
+    <ClCompile Include="src\graphics\tcTerrainView.cpp" />
+    <ClCompile Include="src\graphics\tcTextDialog.cpp" />
+    <ClCompile Include="src\graphics\tcTextEntryBox.cpp" />
+    <ClCompile Include="src\graphics\tcTexture2D.cpp" />
+    <ClCompile Include="src\graphics\tcTVEngine.cpp" />
+    <ClCompile Include="src\graphics\tcWaypointPopup.cpp" />
+    <ClCompile Include="src\graphics\tcWaypointTaskPopup.cpp" />
+    <ClCompile Include="src\graphics\tcWorldMapView.cpp" />
+    <ClCompile Include="src\graphics\tcXmlWindow.cpp" />
+    <ClCompile Include="src\scriptinterface\tcFlightPortInterface.cpp" />
+    <ClCompile Include="src\scriptinterface\tcGroupInterface.cpp" />
+    <ClCompile Include="src\scriptinterface\tcMissionInterface.cpp" />
+    <ClCompile Include="src\scriptinterface\tcPanelInterface.cpp" />
+    <ClCompile Include="src\scriptinterface\tcPlatformInterface.cpp" />
+    <ClCompile Include="src\scriptinterface\tcPlatformInterfaceExtension.cpp" />
+    <ClCompile Include="src\scriptinterface\tcPlatformInterfaceExtensionB.cpp" />
+    <ClCompile Include="src\scriptinterface\tcPythonInterface.cpp" />
+    <ClCompile Include="src\scriptinterface\tcScenarioInterface.cpp" />
+    <ClCompile Include="src\scriptinterface\tcScenarioLogger.cpp" />
+    <ClCompile Include="src\scriptinterface\tcScenarioRandomizer.cpp" />
+    <ClCompile Include="src\scriptinterface\tcSimPythonInterface.cpp" />
+    <ClCompile Include="src\scriptinterface\tcStringArray.cpp" />
+    <ClCompile Include="src\scriptinterface\tcSubInterface.cpp" />
+    <ClCompile Include="src\scriptinterface\tcTrackInterface.cpp" />
+    <ClCompile Include="src\scriptinterface\tcWeaponInterface.cpp" />
+    <ClCompile Include="src\sim\Game.cpp" />
+    <ClCompile Include="src\sim\gcb.cpp" />
+    <ClCompile Include="src\sim\tcAero.cpp" />
+    <ClCompile Include="src\sim\tcAeroAirObject.cpp" />
+    <ClCompile Include="src\sim\tcAirCM.cpp" />
+    <ClCompile Include="src\sim\tcAirfieldObject.cpp" />
+    <ClCompile Include="src\sim\tcAirObject.cpp" />
+    <ClCompile Include="src\sim\tcAllianceInfo.cpp" />
+    <ClCompile Include="src\sim\tcAllianceSensorMap.cpp" />
+    <ClCompile Include="src\sim\tcBallisticMissile.cpp" />
+    <ClCompile Include="src\sim\tcBallisticWeapon.cpp" />
+    <ClCompile Include="src\sim\tcCarrierObject.cpp" />
+    <ClCompile Include="src\sim\tcCommandObject.cpp" />
+    <ClCompile Include="src\sim\tcCommandQueue.cpp" />
+    <ClCompile Include="src\sim\tcControllableObject.cpp" />
+    <ClCompile Include="src\sim\tcDamageModel.cpp" />
+    <ClCompile Include="src\sim\tcDateTime.cpp" />
+    <ClCompile Include="src\sim\tcDemTileReader.cpp" />
+    <ClCompile Include="src\sim\tcDirector.cpp" />
+    <ClCompile Include="src\sim\tcDirectorEvent.cpp" />
+    <ClCompile Include="src\sim\tcECM.cpp" />
+    <ClCompile Include="src\sim\tcEngagementData.cpp" />
+    <ClCompile Include="src\sim\tcESMSensor.cpp" />
+    <ClCompile Include="src\sim\tcFlightOpsObject.cpp" />
+    <ClCompile Include="src\sim\tcFlightPort.cpp" />
+    <ClCompile Include="src\sim\tcFormation.cpp" />
+    <ClCompile Include="src\sim\tcGameObject.cpp" />
+    <ClCompile Include="src\sim\tcGameObjIterator.cpp" />
+    <ClCompile Include="src\sim\tcGameSerializer.cpp" />
+    <ClCompile Include="src\sim\tcGoal.cpp" />
+    <ClCompile Include="src\sim\tcGoalTracker.cpp" />
+    <ClCompile Include="src\sim\tcGroundObject.cpp" />
+    <ClCompile Include="src\sim\tcGroundVehicleObject.cpp" />
+    <ClCompile Include="src\sim\tcGuidanceState.cpp" />
+    <ClCompile Include="src\sim\tcGuidedBomb.cpp" />
+    <ClCompile Include="src\sim\tcHeloObject.cpp" />
+    <ClCompile Include="src\sim\tcLauncher.cpp" />
+    <ClCompile Include="src\sim\tcLauncherState.cpp" />
+    <ClCompile Include="src\sim\tcLaunchRequest.cpp" />
+    <ClCompile Include="src\sim\tcLOS.cpp" />
+    <ClCompile Include="src\sim\tcMapData.cpp" />
+    <ClCompile Include="src\sim\tcMatrix3.cpp" />
+    <ClCompile Include="src\sim\tcMenu.cpp" />
+    <ClCompile Include="src\sim\tcMissileObject.cpp" />
+    <ClCompile Include="src\sim\tcObjectControl.cpp" />
+    <ClCompile Include="src\sim\tcOpticalSensor.cpp" />
+    <ClCompile Include="src\sim\tcPlatformObject.cpp" />
+    <ClCompile Include="src\sim\tcPositionRegistry.cpp" />
+    <ClCompile Include="src\sim\tcRadar.cpp" />
+    <ClCompile Include="src\sim\tcRocket.cpp" />
+    <ClCompile Include="src\sim\tcSensorMap.cpp" />
+    <ClCompile Include="src\sim\tcSensorMapTrack.cpp" />
+    <ClCompile Include="src\sim\tcSensorPlatform.cpp" />
+    <ClCompile Include="src\sim\tcSensorReport.cpp" />
+    <ClCompile Include="src\sim\tcSensorState.cpp" />
+    <ClCompile Include="src\sim\tcSensorTrackIterator.cpp" />
+    <ClCompile Include="src\sim\tcSimState.cpp" />
+    <ClCompile Include="src\sim\tcSonar.cpp" />
+    <ClCompile Include="src\sim\tcSonarEnvironment.cpp" />
+    <ClCompile Include="src\sim\tcSonarRay.cpp" />
+    <ClCompile Include="src\sim\tcSonobuoy.cpp" />
+    <ClCompile Include="src\sim\tcStores.cpp" />
+    <ClCompile Include="src\sim\tcSubObject.cpp" />
+    <ClCompile Include="src\sim\tcSurfaceObject.cpp" />
+    <ClCompile Include="src\sim\tcTime.cpp" />
+    <ClCompile Include="src\sim\tcTorpedoObject.cpp" />
+    <ClCompile Include="src\sim\tcTrack.cpp" />
+    <ClCompile Include="src\sim\tcUnits.cpp" />
+    <ClCompile Include="src\sim\tcUserInfo.cpp" />
+    <ClCompile Include="src\sim\tcUserSelectedGroups.cpp" />
+    <ClCompile Include="src\sim\tcWaterCM.cpp" />
+    <ClCompile Include="src\sim\tcWeaponObject.cpp" />
+    <ClCompile Include="src\sim\tcWeaponTester.cpp" />
+    <ClCompile Include="src\database\CsvTranslator.cpp" />
+    <ClCompile Include="src\database\md5c.c" />
+    <ClCompile Include="src\database\md5class.cpp" />
+    <ClCompile Include="src\database\tcAccountDatabase.cpp" />
+    <ClCompile Include="src\database\tcAcousticModel.cpp" />
+    <ClCompile Include="src\database\tcAirDBObject.cpp" />
+    <ClCompile Include="src\database\tcAirDetectionDBObject.cpp" />
+    <ClCompile Include="src\database\tcBallisticDBObject.cpp" />
+    <ClCompile Include="src\database\tcBallisticMissileDBObject.cpp" />
+    <ClCompile Include="src\database\tcCounterMeasureDBObject.cpp" />
+    <ClCompile Include="src\database\tcCountryData.cpp" />
+    <ClCompile Include="src\database\tcCountryNameChanges.cpp" />
+    <ClCompile Include="src\database\tcDamageEffect.cpp" />
+    <ClCompile Include="src\database\tcDatabase.cpp" />
+    <ClCompile Include="src\database\tcDatabaseIterator.cpp" />
+    <ClCompile Include="src\database\tcDatabaseObject.cpp" />
+    <ClCompile Include="src\database\tcDBString.cpp" />
+    <ClCompile Include="src\database\tcECMDBObject.cpp" />
+    <ClCompile Include="src\database\tcESMDBObject.cpp" />
+    <ClCompile Include="src\database\tcFlightportDBObject.cpp" />
+    <ClCompile Include="src\database\tcFuelTankDBObject.cpp" />
+    <ClCompile Include="src\database\tcGroundDBObject.cpp" />
+    <ClCompile Include="src\database\tcItemDBObject.cpp" />
+    <ClCompile Include="src\database\tcJetDBObject.cpp" />
+    <ClCompile Include="src\database\tcLauncherDBObject.cpp" />
+    <ClCompile Include="src\database\tcLoadoutData.cpp" />
+    <ClCompile Include="src\database\tcMissileDBObject.cpp" />
+    <ClCompile Include="src\database\tcOpticalDBObject.cpp" />
+    <ClCompile Include="src\database\tcPlatformDBObject.cpp" />
+    <ClCompile Include="src\database\tcRadarDBObject.cpp" />
+    <ClCompile Include="src\database\tcSensorDBObject.cpp" />
+    <ClCompile Include="src\database\tcSensorPlatformDBObject.cpp" />
+    <ClCompile Include="src\database\tcShipDBObject.cpp" />
+    <ClCompile Include="src\database\tcSignatureModel.cpp" />
+    <ClCompile Include="src\database\tcSimpleAirDBObject.cpp" />
+    <ClCompile Include="src\database\tcSonarDBObject.cpp" />
+    <ClCompile Include="src\database\tcSonobuoyDBObject.cpp" />
+    <ClCompile Include="src\database\tcSqlReader.cpp" />
+    <ClCompile Include="src\database\tcStoresDBObject.cpp" />
+    <ClCompile Include="src\database\tcSubDBObject.cpp" />
+    <ClCompile Include="src\database\tcTableObject.cpp" />
+    <ClCompile Include="src\database\tcTorpedoDBObject.cpp" />
+    <ClCompile Include="src\database\tcWaterDetectionDBObject.cpp" />
+    <ClCompile Include="src\database\tcWeaponDamage.cpp" />
+    <ClCompile Include="src\database\tcWeaponDBObject.cpp" />
+    <ClCompile Include="src\network\tcAuthenticationMessageHandler.cpp" />
+    <ClCompile Include="src\network\tcConnectionData.cpp" />
+    <ClCompile Include="src\network\tcControlMessageHandler.cpp" />
+    <ClCompile Include="src\network\tcMessage.cpp" />
+    <ClCompile Include="src\network\tcMessageHandler.cpp" />
+    <ClCompile Include="src\network\tcMultiplayerInterface.cpp" />
+    <ClCompile Include="src\network\tcNetworkInterface.cpp" />
+    <ClCompile Include="src\network\tcTextMessageHandler.cpp" />
+    <ClCompile Include="src\network\tcUpdateMessageHandler.cpp" />
+    <ClCompile Include="src\sqlite\sqlite3x_command.cpp" />
+    <ClCompile Include="src\sqlite\sqlite3x_connection.cpp" />
+    <ClCompile Include="src\sqlite\sqlite3x_exception.cpp" />
+    <ClCompile Include="src\sqlite\sqlite3x_reader.cpp" />
+    <ClCompile Include="src\sqlite\sqlite3x_transaction.cpp" />
+    <ClCompile Include="src\ai\Blackboard.cpp" />
+    <ClCompile Include="src\ai\BlackboardInterface.cpp" />
+    <ClCompile Include="src\ai\BlackboardItem.cpp" />
+    <ClCompile Include="src\ai\Brain.cpp" />
+    <ClCompile Include="src\ai\Nav.cpp" />
+    <ClCompile Include="src\ai\PointDefense.cpp" />
+    <ClCompile Include="src\ai\Route.cpp" />
+    <ClCompile Include="src\ai\ScriptedTask.cpp" />
+    <ClCompile Include="src\ai\ScriptedTaskInterface.cpp" />
+    <ClCompile Include="src\ai\SelfPreservation.cpp" />
+    <ClCompile Include="src\ai\Task.cpp" />
+    <ClCompile Include="src\ai\tcAttackMission.cpp" />
+    <ClCompile Include="src\ai\tcCAPMission.cpp" />
+    <ClCompile Include="src\ai\tcMission.cpp" />
+    <ClCompile Include="src\ai\tcMissionManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\BlueII.ico" />
+    <Image Include="res\GCblue.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GCblue.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="res\resource.h" />
+    <ClInclude Include="include\stdwx.h" />
+    <ClInclude Include="include\common\AError.h" />
+    <ClInclude Include="include\common\gctypes.h" />
+    <ClInclude Include="include\common\math_constants.h" />
+    <ClInclude Include="include\common\nsNav.h" />
+    <ClInclude Include="include\common\randfn.h" />
+    <ClInclude Include="include\common\Resource.h" />
+    <ClInclude Include="include\common\simmath.h" />
+    <ClInclude Include="include\common\tc3DPoint.h" />
+    <ClInclude Include="include\common\tcFile.h" />
+    <ClInclude Include="include\common\tcFloatCompressor.h" />
+    <ClInclude Include="include\common\tcGameStream.h" />
+    <ClInclude Include="include\common\tcObjStream.h" />
+    <ClInclude Include="include\common\tcOggStreamer.h" />
+    <ClInclude Include="include\common\tcOptions.h" />
+    <ClInclude Include="include\common\tcRect.h" />
+    <ClInclude Include="include\common\tcSound.h" />
+    <ClInclude Include="include\common\tcSoundConsole.h" />
+    <ClInclude Include="include\common\tcStream.h" />
+    <ClInclude Include="include\common\tcString.h" />
+    <ClInclude Include="include\common\tinystr.h" />
+    <ClInclude Include="include\common\tinyxml.h" />
+    <ClInclude Include="include\common\util.h" />
+    <ClInclude Include="include\common\wxcommands.h" />
+    <ClInclude Include="include\graphics\ObjectUpdater.h" />
+    <ClInclude Include="include\graphics\ScenarioInfo.h" />
+    <ClInclude Include="include\graphics\tc3DModel.h" />
+    <ClInclude Include="include\graphics\tc3DTerrain.h" />
+    <ClInclude Include="include\graphics\tc3DViewer.h" />
+    <ClInclude Include="include\graphics\tc3DWindow2.h" />
+    <ClInclude Include="include\graphics\tcAARBrowsePanel.h" />
+    <ClInclude Include="include\graphics\tcAARInfoWindow.h" />
+    <ClInclude Include="include\graphics\tcAARViewer.h" />
+    <ClInclude Include="include\graphics\tcAIPanel.h" />
+    <ClInclude Include="include\graphics\tcAircraftInfoPopup.h" />
+    <ClInclude Include="include\graphics\tcAltitudeBarControl.h" />
+    <ClInclude Include="include\graphics\tcAreaEditObject.h" />
+    <ClInclude Include="include\graphics\tcBoundingBox.h" />
+    <ClInclude Include="include\graphics\tcBriefingView.h" />
+    <ClInclude Include="include\graphics\tcButton.h" />
+    <ClInclude Include="include\graphics\tcChatBox.h" />
+    <ClInclude Include="include\graphics\tcConsoleBox.h" />
+    <ClInclude Include="include\graphics\tcContainerGui.h" />
+    <ClInclude Include="include\graphics\tcContainerItem.h" />
+    <ClInclude Include="include\graphics\tcControl.h" />
+    <ClInclude Include="include\graphics\tcCreditView.h" />
+    <ClInclude Include="include\graphics\tcDatabaseBrowsePanel.h" />
+    <ClInclude Include="include\graphics\tcDatabaseInfoPanel.h" />
+    <ClInclude Include="include\graphics\tcDatabaseInfoWindow.h" />
+    <ClInclude Include="include\graphics\tcDatabaseViewer.h" />
+    <ClInclude Include="include\graphics\tcDatumEditObject.h" />
+    <ClInclude Include="include\graphics\tcDisplayModes.h" />
+    <ClInclude Include="include\graphics\tcDisplaySettingsView.h" />
+    <ClInclude Include="include\graphics\tcDraggableWindow.h" />
+    <ClInclude Include="include\graphics\tcDraggedIconDisplay.h" />
+    <ClInclude Include="include\graphics\tcDragStatus.h" />
+    <ClInclude Include="include\graphics\tcEditBox.h" />
+    <ClInclude Include="include\graphics\tcEntityContainerItem.h" />
+    <ClInclude Include="include\graphics\tcEventManager.h" />
+    <ClInclude Include="include\graphics\tcFIFO.h" />
+    <ClInclude Include="include\graphics\tcFlightportGui.h" />
+    <ClInclude Include="include\graphics\tcFont.h" />
+    <ClInclude Include="include\graphics\tcFormationObject.h" />
+    <ClInclude Include="include\graphics\tcGameOutcomePopup.h" />
+    <ClInclude Include="include\graphics\tcGameView.h" />
+    <ClInclude Include="include\graphics\tcGeometry.h" />
+    <ClInclude Include="include\graphics\tcGoalAreaEditObject.h" />
+    <ClInclude Include="include\graphics\tcHookInfo.h" />
+    <ClInclude Include="include\graphics\tcLauncherContainerItem.h" />
+    <ClInclude Include="include\graphics\tcLauncherPopup.h" />
+    <ClInclude Include="include\graphics\tcListBox.h" />
+    <ClInclude Include="include\graphics\tcMapAlertObject.h" />
+    <ClInclude Include="include\graphics\tcMapMissionObject.h" />
+    <ClInclude Include="include\graphics\tcMapObject.h" />
+    <ClInclude Include="include\graphics\tcMapOverlay.h" />
+    <ClInclude Include="include\graphics\tcMapView.h" />
+    <ClInclude Include="include\graphics\tcMessageCenter.h" />
+    <ClInclude Include="include\graphics\tcMessageChannel.h" />
+    <ClInclude Include="include\graphics\tcMessageInterface.h" />
+    <ClInclude Include="include\graphics\tcMissionGui.h" />
+    <ClInclude Include="include\graphics\tcMPGameView.h" />
+    <ClInclude Include="include\graphics\tcNetworkView.h" />
+    <ClInclude Include="include\graphics\tcNumberWidget.h" />
+    <ClInclude Include="include\graphics\tcOOBView.h" />
+    <ClInclude Include="include\graphics\tcOptionsView.h" />
+    <ClInclude Include="include\graphics\tcOptionsView2.h" />
+    <ClInclude Include="include\graphics\tcPanel.h" />
+    <ClInclude Include="include\graphics\tcPlatformAreaEditObject.h" />
+    <ClInclude Include="include\graphics\tcPlatformDebugPopup.h" />
+    <ClInclude Include="include\graphics\tcPlatformGui.h" />
+    <ClInclude Include="include\graphics\tcPopupControl.h" />
+    <ClInclude Include="include\graphics\tcPopupMessage.h" />
+    <ClInclude Include="include\graphics\tcPopupText.h" />
+    <ClInclude Include="include\graphics\tcRadioButton.h" />
+    <ClInclude Include="include\graphics\tcRandomBoxObject.h" />
+    <ClInclude Include="include\graphics\tcRegistered.h" />
+    <ClInclude Include="include\graphics\tcScenarioBrowsePanel.h" />
+    <ClInclude Include="include\graphics\tcScenarioDialog.h" />
+    <ClInclude Include="include\graphics\tcScenarioInfoWindow.h" />
+    <ClInclude Include="include\graphics\tcScenarioSelectView.h" />
+    <ClInclude Include="include\graphics\tcScrollBar.h" />
+    <ClInclude Include="include\graphics\tcSky.h" />
+    <ClInclude Include="include\graphics\tcSkyModel.h" />
+    <ClInclude Include="include\graphics\tcSlider.h" />
+    <ClInclude Include="include\graphics\tcSonarInfoPopup.h" />
+    <ClInclude Include="include\graphics\tcStartView.h" />
+    <ClInclude Include="include\graphics\tcStaticText.h" />
+    <ClInclude Include="include\graphics\tcStoresContainerItem.h" />
+    <ClInclude Include="include\graphics\tcStoresGui.h" />
+    <ClInclude Include="include\graphics\tcTabbedWindow.h" />
+    <ClInclude Include="include\graphics\tcTabHeader.h" />
+    <ClInclude Include="include\graphics\tcTacticalMapView.h" />
+    <ClInclude Include="include\graphics\tcTerrainTextureFactory.h" />
+    <ClInclude Include="include\graphics\tcTerrainView.h" />
+    <ClInclude Include="include\graphics\tcTextDialog.h" />
+    <ClInclude Include="include\graphics\tcTextEntryBox.h" />
+    <ClInclude Include="include\graphics\tcTexture2D.h" />
+    <ClInclude Include="include\graphics\tcTVEngine.h" />
+    <ClInclude Include="include\graphics\tcWaypointPopup.h" />
+    <ClInclude Include="include\graphics\tcWaypointTaskPopup.h" />
+    <ClInclude Include="include\graphics\tcWorldMapView.h" />
+    <ClInclude Include="include\graphics\tcXmlWindow.h" />
+    <ClInclude Include="include\scriptinterface\tcFlightPortInterface.h" />
+    <ClInclude Include="include\scriptinterface\tcGroupInterface.h" />
+    <ClInclude Include="include\scriptinterface\tcMissionInterface.h" />
+    <ClInclude Include="include\scriptinterface\tcPanelInterface.h" />
+    <ClInclude Include="include\scriptinterface\tcPlatformInterface.h" />
+    <ClInclude Include="include\scriptinterface\tcPythonInterface.h" />
+    <ClInclude Include="include\scriptinterface\tcScenarioInterface.h" />
+    <ClInclude Include="include\scriptinterface\tcScenarioLogger.h" />
+    <ClInclude Include="include\scriptinterface\tcScenarioRandomizer.h" />
+    <ClInclude Include="include\scriptinterface\tcSimPythonInterface.h" />
+    <ClInclude Include="include\scriptinterface\tcStringArray.h" />
+    <ClInclude Include="include\scriptinterface\tcSubInterface.h" />
+    <ClInclude Include="include\scriptinterface\tcTrackInterface.h" />
+    <ClInclude Include="include\scriptinterface\tcWeaponInterface.h" />
+    <ClInclude Include="include\sim\commandlist.h" />
+    <ClInclude Include="include\sim\Game.h" />
+    <ClInclude Include="include\sim\gcb.h" />
+    <ClInclude Include="include\sim\mapsymbols.h" />
+    <ClInclude Include="include\sim\tcAero.h" />
+    <ClInclude Include="include\sim\tcAeroAirObject.h" />
+    <ClInclude Include="include\sim\tcAirCM.h" />
+    <ClInclude Include="include\sim\tcAirfieldObject.h" />
+    <ClInclude Include="include\sim\tcAirObject.h" />
+    <ClInclude Include="include\sim\tcAllianceInfo.h" />
+    <ClInclude Include="include\sim\tcAllianceSensorMap.h" />
+    <ClInclude Include="include\sim\tcBallisticMissile.h" />
+    <ClInclude Include="include\sim\tcBallisticWeapon.h" />
+    <ClInclude Include="include\sim\tcCarrierObject.h" />
+    <ClInclude Include="include\sim\tcCommandObject.h" />
+    <ClInclude Include="include\sim\tcCommandQueue.h" />
+    <ClInclude Include="include\sim\tcControllableObject.h" />
+    <ClInclude Include="include\sim\tcDamageModel.h" />
+    <ClInclude Include="include\sim\tcDateTime.h" />
+    <ClInclude Include="include\sim\tcDemTileReader.h" />
+    <ClInclude Include="include\sim\tcDirector.h" />
+    <ClInclude Include="include\sim\tcDirectorEvent.h" />
+    <ClInclude Include="include\sim\tcECM.h" />
+    <ClInclude Include="include\sim\tcEngagementData.h" />
+    <ClInclude Include="include\sim\tcESMSensor.h" />
+    <ClInclude Include="include\sim\tcFlightOpsObject.h" />
+    <ClInclude Include="include\sim\tcFlightPort.h" />
+    <ClInclude Include="include\sim\tcFormation.h" />
+    <ClInclude Include="include\sim\tcGameObject.h" />
+    <ClInclude Include="include\sim\tcGameObjIterator.h" />
+    <ClInclude Include="include\sim\tcGameSerializer.h" />
+    <ClInclude Include="include\sim\tcGoal.h" />
+    <ClInclude Include="include\sim\tcGoalTracker.h" />
+    <ClInclude Include="include\sim\tcGroundObject.h" />
+    <ClInclude Include="include\sim\tcGroundVehicleObject.h" />
+    <ClInclude Include="include\sim\tcGuidanceState.h" />
+    <ClInclude Include="include\sim\tcGuidedBomb.h" />
+    <ClInclude Include="include\sim\tcHeloObject.h" />
+    <ClInclude Include="include\sim\tcLauncher.h" />
+    <ClInclude Include="include\sim\tcLauncherState.h" />
+    <ClInclude Include="include\sim\tcLaunchRequest.h" />
+    <ClInclude Include="include\sim\tcLOS.h" />
+    <ClInclude Include="include\sim\tcMapData.h" />
+    <ClInclude Include="include\sim\tcMatrix3.h" />
+    <ClInclude Include="include\sim\tcMenu.h" />
+    <ClInclude Include="include\sim\tcMissileObject.h" />
+    <ClInclude Include="include\sim\tcObjectControl.h" />
+    <ClInclude Include="include\sim\tcOpticalSensor.h" />
+    <ClInclude Include="include\sim\tcPlatformObject.h" />
+    <ClInclude Include="include\sim\tcPool.h" />
+    <ClInclude Include="include\sim\tcPositionRegistry.h" />
+    <ClInclude Include="include\sim\tcRadar.h" />
+    <ClInclude Include="include\sim\tcRocket.h" />
+    <ClInclude Include="include\sim\tcSensorMap.h" />
+    <ClInclude Include="include\sim\tcSensorMapTrack.h" />
+    <ClInclude Include="include\sim\tcSensorPlatform.h" />
+    <ClInclude Include="include\sim\tcSensorReport.h" />
+    <ClInclude Include="include\sim\tcSensorState.h" />
+    <ClInclude Include="include\sim\tcSensorTrackIterator.h" />
+    <ClInclude Include="include\sim\tcSimState.h" />
+    <ClInclude Include="include\sim\tcSonar.h" />
+    <ClInclude Include="include\sim\tcSonarEnvironment.h" />
+    <ClInclude Include="include\sim\tcSonarRay.h" />
+    <ClInclude Include="include\sim\tcSonobuoy.h" />
+    <ClInclude Include="include\sim\tcStores.h" />
+    <ClInclude Include="include\sim\tcSubObject.h" />
+    <ClInclude Include="include\sim\tcSurfaceObject.h" />
+    <ClInclude Include="include\sim\tcTime.h" />
+    <ClInclude Include="include\sim\tcTorpedoObject.h" />
+    <ClInclude Include="include\sim\tcTrack.h" />
+    <ClInclude Include="include\sim\tcUnits.h" />
+    <ClInclude Include="include\sim\tcUserInfo.h" />
+    <ClInclude Include="include\sim\tcUserSelectedGroups.h" />
+    <ClInclude Include="include\sim\tcWaterCM.h" />
+    <ClInclude Include="include\sim\tcWeaponObject.h" />
+    <ClInclude Include="include\sim\tcWeaponTester.h" />
+    <ClInclude Include="include\sim\tsSensorState.h" />
+    <ClInclude Include="include\database\CsvTranslator.h" />
+    <ClInclude Include="include\database\md5.h" />
+    <ClInclude Include="include\database\md5class.h" />
+    <ClInclude Include="include\database\tcAccountDatabase.h" />
+    <ClInclude Include="include\database\tcAcousticModel.h" />
+    <ClInclude Include="include\database\tcAirDBObject.h" />
+    <ClInclude Include="include\database\tcAirDetectionDBObject.h" />
+    <ClInclude Include="include\database\tcBallisticDBObject.h" />
+    <ClInclude Include="include\database\tcBallisticMissileDBObject.h" />
+    <ClInclude Include="include\database\tcCounterMeasureDBObject.h" />
+    <ClInclude Include="include\database\tcCountryData.h" />
+    <ClInclude Include="include\database\tcDamageEffect.h" />
+    <ClInclude Include="include\database\tcDatabase.h" />
+    <ClInclude Include="include\database\tcDatabaseIterator.h" />
+    <ClInclude Include="include\database\tcDatabaseObject.h" />
+    <ClInclude Include="include\database\tcDatabaseTable.h" />
+    <ClInclude Include="include\database\tcDBMapSerializerSql.h" />
+    <ClInclude Include="include\database\tcDBObjSerializer.h" />
+    <ClInclude Include="include\database\tcDBObjSerializerSql.h" />
+    <ClInclude Include="include\database\tcDBString.h" />
+    <ClInclude Include="include\database\tcECMDBObject.h" />
+    <ClInclude Include="include\database\tcESMDBObject.h" />
+    <ClInclude Include="include\database\tcFlightportDBObject.h" />
+    <ClInclude Include="include\database\tcFuelTankDBObject.h" />
+    <ClInclude Include="include\database\tcGroundDBObject.h" />
+    <ClInclude Include="include\database\tcItemDBObject.h" />
+    <ClInclude Include="include\database\tcJetDBObject.h" />
+    <ClInclude Include="include\database\tcLauncherDBObject.h" />
+    <ClInclude Include="include\database\tcLoadoutData.h" />
+    <ClInclude Include="include\database\tcMissileDBObject.h" />
+    <ClInclude Include="include\database\tcOpticalDBObject.h" />
+    <ClInclude Include="include\database\tcPlatformDBObject.h" />
+    <ClInclude Include="include\database\tcPlatformSetupContainers.h" />
+    <ClInclude Include="include\database\tcPlayerDatabase.h" />
+    <ClInclude Include="include\database\tcRadarDBObject.h" />
+    <ClInclude Include="include\database\tcSensorDBObject.h" />
+    <ClInclude Include="include\database\tcSensorPlatformDBObject.h" />
+    <ClInclude Include="include\database\tcShipDBObject.h" />
+    <ClInclude Include="include\database\tcSignatureModel.h" />
+    <ClInclude Include="include\database\tcSimpleAirDBObject.h" />
+    <ClInclude Include="include\database\tcSonarDBObject.h" />
+    <ClInclude Include="include\database\tcSonobuoyDBObject.h" />
+    <ClInclude Include="include\database\tcSqlReader.h" />
+    <ClInclude Include="include\database\tcStoresDBObject.h" />
+    <ClInclude Include="include\database\tcSubDBObject.h" />
+    <ClInclude Include="include\database\tcTableObject.h" />
+    <ClInclude Include="include\database\tcTorpedoDBObject.h" />
+    <ClInclude Include="include\database\tcWaterDetectionDBObject.h" />
+    <ClInclude Include="include\database\tcWeaponDamage.h" />
+    <ClInclude Include="include\database\tcWeaponDBObject.h" />
+    <ClInclude Include="include\network\tcAuthenticationMessageHandler.h" />
+    <ClInclude Include="include\network\tcConnectionData.h" />
+    <ClInclude Include="include\network\tcControlMessageHandler.h" />
+    <ClInclude Include="include\network\tcMessage.h" />
+    <ClInclude Include="include\network\tcMessageHandler.h" />
+    <ClInclude Include="include\network\tcMultiplayerInterface.h" />
+    <ClInclude Include="include\network\tcNetworkInterface.h" />
+    <ClInclude Include="include\network\tcTextMessageHandler.h" />
+    <ClInclude Include="include\network\tcUpdateMessageHandler.h" />
+    <ClInclude Include="include\sqlite\sqlite3x.hpp" />
+    <ClInclude Include="include\ai\Blackboard.h" />
+    <ClInclude Include="include\ai\BlackboardInterface.h" />
+    <ClInclude Include="include\ai\BlackboardItem.h" />
+    <ClInclude Include="include\ai\Brain.h" />
+    <ClInclude Include="include\ai\MissionAircraftInfo.h" />
+    <ClInclude Include="include\ai\Nav.h" />
+    <ClInclude Include="include\ai\PointDefense.h" />
+    <ClInclude Include="include\ai\Route.h" />
+    <ClInclude Include="include\ai\ScriptedTask.h" />
+    <ClInclude Include="include\ai\ScriptedTaskInterface.h" />
+    <ClInclude Include="include\ai\SelfPreservation.h" />
+    <ClInclude Include="include\ai\Task.h" />
+    <ClInclude Include="include\ai\tcAttackMission.h" />
+    <ClInclude Include="include\ai\tcCAPMission.h" />
+    <ClInclude Include="include\ai\tcMission.h" />
+    <ClInclude Include="include\ai\tcMissionManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram11.cd" />
+    <None Include="ClassDiagram12.cd" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

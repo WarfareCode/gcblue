@@ -1,0 +1,14 @@
+<particle-system>
+  <emitter type="billboard" max-particles="150" id="0" size="1" location="0/0/0" direction="1/0/0" directional="True" randomdirectionfactor="0/0/0" power="1" lifetime="30" shape="0" texture="particles\nebula.dds" color="0,0.2,0.7,1" speed="200" usegravity="False" gravity="0/0/0" alphachange="1" alphablending="1" alphatest="True" alpharef="0" alphadepthwrite="False" boxsize="0/0/0" sphereradius="0" looping="True">
+    <emitter-keyframes>
+      <keyframe id="0" key="1" location="0/0/0" direction="0/0/0" power="0" lifetime="0" color="1,1,1,0.5" speed="0" boxsize="1/1/5" sphereradius="0" />
+      <keyframe id="1" key="3" location="0/0/0" direction="0/0/0" power="0" lifetime="0" color="1,1,1,0.3" speed="0" boxsize="1/1/5" sphereradius="0" />
+    </emitter-keyframes>
+  </emitter>
+  <emitter type="billboard" max-particles="100" id="1" size="1" location="0/0/0" direction="-1/0/0" directional="True" randomdirectionfactor="0/0/0" power="1" lifetime="30" shape="0" texture="particles\nebula.dds" color="0,0.2,0.7,1" speed="200" usegravity="False" gravity="0/0/0" alphachange="1" alphablending="1" alphatest="True" alpharef="0" alphadepthwrite="False" boxsize="0/0/0" sphereradius="0" looping="True">
+    <emitter-keyframes>
+      <keyframe id="0" key="1" location="0/0/0" direction="0/0/0" power="0" lifetime="0" color="1,1,1,0.5" speed="0" boxsize="1/1/5" sphereradius="0" />
+      <keyframe id="1" key="3" location="0/0/0" direction="0/0/0" power="0" lifetime="0" color="1,1,1,0.3" speed="0" boxsize="1/1/5" sphereradius="0" />
+    </emitter-keyframes>
+  </emitter>
+</particle-system>

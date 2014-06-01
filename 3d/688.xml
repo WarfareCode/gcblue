@@ -1,0 +1,12 @@
+<Model File="688.tvm"/>
+<Info Author="3d cafe" Notes=""/>
+<Smoke X="0" Z="-50.0" Y="0"/>
+<Launcher X="0" Z="-2.3" Y="0" Az="0" El="0"/>
+<Launcher X="2.0" Z="45.0" Y="-1.8" Az="0" El="0"/>
+<Launcher X="0.2" Z="45.0" Y="-1.8" Az="0" El="0"/>
+<Launcher X="-0.2" Z="45.0" Y="-1.8" Az="0" El="0"/>
+<Launcher X="-2.0" Z="45.0" Y="-1.8" Az="0" El="0"/>
+<Launcher X="2.0" Z="45.0" Y="-1.3" Az="0" El="80"/>
+<Launcher X="-2.0" Z="45.0" Y="-1.3" Az="0" El="80"/>
+
+

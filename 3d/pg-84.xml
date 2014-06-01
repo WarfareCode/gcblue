@@ -1,0 +1,8 @@
+<Model File="pg-84.tvm"/>
+<Info Author="Marcelo Caceres" Notes="Test of xml model wrapper"/>
+<!-- need submodels defined to use animations
+<Animation Object="nav_radar" Type="Sensor" SensorIndex="0" AxisX="0" AxisY="0" AxisZ="1" AngleRate="0.2"/>
+<Animation Object="prop_l" Type="Propeller" AxisX="0.0" AxisY="1" AxisZ="0" AngleRate="1.0"/>
+<Animation Object="prop_r" Type="Propeller" AxisX="0.0" AxisY="1" AxisZ="0" AngleRate="1.0"/>
+-->
+

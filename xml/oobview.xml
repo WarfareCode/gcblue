@@ -1,0 +1,7 @@
+<Window>
+
+<Button X="10" Y="5" Width="80" Height="15" Caption="OWN" Command="1" YDir="1" FontSize="10" Alpha="0.5" />
+<Button X="100" Y="5" Width="80" Height="15" Caption="TRACKS" Command="2" YDir="1" FontSize="10" Alpha="0.5" />
+
+
+</Window>

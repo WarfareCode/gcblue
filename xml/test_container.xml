@@ -1,0 +1,10 @@
+<Window Width="400" Height="300" BackgroundImage="dblue031.jpg" >
+  <Button X="384" Y="0" Width="16" Height="16" Command="86" Caption="">
+    <Image Off="close.png" On="close.png" />
+  </Button>
+  <Slot X="10" Y="60" Size="32"/>
+  <Slot X="50" Y="60" Size="32"/>
+  <Slot X="10" Y="100" Size="32"/>
+  <Slot X="50" Y="100" Size="32"/>
+
+</Window>

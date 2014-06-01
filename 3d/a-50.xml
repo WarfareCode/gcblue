@@ -1,0 +1,7 @@
+<Model File="a-50-body.tvm"/>
+<Info Author="Pere" />
+
+<Submodel File="a-50-dome.tvm" Object="a50dome" X="0" Y="0" Z="0" Yaw="0" Pitch="0" Roll="0"/>
+
+
+<Animation Object="a50dome" Type="Sensor" SensorIndex="0" AxisX="0" AxisY="1" AxisZ="0" AngleRate="0.2"/>

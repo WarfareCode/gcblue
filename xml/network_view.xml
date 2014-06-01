@@ -1,0 +1,39 @@
+<Window>
+
+  <RadioButton X="30" Y="50" Width="170" Height="40" Caption="Multiplayer Mode" Command="150">
+    <Button X="5" Y="20" Width="50" Height="15" Caption="OFF" Command="0"/>
+    <Button X="60" Y="20" Width="50" Height="15" Caption="CLIENT" Command="1"/>
+    <Button X="115" Y="20" Width="50" Height="15" Caption="SERVER" Command="2"/>	
+  </RadioButton>  
+
+  <EditIP X="30" Y="220" Width="180" Height="25" BarX="10.0" BarY="5.0" BarWidth="160.0" BarHeight="14.0" FontSize="14.0" Caption="IP Address"/>
+  <EditName X="30" Y="260" Width="180" Height="25" BarX="10.0" BarY="5.0" BarWidth="160.0" BarHeight="14.0" FontSize="14.0" Caption="Username"/>
+  <EditPassword X="30" Y="300" Width="180" Height="25" BarX="10.0" BarY="5.0" BarWidth="160.0" BarHeight="14.0" FontSize="14.0" Caption="Password" PasswordMode="1"/> 
+
+  <Button X="240" Y="220" Width="64" Height="36" Caption="Connect" FontSize="16" Command="160">
+    <Image Off="connect.png" On="connect.png" OverOff="connect_over.png" OverOn="connect_over.png"/>
+  </Button>
+
+  <!--
+  <Button X="340" Y="225" Width="65" Height="15" Caption="Join Game" Command="170"/>
+  -->
+  <StatusBox X="250" Y="50" Width="250" Height="120"/>
+
+  <ChatBox X="30" Y="340" Width="450" Height="250" FontSize="14.0" Wrap="70" DrawBorder="1"/>
+  <ChatEntry X="30" Y="596" Width="450" Height="20" BarX="0.0" BarY="1.0" BarWidth="450.0" BarHeight="18.0" FontSize="14.0" Caption=""/>
+
+
+  <RadioButton X="30" Y="120" Width="170" Height="40" Caption="Client Login Policy" Command="190">
+    <Button X="30" Y="20" Width="55" Height="15" Caption="All" Command="0"/>
+    <Button X="95" Y="20" Width="55" Height="15" Caption="Reg Only" Command="1"/>
+  </RadioButton>  
+
+  <!--
+  <RadioButton X="30" Y="110" Width="115" Height="40" Caption="Chat Protocol" Command="180">
+    <Button X="5" Y="20" Width="50" Height="15" Caption="TCP" Command="0"/>
+    <Button X="60" Y="20" Width="50" Height="15" Caption="UDP" Command="1"/>
+  </RadioButton>  
+  -->
+
+
+</Window>

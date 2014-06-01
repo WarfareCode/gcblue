@@ -1,0 +1,11 @@
+<Window Width="500" Height="190" BackgroundImage="platform_background_air.jpg" >
+  <Button X="482" Y="2" Width="16" Height="16" Command="86" Caption="">
+    <Image Off="close.png" On="close.png" />
+  </Button>
+
+
+  <Platform SlotSize="32" LauncherLocX="12" LauncherLocY="30" LauncherOffsetX="50" MagazineLocX="12" MagazineLocY="85" MagazineOffsetX="50" FlightPortLocX="12" FlightPortLocY="140" FuelLocX="300" FuelLocY="137" />
+
+
+
+</Window>

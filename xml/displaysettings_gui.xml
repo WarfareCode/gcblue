@@ -1,0 +1,7 @@
+<Window>
+  <Button X="30" Y="30" Width="65" Height="15" Caption="Main" Command="10"/>
+  <Button X="100" Y="30" Width="65" Height="15" Caption="Credits" Command="20"/>
+  <Button X="170" Y="30" Width="65" Height="15" Caption="Database" Command="30"/>
+  <Button X="240" Y="30" Width="65" Height="15" Caption="Options" Command="40"/>
+  <Button X="310" Y="30" Width="65" Height="15" Caption="Scenarios" Command="50"/>
+</Window>

@@ -1,0 +1,9 @@
+<Model File="e2c-body.tvm"/>
+<Info Author="Guido Militello" Notes="Adapted from Rick Sasala's model at www.surclaro.com"/>
+<Submodel File="e2c-prop.tvm" Object="propl" X="-3.23" Y="1.80" Z="3.53" Yaw="0" Pitch="0" Roll="0"/>
+<Submodel File="e2c-prop.tvm" Object="propr" X="3.23" Y="1.80" Z="3.53" Yaw="0" Pitch="0" Roll="0"/>
+<Submodel File="e2c-dome.tvm" Object="dome" X="0" Y="3.91" Z="-1.3" Yaw="0" Pitch="-0.05" Roll="0"/>
+
+<Animation Object="propl" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="9"/>
+<Animation Object="propr" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="-9"/>
+<Animation Object="dome" Type="Sensor" SensorIndex="0" AxisX="0" AxisY="1" AxisZ="0" AngleRate="0.2"/>

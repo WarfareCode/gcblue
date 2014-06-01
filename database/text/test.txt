@@ -1,0 +1,5 @@
+A test description
+To use a file for a description, start the description field with /fname=<filename>
+    E.g. this description file was set using /fname=/text/test.txt
+Don't put white space in front of the /fname
+Max description length is 2000 characters

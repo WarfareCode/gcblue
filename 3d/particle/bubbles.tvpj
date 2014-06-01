@@ -1,0 +1,9 @@
+<particle-system>
+  <emitter type="billboard" max-particles="300" id="0" size="1" location="0/0/0" direction="0/1/0" directional="True" randomdirectionfactor="0.01/0.05/0.01" power="1" lifetime="10" shape="1" texture="particles\water01.png" color="1,1,1,0.5" speed="35" usegravity="True" gravity="0/0/0" alphachange="1" alphablending="1" alphatest="True" alpharef="0" alphadepthwrite="False" boxsize="0/0/0" sphereradius="20" looping="True">
+    <particle-keyframes>
+      <keyframe id="0" key="0" size="0.02/0.02/0.02" color="1,1,1,0" />
+      <keyframe id="1" key="5" size="0.03/0.03/0.03" color="1,1,1,1" />
+      <keyframe id="2" key="10" size="0.04/0.04/0.04" color="1,1,1,0" />
+    </particle-keyframes>
+  </emitter>
+</particle-system>

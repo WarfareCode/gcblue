@@ -1,0 +1,14 @@
+<Model File="TicoVLS.tvm"/>
+<Info Author="Ryan Crierie" Notes="ab_f2a"/>
+<Animation Object="prop_l" Type="Propeller" AxisX="0.0" AxisY="1" AxisZ="0" AngleRate="1.0"/>
+<Animation Object="prop_r" Type="Propeller" AxisX="0.0" AxisY="1" AxisZ="0" AngleRate="1.0"/>
+<Launcher X="-0.064" Y="-1.337" Z="0.177" Az="0" Comment="Bow5Inch"/> 
+<Launcher X="-0.131" Y="-0.996" Z="0.149" Az="0" El="88" Comment="VLS_Bow"/> 
+<Launcher X="-0.172" Y="-0.077" Z="0.387" Az="0" Comment="PortPhalanx"/>
+<Launcher X="0.06" Y="-0.077" Z="0.387" Az="0" Comment="StbdPhalanx"/>
+<Launcher X="-0.226" Y="0.196" Z="0.16" Az="0" Comment="PortMk32"/>
+<Launcher X="0.089" Y="0.196" Z="0.16" Az="0" Comment="StbdMk32"/>
+<Launcher X="-0.131" Y="1.489" Z="0.149" Az="0" El="88" Comment="VLS_Stern"/> 
+<Launcher X="-0.064" Y="1.795" Z="0.118" Az="0" Comment="Aft5Inch"/> 
+<Launcher X="-0.194" Y="2.057" Z="0.108" Az="0" El="88" Comment="PortHarp"/> 
+<Launcher X="-0.173" Y="1.987" Z="0.108" Az="0" El="88" Comment="StbdHarp"/> 

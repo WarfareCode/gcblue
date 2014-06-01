@@ -1,0 +1,8 @@
+<Window>
+
+  <ChatBox X="30" Y="25" Width="470" Height="295" FontSize="14.0" Wrap="70" DrawBorder="1"/>
+  <ChatEntry X="30" Y="326" Width="470" Height="20" BarX="0.0" BarY="1.0" BarWidth="468.0" BarHeight="18.0" FontSize="14.0" Caption=""/>
+
+  
+
+</Window>

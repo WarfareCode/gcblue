@@ -1,0 +1,9 @@
+<Model File="hormonebody.TVM"/>
+<Info Author="Pere" />
+
+<Submodel File="hormonerotorup.TVM" Object="rotorup" X="0" Y="0" Z="0" Yaw="0" Pitch="0" Roll="0"/>
+<Submodel File="hormonerotordown.TVM" Object="rotordown" X="0" Y="0" Z="0" Yaw="0" Pitch="0" Roll="0"/>
+
+
+<Animation Object="rotorup" Type="Rotor" SensorIndex="0" AxisX="0" AxisY="1" AxisZ="0" AngleRate="9"/>
+<Animation Object="rotordown" Type="Rotor" SensorIndex="0" AxisX="0" AxisY="1" AxisZ="0" AngleRate="-9"/>

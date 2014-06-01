@@ -1,0 +1,5 @@
+<Model File="roland-sam.tvm"/>
+<Info Author="Marcelo Caceres" Notes="Stand-in model. Roland SAM model"/>
+<Smoke X="0.0" Y="0.0" Z="-1.4"/>
+
+

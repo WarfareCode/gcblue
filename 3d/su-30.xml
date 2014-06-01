@@ -1,0 +1,8 @@
+<Model File="su-30.tvm"/>
+<Info Author="Guido Militello" Notes=""/>
+<Smoke X="1.27" Z="-6.4" Y="0.0"/>
+<Smoke X="-1.27" Z="-6.4" Y="0.0"/>
+<Launcher X="6.3" Z="-2.2" Y="0.5"/>
+<Launcher X="4.3" Z="-0.9" Y="0.5"/>
+<Launcher X="0" Z="0" Y="-0.2"/>
+

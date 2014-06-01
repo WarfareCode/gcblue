@@ -1,0 +1,21 @@
+<Model File="b-52.tvm"/>
+<Info Author="Pere" Notes="b-52"/>
+<Smoke X="-18" Z="1.4" Y="2.2"/>
+<Smoke X="-17.5" Z="1.4" Y="2.2"/>
+<Smoke X="-10.8" Z="8" Y="2.6"/>
+<Smoke X="-10.8" Z="8" Y="2.6"/>
+
+<Smoke X="18" Z="1.4" Y="2.2"/>
+<Smoke X="17.5" Z="1.4" Y="2.2"/>
+<Smoke X="10.8" Z="8" Y="2.6"/>
+<Smoke X="10.8" Z="8" Y="2.6"/>
+
+<Launcher X="0.0" Y="-0.5" Z="-1.2" Az="0"/>
+<Launcher X="-1.9" Y="-1.5" Z="-0.2" Az="0"/>
+<Launcher X="1.9" Y="-1.5" Z="-0.2" Az="0"/>
+<Launcher X="-1.9" Y="-1.5" Z="-0.2" Az="0"/>
+<Launcher X="1.9" Y="-1.5" Z="-0.2" Az="0"/>
+<Launcher X="-1.9" Y="-1.5" Z="-0.2" Az="0"/>
+<Launcher X="1.9" Y="-1.5" Z="-0.2" Az="0"/>
+
+

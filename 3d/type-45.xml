@@ -1,0 +1,11 @@
+<Model File="type-45.tvm"/>
+<Info Author="Marcelo Caceres" Notes=""/>
+<!-- need submodels created for these animations
+<Animation Object="nav_radar1" Type="Sensor" SensorIndex="0" AxisX="0" AxisY="0" AxisZ="1" AngleRate="0.2"/>
+<Animation Object="nav_radar2" Type="Sensor" SensorIndex="0" AxisX="0" AxisY="0" AxisZ="1" AngleRate="0.2"/>
+<Animation Object="nav_radar3" Type="Sensor" SensorIndex="0" AxisX="0" AxisY="0" AxisZ="1" AngleRate="0.2"/>
+<Animation Object="prop_l" Type="Propeller" AxisX="0.0" AxisY="1" AxisZ="0" AngleRate="1.0"/>
+<Animation Object="prop_r" Type="Propeller" AxisX="0.0" AxisY="1" AxisZ="0" AngleRate="1.0"/>
+-->
+
+

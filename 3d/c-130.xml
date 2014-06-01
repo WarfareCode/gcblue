@@ -1,0 +1,12 @@
+<Model File="c-130-body.tvm"/>
+<Info Author="Marcelo Caceres" Notes="AR colors"/>
+<Submodel File="c-130-prop.tvm" Object="prop1" X="-4.78" Y="0.58" Z="2.74" Yaw="0" Pitch="0" Roll="0"/>
+<Submodel File="c-130-prop.tvm" Object="prop2" X="-2.39" Y="0.45" Z="2.74" Yaw="0" Pitch="0" Roll="0"/>
+<Submodel File="c-130-prop.tvm" Object="prop3" X="+4.78" Y="0.58" Z="2.74" Yaw="0" Pitch="0" Roll="0"/>
+<Submodel File="c-130-prop.tvm" Object="prop4" X="+2.39" Y="0.45" Z="2.74" Yaw="0" Pitch="0" Roll="0"/>
+
+<Animation Object="prop1" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="9"/>
+<Animation Object="prop2" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="9"/>
+<Animation Object="prop3" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="-9"/>
+<Animation Object="prop4" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="-9"/>
+

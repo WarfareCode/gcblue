@@ -1,0 +1,8 @@
+<Model File="roland2-site.tvm"/>
+<Info Author="Marcelo Caceres" Notes="Using temporarily for s300 model. Roland2 SAM site model (rotate the roland group for animation?)"/>
+<Animation Object="roland" Type="Sensor" SensorIndex="0" AxisX="0" AxisY="0" AxisZ="1" AngleRate="0.2"/>
+<Launcher X="0" Y="0" Z="2" El="60"/>
+
+
+
+

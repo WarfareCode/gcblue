@@ -1,0 +1,8 @@
+<Window Width="200" Height="250" BackgroundImage="stores_background.jpg" >
+  <Button X="182" Y="2" Width="16" Height="16" Command="86" Caption="">
+    <Image Off="close.png" On="close.png" />
+  </Button>
+  <Stores SlotSize="16" UpperLeftX="12" UpperLeftY="50" HorizontalSpacing="90" VerticalSpacing="21" RowSize="444" />
+
+
+</Window>

@@ -1,0 +1,12 @@
+<Model File="mig21E.tvm"/>
+<Info Author="Pere" Notes="Mig 21 F1"/>
+<Smoke X="0.0" Y="1.29" Z="-6.6"/>
+<Launcher X="0.0" Y="-0.5" Z="-1.2" Az="0"/>
+<Launcher X="-1.9" Y="-1.5" Z="-0.2" Az="0"/>
+<Launcher X="1.9" Y="-1.5" Z="-0.2" Az="0"/>
+<Launcher X="-1.9" Y="-1.5" Z="-0.2" Az="0"/>
+<Launcher X="1.9" Y="-1.5" Z="-0.2" Az="0"/>
+<Launcher X="-1.9" Y="-1.5" Z="-0.2" Az="0"/>
+<Launcher X="1.9" Y="-1.5" Z="-0.2" Az="0"/>
+
+

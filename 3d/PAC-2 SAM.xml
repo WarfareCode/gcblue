@@ -1,0 +1,4 @@
+<Model File="PT2SAM.tvm"/>
+<Info Author="juniboy13" Notes="Patriot 2 missile system"/>
+<Animation Object="rapier" Type="Sensor" SensorIndex="0" AxisX="0" AxisY="0" AxisZ="1" AngleRate="0.2"/>
+

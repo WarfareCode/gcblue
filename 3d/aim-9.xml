@@ -1,0 +1,4 @@
+<Model File="aim-9b.tvm"/>
+<Info Author="Ryan Crierie" Notes="AIM-9B model"/>
+<Smoke X="0.0" Y="0.0" Z="-1.1595"/>
+

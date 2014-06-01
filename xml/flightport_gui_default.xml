@@ -1,0 +1,9 @@
+<Window Width="450" Height="260" BackgroundImage="flightport_background1.jpg" >
+  <Button X="432" Y="2" Width="16" Height="16" Command="86" Caption="">
+    <Image Off="close.png" On="close.png" />
+  </Button>
+  <FlightPort SlotSize="32" LaunchX="15" LaunchY="30" LaunchSpacing="40" ReadyX="15" ReadyY="95" ReadySpacing="40" HangarX="15" HangarY="160" HangarSpacingH="40" HangarSpacingV="55" HangarRowSize="10" MagazineLocX="205" MagazineLocY="30" MagazineOffsetX="40" />
+
+
+
+</Window>

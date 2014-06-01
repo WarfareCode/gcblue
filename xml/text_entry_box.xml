@@ -1,0 +1,3 @@
+<Window>
+  <TextEntry X="5" Y="25" Width="200" Height="16" BarX="0.0" BarY="1.0" BarWidth="200.0" BarHeight="14.0" Caption="Enter Text" FontSize="14.0"  DrawBorder="1"/>
+</Window>

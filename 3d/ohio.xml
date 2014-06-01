@@ -1,0 +1,5 @@
+<Model File="ohio-body.tvm"/>
+<Info Author="TomaGabriel" Notes=""/>
+<Submodel File="ohio-prop.tvm" Object="prop" X="0" Y="-4.5" Z="-86.3" Yaw="0" Pitch="0" Roll="0"/>
+<Animation Object="prop" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="0.1"/>
+<Smoke X="0.0" Y="-3.2" Z="-40.5"/>

@@ -1,0 +1,6 @@
+<Model File="rapier.tvm"/>
+<Info Author="Marcelo Caceres" Notes="Rapier SAM towed unit, BAe"/>
+<Animation Object="rapier" Type="Sensor" SensorIndex="0" AxisX="0" AxisY="0" AxisZ="1" AngleRate="0.2"/>
+
+
+

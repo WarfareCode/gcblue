@@ -1,0 +1,6 @@
+<Model File="rapier-sam.tvm"/>
+<Info Author="Marcelo Caceres" Notes="Rapier SAM missile model"/>
+<Smoke X="0.0" Y="0.0" Z="-1.3"/>
+
+
+

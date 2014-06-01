@@ -1,0 +1,6 @@
+<Model File="mig-29.tvm"/>
+<Info Author="Guido Militello" Notes=""/>
+<Smoke X="0.85" Y="0.0" Z="-6.8"/>
+<Smoke X="-0.85" Y="0.0" Z="-6.8"/>
+
+

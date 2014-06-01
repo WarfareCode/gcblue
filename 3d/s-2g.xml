@@ -1,0 +1,7 @@
+<Model File="s-2g.tvm"/>
+<Info Author="Guido Militello" Notes="S-2G Tracker (1970s)"/>
+<Animation Object="helice_izq" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="9"/>
+<Animation Object="helice_der" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="-9"/>
+
+
+

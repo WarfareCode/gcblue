@@ -1,0 +1,8 @@
+<Model File="burke.tvm"/>
+<Info Author="Marcelo Caceres" Notes="ab_f2a"/>
+<Animation Object="nav_radar1" Type="Sensor" SensorIndex="0" AxisX="0" AxisY="0" AxisZ="1" AngleRate="0.2"/>
+<Animation Object="nav_radar2" Type="Sensor" SensorIndex="0" AxisX="0" AxisY="0" AxisZ="1" AngleRate="0.2"/>
+<Animation Object="prop_l" Type="Propeller" AxisX="0.0" AxisY="1" AxisZ="0" AngleRate="0.2"/>
+<Animation Object="prop_r" Type="Propeller" AxisX="0.0" AxisY="1" AxisZ="0" AngleRate="-0.2"/>
+
+
