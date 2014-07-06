@@ -1815,23 +1815,28 @@ void tcLauncher::UpdateStatus()
             return;
 		}
 
-        // for datum_only weapon types, check that target range is between min and max range
-        if (tcWeaponDBObject* weaponData = dynamic_cast<tcWeaponDBObject*>(mpChildDBObj))
-        {
-            GeoPoint current;
-            current.Set(parent->mcKin.mfLon_rad, parent->mcKin.mfLat_rad);
-            float range_km = C_RADTOKM * nsNav::GCDistance_rad(current, msDatum);
-            if (range_km > weaponData->maxRange_km)
-            {
-                status = OUT_OF_RANGE;
-                return;
-            }
-            else if (range_km < weaponData->minRange_km)
-            {
-                status = TOO_CLOSE;
-                return;
-            }
-        }
+		// for datum_only weapon types, check that target range is between min and max range
+		if (tcWeaponDBObject* weaponData = dynamic_cast<tcWeaponDBObject*>(mpChildDBObj))
+		{
+			GeoPoint current;
+			current.Set(parent->mcKin.mfLon_rad, parent->mcKin.mfLat_rad);
+			
+
+			float range_km = C_RADTOKM * nsNav::GCDistance_rad(current, msDatum);
+			/** 2014-07-06 amram request to remove this check
+			if (range_km > weaponData->maxRange_km)
+			{
+				status = OUT_OF_RANGE;
+				return;
+			}
+			*/
+			if (range_km < weaponData->minRange_km)
+			{
+				status = TOO_CLOSE;
+				return;
+			}
+
+		}
 
         //// check ROE, disabled this, annoying and feedback to user isn't great, do this at AI script level 7NOV2010
         //tcGoalTracker* goalTracker = tcGoalTracker::Get();

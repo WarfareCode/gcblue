@@ -779,7 +779,7 @@ void tcMissileObject::UpdateDatumInterceptGuidance(double t, bool& useInterceptP
 {
     tcTrack groundTrack;
 
-    groundTrack.mfAlt_m = msWaypoint.mfAlt_m + mpDBObject->detonationRange_m;
+    groundTrack.mfAlt_m = msWaypoint.mfAlt_m; // 2014-07-06 note waypoint altitude already set to mpDBObject->detonationRange_m;
     groundTrack.mfLon_rad = msWaypoint.mfLon_rad;
     groundTrack.mfLat_rad = msWaypoint.mfLat_rad;
     groundTrack.mfSpeed_kts = 0;
