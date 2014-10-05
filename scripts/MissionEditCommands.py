@@ -13,6 +13,62 @@ def AutoConfigurePlatform(UI, setupName):
 def MovePlatform(UI, lon, lat):
     UI.MovePlatform(lon, lat)
 
+    
+def split_multi(s, separators):
+    rr = [s]
+    for sep in separators:
+        s, rr = rr, []
+        for seq in s:
+            rr += seq.split(sep)
+    return rr    
+    
+def MovePlatformString(UI, s):
+    s = s.replace('W','-')
+    s = s.replace('S','-')
+    s = s.replace('E',' ')
+    s = s.replace('N',' ')
+    
+    svect = split_multi(s, [' ',',','\'',':'])
+    sfilt = []
+    for k in range(0, len(svect)):
+        try:
+            x = float(svect[k])
+            sfilt.append(x)
+        except:
+            pass # do nothing and skip
+    if (len(sfilt) == 2): # lat DD.DDD lon DD.DDD
+        lat = sfilt[0]
+        lon = sfilt[1]
+    elif (len(sfilt) == 4): # lat DD MM.MMM lon DD MM.MMM
+        if (sfilt[0] < 0):
+            lat_sign = -1
+        else:
+            lat_sign = 1
+        lat = sfilt[0] + 0.0166666667*lat_sign*sfilt[1]
+        if (sfilt[2] < 0):
+            lon_sign = -1
+        else:
+            lon_sign = 1
+        lon = sfilt[2] + 0.0166666667*lon_sign*sfilt[3]
+    elif (len(sfilt) == 6): # lat DD MM SS.SSS lon DD MM SS.SSS
+        if (sfilt[0] < 0):
+            lat_sign = -1
+        else:
+            lat_sign = 1
+        lat = sfilt[0] + 0.0166666667*lat_sign*sfilt[1] + 0.000277777778*lat_sign*sfilt[2]
+        if (sfilt[3] < 0):
+            lon_sign = -1
+        else:
+            lon_sign = 1        
+        lon = sfilt[3] + 0.0166666667*lon_sign*sfilt[4] + 0.000277777778*lon_sign*sfilt[5]
+    else:
+        UI.DisplayMessage('Bad coordinate string (%s)' % s)
+    if ((lat > 90) or (lat < -90) or (lon < -180.0) or (lon > 180.0)):
+        UI.DisplayMessage('Bad coordinate (%.5f, %.5f)' % (lat, lon))
+    else:
+        UI.DisplayMessage('Moving to %.5f %.5f' % (lat, lon))
+        UI.MovePlatform(deg_to_rad*lon, deg_to_rad*lat)
+    
 def MoveGroup(GI, lon, lat):
     unit_count = GI.GetUnitCount()
     if (unit_count < 1):
@@ -36,7 +92,7 @@ def RotateGroup(GI, angle_rad):
     lon_cen = 0
     unit_count = GI.GetUnitCount()
     for n in range(0, unit_count):
-        UI = GI.GetPlatformInterface(n)
+        UI = GetPlatformOrWeaponInterface(GI, n)
         lat_cen = lat_cen + UI.GetLatitude()
         lon_cen = lon_cen + UI.GetLongitude() # won't work near 180E
     scale = 1.0 / float(unit_count)
@@ -46,7 +102,7 @@ def RotateGroup(GI, angle_rad):
     inv_cos_latc = 1.0 / cos_latc
     
     for n in range(0, unit_count):
-        UI = GI.GetPlatformInterface(n)
+        UI = GetPlatformOrWeaponInterface(GI, n)
         lon_n = UI.GetLongitude()
         lat_n = UI.GetLatitude()
         dlon = lon_n - lon_cen
@@ -61,13 +117,14 @@ def DeletePlatform(UI):
 
 def DeleteGroup(GI):
     names_to_delete = []
+    UI_to_delete = [] # to work with both platform and weapon interface types
     unit_count = GI.GetUnitCount()
     for n in range(0, unit_count):
-        UI = GI.GetPlatformInterface(n)
+        UI = GetPlatformOrWeaponInterface(GI, n)
         names_to_delete.append(UI.GetPlatformName())
-    SM = GI.GetScenarioInterface()
+        UI_to_delete.append(UI)
     for n in range(0, len(names_to_delete)):
-        UI = SM.GetUnitInterface(names_to_delete[n])
+        UI = UI_to_delete[n]
         UI.DeletePlatform()
 
 def RenamePlatform(UI, name):
@@ -94,6 +151,9 @@ def AddItemToMagazine(UI, item):
 
 def SetSeaState(SM, sea_state):
     SM.SetSeaState(sea_state)
+    
+def SetSonarTemplate(SM, id):
+    SM.SetSonarTemplate(id)    
     
 def SetScenarioName(SM, name):
     SM.SetScenarioName(name)
@@ -161,26 +221,40 @@ def CopyPlatform(UI_ref, lon, lat):
     unit.SetPosition(rad_to_deg*lon, rad_to_deg*lat, UI_ref.GetAltitude())  # lon, lat, alt
     unit.heading = UI_ref.GetHeading() # deg
     unit.speed = UI_ref.GetSpeed() # kts
-    unit.throttle = UI_ref.GetThrottle()
+    
+    try:
+        unit.throttle = UI_ref.GetThrottle()
+    except:
+        pass
+        
     
     alliance = UI_ref.GetPlatformAlliance()
     SM.AddUnitToAlliance(unit, alliance)
     
     # duplicate loadout
-    nLaunchers = UI_ref.GetLauncherCount()
-    for n in range(0, nLaunchers):
-        SM.SetUnitLauncherItem(unit.unitName, n, UI_ref.GetLauncherWeaponName(n), UI_ref.GetLauncherQuantity(n))
-    
-    # duplicate magazine items
-    magItems = UI_ref.GetMagazineItems()
-    nItems = magItems.Size()
-    for n in range(0, nItems):
-        itemName = magItems.GetString(n)
-        qty = UI_ref.GetMagazineQuantity(itemName)
-        SM.AddToUnitMagazine(unit.unitName, itemName, qty)
+    try:
+        nLaunchers = UI_ref.GetLauncherCount()
+        for n in range(0, nLaunchers):
+            SM.SetUnitLauncherItem(unit.unitName, n, UI_ref.GetLauncherWeaponName(n), UI_ref.GetLauncherQuantity(n))
         
-    SM.DuplicateUnitTasking(refName, unit.unitName)
-    
+        # duplicate magazine items
+        magItems = UI_ref.GetMagazineItems()
+        nItems = magItems.Size()
+        for n in range(0, nItems):
+            itemName = magItems.GetString(n)
+            qty = UI_ref.GetMagazineQuantity(itemName)
+            SM.AddToUnitMagazine(unit.unitName, itemName, qty)
+            
+        SM.DuplicateUnitTasking(refName, unit.unitName)
+    except:
+        pass
+
+# returns platform or weapon interface based on type of unit n in group
+def GetPlatformOrWeaponInterface(GI, n):
+    if (GI.IsPlatform(n)):
+        return GI.GetPlatformInterface(n)
+    else: # assume weapon type
+        return GI.GetWeaponInterface(n)
     
 # Adds copy of group at specified coordinates
 def CopyGroup(GI, lon, lat):
@@ -189,7 +263,7 @@ def CopyGroup(GI, lon, lat):
     lon_cen = 0
     unit_count = GI.GetUnitCount()
     for n in range(0, unit_count):
-        UI = GI.GetPlatformInterface(n)
+        UI = GetPlatformOrWeaponInterface(GI, n)
         lat_cen = lat_cen + UI.GetLatitude()
         lon_cen = lon_cen + UI.GetLongitude() # won't work near 180E
     scale = 1.0 / float(unit_count)
@@ -197,12 +271,13 @@ def CopyGroup(GI, lon, lat):
     lon_cen = lon_cen * scale
     
     for n in range(0, unit_count):
-        UI = GI.GetPlatformInterface(n)
+        UI = GetPlatformOrWeaponInterface(GI, n)
         CopyPlatform(UI, lon+UI.GetLongitude()-lon_cen, lat+UI.GetLatitude()-lat_cen)
 
 # changes root name of group and renumbers starting with 1
 def RenameGroup(GI, new_root):
     SM = GI.GetScenarioInterface()
+    SM.ConsoleText('Rename Group Called')
     parsed = SM.GetParsedUnitName(new_root)
     if (parsed.isValid):
         start_id = parsed.id
@@ -218,16 +293,16 @@ def RenameGroup(GI, new_root):
     tries = 0
     while (searching and (tries < 100)):
         unitName = '%s%s%d' % (root, separator, start_id)
-        UI_check = SM.GetUnitInterface(unitName)
-        if (UI_check.IsValid()):
+        if (SM.GetUnitIdByName(unitName) != -1):
             start_id = start_id + 1
             tries = tries + 1
         else:
             searching = 0
-
+            
+    SM.ConsoleText('Renaming group with root %s' % root)
     unit_count = GI.GetUnitCount()
     for n in range(0, unit_count):
-        UI = GI.GetPlatformInterface(n)
+        UI = GetPlatformOrWeaponInterface(GI, n)
         UI.RenamePlatform('%s%s%d' % (root, separator, start_id+n))
         
         
@@ -239,6 +314,11 @@ def AddNewPlatformToFlightDeck(SM, host_id, className):
     for n in range(0, group_count):
         hostName = SM.GetUnitNameById(host_id)
         unitName = '%s-%d' % (group_name, start_id+n)
+        UI = SM.GetUnitInterface()
+        BB = UI.GetBlackboardInterface()
+        if BB.KeyExists('MagTonnage'):
+            BB.Erase('MagTonnage')
+        
         SM.AddUnitToFlightDeck(hostName, className, unitName, 3)
 
 # version for edit mode with platform hooked
@@ -349,6 +429,7 @@ def ChangePassTime(SM, time_minutes, goal_id):
         return
     time_goal = goal.AsTimeGoal()
     time_goal.SetPassTimeout(60.0*float(time_minutes))
+    time_goal.SetFailTimeout(31556926.0)
 
 
 def ChangeFailTime(SM, time_minutes, goal_id):
@@ -357,6 +438,7 @@ def ChangeFailTime(SM, time_minutes, goal_id):
         return
     time_goal = goal.AsTimeGoal()
     time_goal.SetFailTimeout(60.0*float(time_minutes))
+    time_goal.SetPassTimeout(31556926.0)
 
 # toggle compound goal between OR and AND type
 def ToggleCompoundType(SM, goal_id):
@@ -418,6 +500,74 @@ def SetAreaTimeDelay(SM, timeDelayMinutesString, goal_id):
     area_goal = goal.AsAreaGoal()
     timeObjective_s = 60.0 * float(timeDelayMinutesString)
     area_goal.SetTimeObjective(timeObjective_s)
+
+def AddGoalTarget(SM, target_id, goal_id):
+    targetName = SM.GetUnitNameById(target_id)
+    goal = SM.GetGoalById(goal_id)
+    if (goal.GetTypeString() == 'Destroy'):
+        goal = goal.AsDestroyGoal()
+    elif (goal.GetTypeString() == 'Protect'):
+        goal = goal.AsProtectGoal()
+    else:
+        return
+    if (len(targetName) == 0):
+        return
+    goal.AddTarget(targetName)
+
+def AddGoalTargetArea(SM, lon1, lat1, lon2, lat2, goal_id):
+    goal = SM.GetGoalById(goal_id)
+    if (goal.GetTypeString() == 'Destroy'):
+        goal = goal.AsDestroyGoal()
+    elif (goal.GetTypeString() == 'Protect'):
+        goal = goal.AsProtectGoal()
+    else:
+        return
+    unitList = SM.GetUnitList(lon1, lat1, lon2, lat2, -1)
+    nUnits = unitList.Size()
+    for n in range(0, nUnits):
+        targetName = unitList.GetString(n)
+        goal.AddTarget(targetName)
+    
+def RemoveGoalTarget(SM, param_str):
+    goal_id = int(param_str[0:8])
+    targetName = param_str[8:]
+    goal = SM.GetGoalById(goal_id)
+    if (goal.GetTypeString() == 'Destroy'):
+        goal = goal.AsDestroyGoal()
+    elif (goal.GetTypeString() == 'Protect'):
+        goal = goal.AsProtectGoal()
+    else:
+        return
+    goal.RemoveTarget(targetName)
+       
+   
+def SetGoalQuantity(SM, param_str):
+    goal_id = int(param_str[0:8])
+    quantity = int(param_str[8:])
+    goal = SM.GetGoalById(goal_id)
+    if (goal.GetTypeString() == 'Destroy'):
+        goal = goal.AsDestroyGoal()
+    elif (goal.GetTypeString() == 'Protect'):
+        goal = goal.AsProtectGoal()
+    elif (goal.GetTypeString() == 'Area'):
+        goal = goal.AsAreaGoal()        
+    else:
+        return
+    goal.SetQuantity(quantity)
+    
+# version that takes input from user text box
+def SetGoalQuantity2(SM, param_str, goal_id):
+    quantity = int(param_str)
+    goal = SM.GetGoalById(goal_id)
+    if (goal.GetTypeString() == 'Destroy'):
+        goal = goal.AsDestroyGoal()
+    elif (goal.GetTypeString() == 'Protect'):
+        goal = goal.AsProtectGoal()
+    elif (goal.GetTypeString() == 'Area'):
+        goal = goal.AsAreaGoal()
+    else:
+        return
+    goal.SetQuantity(quantity)    
     
 def SetIncludeProbability(UI, prob):
     UI.SetIncludeProbability(float(prob))
@@ -442,4 +592,20 @@ def SetAlwaysVisible(UI, state):
 def SetAlliancePlayable(SM, state):
     current_side = SM.GetUserAlliance()
     SM.SetAlliancePlayable(current_side, state)
+
+# set custom cost for this unit for scoring, string cost in millions
+def SetCustomCost(UI, cost_million):
+    try:
+        x = 1e6 * float(cost_million)
+        UI.SetCost(x)
+        UI.DisplayMessage('Changed cost to %.1f M' % (1e-6 * x))
+    except:
+        UI.DisplayMessage('Error with cost string (%s)' % cost_million)
+
+def SetFilterByYear(SM, state):
+    SM.SetFilterByYear(state)
+   
+def SetFilterByCountry(SM, state):
+    SM.SetFilterByCountry(state)
+   
     

@@ -1,0 +1,3 @@
+<Model File="AGM-69 SRAM.tvm"/>
+    <Info Author="Emiliano D'Alessandri AkA Clockmaster" Notes="Boeing AGM-69 SRAM Short Range Attack Missile model"/>
+    <Smoke X="0.0" Y="0.0" Z="-2.15"/>

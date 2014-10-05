@@ -2,18 +2,20 @@ import operator
 from UnitCommands import *
 from GroupCommands import *
 from HotKey import *
-from Amram_AI_Scripts import *
-#from marshal import dumps
-#from pickle import dumps, loads, HIGHEST_PROTOCOL
+from Amram_Menu import *
 
 
 # Updated with Ben "Mnfe" 20061217 post
 def BuildGroupMenu(GroupMenu, GroupInfo):
     GroupMenu.Clear()
-    
+
+    BuildAmramMenu(GroupMenu, GroupInfo)
+
     if (not IsGroupControlled(GroupInfo)):
         GroupMenu.AddItem('Take control of group', 'TakeControlGroup')
         return
+    
+    return
     
     unit_count = GroupInfo.GetUnitCount()
     if (unit_count <= 0):
@@ -41,56 +43,6 @@ def BuildGroupMenu(GroupMenu, GroupInfo):
     if(helo_count==unit_count):
         GroupMenu.AddItem('Helo Group: %d units' % helo_count,'')
 
-    GroupMenu.AddItem('AI_Amram','')
-    GroupMenu.BeginSubMenu()
-    GroupMenu.SetStayOpen(1)
-
-    GroupMenu.AddItem('Start/Stop','')
-    GroupMenu.BeginSubMenu()
-    GroupMenu.SetStayOpen(0)
-	#get a ratio of how many units are running my script, this ratio determines the action the next commands will take.
-    GroupMenu.AddItemWithTextParam('Start Full AI for all units', 'BBOptionHandler', 'AI_Weaponry;AI_Navigation|Task|Start')
-    GroupMenu.AddItemWithTextParam('Stop All AI for all units', 'BBOptionHandler', 'AI_Weaponry;AI_Navigation|Task|End')
-    GroupMenu.AddItemWithTextParam('Start AI_Weaponry for all units', 'BBOptionHandler', 'AI_Weaponry|Task|Start')
-    GroupMenu.AddItemWithTextParam('Stop AI_Weaponry where started', 'BBOptionHandler', 'AI_Weaponry|Task|End')
-    GroupMenu.AddItemWithTextParam('Start AI_Navigation for all units', 'BBOptionHandler', 'AI_Navigation|Task|Start')
-    GroupMenu.AddItemWithTextParam('Stop AI_Navigation where started', 'BBOptionHandler', 'AI_Navigation|Task|End')
-
-    task_valid = 0
-    for n in range(0, unit_count):
-        UI = GroupInfo.GetPlatformInterface(n)
-        if UI.TaskExists('AI_Weaponry') or UI.TaskExists('AI_Navigation'):
-            task_valid += 1
-    if task_valid > 0:
-        GroupMenu.AddItem('Settings','')
-        GroupMenu.SetStayOpen(1)
-        GroupMenu.BeginSubMenu()
-        freelist = free_Counter(GroupInfo, unit_count)
-        GroupMenu.AddItemWithTextParam('May attack Surface      : %d'% freelist[0], 'BBOptionHandler', 'FlagFree1|Set|1')
-        GroupMenu.AddItemWithTextParam('May attack Aircraft       : %d'% freelist[1], 'BBOptionHandler', 'FlagFree2|Set|1')
-        GroupMenu.AddItemWithTextParam('May attack Ground       : %d'% freelist[2], 'BBOptionHandler', 'FlagFree4|Set|1')
-        GroupMenu.AddItemWithTextParam('May attack Missile        : %d'% freelist[3], 'BBOptionHandler', 'FlagFree8|Set|1')
-        GroupMenu.AddItemWithTextParam('May attack Submarine : %d'% freelist[4], 'BBOptionHandler', 'FlagFree16|Set|1')
-        GroupMenu.AddItemWithTextParam('Not attack Surface      : %d'% (unit_count - freelist[0]), 'BBOptionHandler', 'FlagFree1|Set|0')
-        GroupMenu.AddItemWithTextParam('Not attack Aircraft       : %d'% (unit_count - freelist[1]), 'BBOptionHandler', 'FlagFree2|Set|0')
-        GroupMenu.AddItemWithTextParam('Not attack Ground       : %d'% (unit_count - freelist[2]), 'BBOptionHandler', 'FlagFree4|Set|0')
-        GroupMenu.AddItemWithTextParam('Not attack Missile        : %d'% (unit_count - freelist[3]), 'BBOptionHandler', 'FlagFree8|Set|0')
-        GroupMenu.AddItemWithTextParam('Not attack Submarine : %d'% (unit_count - freelist[4]), 'BBOptionHandler', 'FlagFree16|Set|0')
-        GroupMenu.AddItem('Rules of Engagement','')
-        GroupMenu.SetStayOpen(1)
-        GroupMenu.BeginSubMenu()
-        ROElist = ROE_Counter(GroupInfo, unit_count)
-        GroupMenu.AddItemWithTextParam('Valid                   : %d'% ROElist[0], 'BBOptionHandler', 'ROE|Set|100')
-        GroupMenu.AddItemWithTextParam('Non Friendly       : %d'% ROElist[1], 'BBOptionHandler', 'ROE|Set|4')
-        GroupMenu.AddItemWithTextParam('Hostile                 : %d'% ROElist[2], 'BBOptionHandler', 'ROE|Set|3')
-        GroupMenu.AddItemWithTextParam('Neutral                : %d'% ROElist[3], 'BBOptionHandler', 'ROE|Set|2')
-        GroupMenu.AddItemWithTextParam('Friendly               : %d'% ROElist[4], 'BBOptionHandler', 'ROE|Set|1')
-        GroupMenu.AddItemWithTextParam('Unknown             : %d'% ROElist[5], 'BBOptionHandler', 'ROE|Set|0')
-        GroupMenu.EndSubMenu()
-        GroupMenu.EndSubMenu()
-    GroupMenu.EndSubMenu()
-    GroupMenu.EndSubMenu()
-    
     GroupMenu.AddItem('Navigate','')
     GroupMenu.BeginSubMenu()
 

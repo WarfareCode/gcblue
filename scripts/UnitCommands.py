@@ -1,4 +1,11 @@
+import os, sys
+from os.path import dirname, abspath, join, normpath
+sys.path.append(abspath(join(dirname(__file__), 'Amram_Script_Data')))
+from Amram_AI_Weapon_Lists import *
 from MissionTemplates import *
+from Amram_Utilities import *
+import math
+
 
 deg_to_rad = 0.01745329252
 
@@ -14,7 +21,8 @@ def EnableFormationEdit(UI):
 def DisableFormationEdit(UI):
     UI.SetFormationEdit(0)
     
-
+def SetFormationMode(UI, mode_id):
+    UI.SetFormationMode(mode_id)
     
 def ActivateAllSensors(UI):
     UI.SetAllSensorState(1)
@@ -325,7 +333,7 @@ def ClearWaypoints(UI):
         
 # gets info on closest (known) enemy or unknown platform within search range
 def ClosestOfType(UI, class_mask, search_range_km):
-    track_list = UI.GetTrackList(class_mask, search_range_km, 3)
+    track_list = UI.GetTrackList(class_mask, search_range_km, 100)
 
     current_time = UI.GetTime()
     nTracks = track_list.Size()
@@ -338,7 +346,7 @@ def ClosestOfType(UI, class_mask, search_range_km):
         staleness = current_time - track_info.Time
         range_km = UI.GetRangeToTrack(track_info)
 
-        if ((staleness <= 15.0) and (range_km < closest_range)):
+        if ((staleness <= 20.0) and (range_km < closest_range)):
             closest_range = range_km
             closest_id = track_id
         
@@ -347,7 +355,7 @@ def ClosestOfType(UI, class_mask, search_range_km):
 
 # gets info on closest (known) enemy or unknown platform within search range
 def ClosestOfTypeUnengaged(UI, class_mask, search_range_km):
-    track_list = UI.GetTrackList(class_mask, search_range_km, 3)
+    track_list = UI.GetTrackList(class_mask, search_range_km, 100)
 
     current_time = UI.GetTime()
     nTracks = track_list.Size()
@@ -362,7 +370,7 @@ def ClosestOfTypeUnengaged(UI, class_mask, search_range_km):
         staleness = current_time - track_info.Time
         range_km = UI.GetRangeToTrack(track_info)
 
-        if ((nEngaged == 0) and (staleness <= 15.0) and (range_km < closest_range)):
+        if ((nEngaged == 0) and (staleness <= 20.0) and (range_km < closest_range)):
             closest_range = range_km
             closest_id = track_id
             closest_bearing = UI.GetHeadingToDatum(track_info.Lon, track_info.Lat)
@@ -422,7 +430,8 @@ def SetPatrolAnchor(UI, anchor_unit, anchor_mode):
     track = UI.GetTrackById(id)
     if (not track.IsValid()):
         return
-    anchor_string = '%s,%.7f,%.7f,%d' % (anchor_unit, track.Lon, track.Lat, anchor_mode)
+    #anchor_string = '%s,%.7f,%.7f,%d' % (anchor_unit, track.Lon, track.Lat, anchor_mode)
+    anchor_string = '%s,%d' % (anchor_unit, anchor_mode)
  
     BB = UI.GetBlackboardInterface()
     BB.Write('PatrolAnchor', anchor_string)
@@ -613,29 +622,29 @@ def SpeedCruise(UI):
 def AltitudeHigh(UI):
     max_altitude = UI.GetMaxAlt()
     if (max_altitude >= 10000):
-        UI.SetAlt(10000)
+        SetAlt(UI, 10000)
     else:
-        UI.SetAlt(max_altitude)
+        SetAlt(UI, max_altitude)
 
 def AltitudeMedium(UI):
-    UI.SetAlt(4000)
+    SetAlt(UI, 4000)
 
 def AltitudeLow(UI):
-    UI.SetAlt(150)
+    SetAlt(UI, 150)
 
 def AltitudeVeryLow(UI):
-    UI.SetAlt(50)
+    SetAlt(UI, 50)
 
 
 def DepthSurface(UI):
     if (not UI.IsSub()):
         return
-    UI.SetAlt(0)
+    SetAlt(UI, 0)
 
 def DepthPeriscope(UI):
     if (not UI.IsSub()):
         return
-    UI.SetAlt(0)
+    SetAlt(UI, 0)
     
     SubInterface = UI.GetSubInterface()
     SubInterface.GoToPeriscopeDepth()
@@ -643,14 +652,14 @@ def DepthPeriscope(UI):
 def DepthMedium(UI):
     if (not UI.IsSub()):
         return
-    UI.SetAlt(-100)
+    SetAlt(UI, -100)
 
 def DepthDeep(UI):
     if (not UI.IsSub()):
         return
     SubInterface = UI.GetSubInterface()
     max_depth = SubInterface.GetMaxDepth()
-    UI.SetAlt(-max_depth + 50)
+    SetAlt(UI, -max_depth + 50)
 
 def SetPeriscope(UI, state):
     if (not UI.IsSub()):
@@ -735,7 +744,7 @@ def SetHeading(UI,h):
     UI.SetHeadingRad(h)
 
 def Altitude(UI):
-    UI.SetAlt(2345)
+    SetAlt(UI, 2345)
 
 def ShowFlightPanel(UI):
     UI.SendCommand('ShowFlightPanel')
@@ -768,20 +777,7 @@ def HasSonar(UI):
         if ((sens_info.type == 4) or (sens_info.type == 8)): 
             return 1
     return 0
-			
-				
-# return maximum range of ground weapon in km (0 if none) and corresponding launcher_idx
-def GroundWeaponMaxRangeKm(UI):
-    maxRange_km = 0
-    nLaunchers = UI.GetLauncherCount()
-    launcher_idx = -1
-    for n in range(0, nLaunchers):
-        info = UI.GetLauncherInfo(n)
-        # TargetFlags 0x04 is effective vs land flag
-        if ((info.TargetFlags & 4) != 0) and (info.LaunchMode < 4) and (info.Quantity > 0) and (info.MaxRange_km > maxRange_km):
-            maxRange_km = info.MaxRange_km
-            launcher_idx = n
-    return (maxRange_km, launcher_idx)
+
                 
 # return 1 if unit has gravity bombs, 0 otherwise
 def HasGravityBombs(UI):
@@ -822,7 +818,18 @@ def AddCAPMission(UI, lon, lat):
     FP = UI.GetFlightPortInfo()
     FP.AddCAPMission(lon, lat)
 
+def AddASWMission(UI, lon, lat):
+    if (not UI.HasFlightPort()):
+        return
+    FP = UI.GetFlightPortInfo()
+    FP.AddASWMission(lon, lat)    
 
+def AddAEWMission(UI, lon, lat):
+    if (not UI.HasFlightPort()):
+        return
+    FP = UI.GetFlightPortInfo()
+    FP.AddAEWMission(lon, lat)        
+    
 def AddAttackMission(UI, targetId):
     if (not UI.HasFlightPort()):
         return
@@ -855,3 +862,393 @@ def ReportBestLauncherForTarget(UI):
         
 def UpdateWeaponTargetDatum(WI, lon_rad, lat_rad):
     WI.UpdateTargetPosition(lon_rad, lat_rad)
+
+    
+def SetPitch(UI, theta, rate = 9, uncontrolled = True):
+    BB = UI.GetBlackboardInterface()
+    if uncontrolled:
+        if not BB.KeyExists('uncontrolled_dive'):
+            BB.Write('uncontrolled_dive', '1')
+    Fast = True
+    if abs(UI.GetClimbDeg() - theta) <= (rate*2):
+        UI.SetClimbDeg(theta)
+        Fast = False
+    elif theta - UI.GetClimbDeg() > rate:
+        UI.SetClimbDeg(UI.GetClimbDeg() + rate)
+    elif UI.GetClimbDeg() - theta > rate:
+        UI.SetClimbDeg(UI.GetClimbDeg() - rate)
+    else:
+        UI.SetClimbDeg(theta)
+        Fast = False
+    return Fast            
+
+def cruiseclimb(TI):
+    UI = TI.GetPlatformInterface()
+    BB = UI.GetBlackboardInterface()
+    update = 0.2
+    TI.SetUpdateInterval(update)
+    #assumes full throttle climb
+    #achieves cruise speed, then pitched up, and tries to manipulate pitch to maintain cruise speed and climb rate to within 5%
+    #later development should also attempt to obey maxclimbrate.
+    #later development should also accept desired altitude inputs so we can level off when we get there.
+    #do everything in absolute values as relative differences, then invert to negative for descent if necessary.
+   
+    try:
+        alt = float(BB.ReadMessage('ClimbInitAlt'))
+    except:
+        TI.EndTask()
+        return
+    if alt == -1:
+        alt = UI.GetCruiseAlt()
+    if alt <  UI.GetTerrainElevation():
+        alt = UI.GetTerrainElevation() + 50
+    do_pitch = False
+    if alt < UI.GetAlt() - 5:
+        UI.SetAlt(alt)
+        TI.EndTask()
+        return
+    elif alt > UI.GetAlt() + 5:
+        do_pitch = True
+    else:
+        throttle = float(BB.ReadMessage('ClimbInitThrottle'))
+        if throttle == -1:
+            SpeedCruise(UI)
+        else:
+            UI.SetThrottle(throttle)
+            
+        alt = float(BB.ReadMessage('ClimbInitAlt'))
+        if alt == -1:
+            alt = UI.GetCruiseAlt()
+
+        BB.Erase('Last_Speed')
+        BB.Erase('ClimbInitThrottle')
+        BB.Erase('ClimbInitAlt')
+        TI.EndTask()
+        UI.SetClimbDeg(0.0)
+        UI.SetAlt(alt)
+        return
+    if do_pitch:
+        if BB.KeyExists('Last_Speed'):
+            last_speed = float(BB.ReadMessage('Last_Speed'))
+        else:
+            last_speed = UI.GetSpeed()
+
+        pitch = UI.GetClimbDeg()
+        rate_mod = 3
+        
+        want_pitch = math.degrees(math.atan((alt - UI.GetAlt()) / 1500))
+        if want_pitch < -67:
+            want_pitch = -67
+
+        cruise_spd = UI.GetCruiseSpeedForAltitude(UI.GetAlt()) + 10
+        gravity_losses = math.sin(math.radians(pitch)) * 9.80665
+        accel_mod = ((1-(cruise_spd / UI.GetSpeed())) / 0.4) / update
+        accel_mod2 = ((1-((cruise_spd+20) / UI.GetSpeed())) / 0.4) / update
+        acceleration = (UI.GetSpeed() - last_speed) / update
+        if alt > UI.GetAlt():
+            if accel_mod2 > 0:
+                UI.SetAlt(alt)
+                return
+            else:
+                new_gravity_losses = gravity_losses + accel_mod + acceleration
+                if new_gravity_losses < 0:
+                    new_gravity_losses = 0
+                rate_mod = max(abs(acceleration) / 10 + 0.5,0.5)
+                if new_gravity_losses < 0:
+                    new_gravity_losses = 0
+                if new_gravity_losses > 9.80665:
+                    new_gravity_losses = 9.80665
+        elif alt < UI.GetAlt():
+            new_gravity_losses = -9.02707
+            if new_gravity_losses < -9.02707:
+                new_gravity_losses = -9.02707
+            if new_gravity_losses > 0:
+                new_gravity_losses = 0
+            
+        new_pitch = math.degrees(math.asin(new_gravity_losses/9.80665))
+        if want_pitch < 0:
+            new_pitch = want_pitch
+        else:
+            if new_pitch > want_pitch:
+                new_pitch = want_pitch
+    
+        #current_climb_rate = (UI.GetSpeed() * 0.514444) * math.sin(math.radians(abs(pitch)))
+        #UI.DisplayMessage('alt %0.1f, Rate %0.1f, Pitch %0.1f' % (alt, current_climb_rate, pitch))
+        #UI.DisplayMessage('Alt %0.1f, cruise %0.2f, current %0.2f' % (UI.GetAlt(), cruise_spd, UI.GetSpeed()))
+        #UI.DisplayMessage('GLos %0.2f, amod %0.2f, acel %0.2f' % (gravity_losses, accel_mod, acceleration))
+        
+        SetPitch(UI, new_pitch, rate=rate_mod, uncontrolled=False)
+        write_speed = str(UI.GetSpeed())
+        BB.Write('Last_Speed',write_speed)
+
+def SetAlt(UI, alt):
+    UI.SetAlt(alt)
+    if UI.HasThrottle():
+        #then we can use my advanced climb until 1.26 resolved this.
+        if UI.GetSpeed() == UI.GetCruiseSpeedForAltitude(UI.GetAlt()):
+            throttle = -1
+        else:
+            throttle = UI.GetThrottle()
+        if throttle < 1.0 and alt > UI.GetAlt():
+            UI.SetThrottle(1.0)
+        OptionHandler(UI,'ClimbInitThrottle|Set|%s;ClimbInitAlt|Set|%s;cruiseclimb|Task|Start~0.2~-1' % (throttle, alt))
+
+def CruiseEnforcement(TI, Speed_Only = False):
+    from Landing import GetCruiseAltitude
+    UI = TI.GetPlatformInterface()
+    TI.SetUpdateInterval(5)
+    if not(UI.TaskExists('CruiseEnforcement')):
+        AddTask('CruiseEnforcement', 5,-1)
+    if not(UI.TaskExists('TakeOff')):
+        if UI.TaskExists('AutoLoiter'):
+            DeleteHiddenTask(UI, 'AutoLoiter')
+    if Speed_Only:
+        if UI.GetClimbDeg() == 0:
+            if UI.GetPlatformClass() == 'SR-71':
+                UI.SetThrottle(1.0)
+            else:
+                UI.SetSpeed(UI.GetCruiseSpeedForAltitude(GetCruiseAltitude(UI)))
+            TI.EndTask()
+    else:
+        if abs(UI.GetAlt() == GetCruiseAltitude(UI)) < 5 and UI.GetClimbDeg() == 0:  #matched altitude to within 5m, and have stopped changing altitude
+            if UI.GetPlatformClass() == 'SR-71':
+                UI.SetThrottle(1.0)
+            else:
+                UI.SetSpeed(UI.GetCruiseSpeedForAltitude(GetCruiseAltitude(UI)))
+            TI.EndTask()
+        SetAlt(UI, GetCruiseAltitude(UI))            
+        
+def Check_Status(UI, launcher, mode):
+        # 0 = LAUNCHER_READY
+        # 1 = BAD_LAUNCHER              ///< launcher index does not exist
+        # 2 = LAUNCHER_EMPTY
+        # 3 = LAUNCHER_BUSY             ///< launcher auto reloading
+        # 4 = NO_DATUM
+        # 5 = NO_TARGET
+        # 6 = NOT_DETECTED_FC           ///< fire control sensor can't detect target (could be off)
+        # 7 = NOT_DETECTED_SEEKER       ///< seeker can't detect target
+        # 8 = FC_BUSY                   ///< fire control sensor has no free tracks
+        # 9 = LAUNCHER_ERROR
+        #10 = LAUNCHER_INACTIVE
+        #11 = NO_FIRECONTROL
+        #12 = TOO_DEEP                  ///< too deep for sub launch
+        #13 = TOO_LOW                   ///< too low for aircraft missile launch
+        #14 = TOO_HIGH                  ///< too high for aircraft missile launch
+        #15 = DAMAGED                   ///< cannot operate due to damage
+        #16 = INVALID_TARGET            ///< not effective vs. target type
+        #17 = OUT_OF_RANGE              ///< target is beyond max range
+        #18 = INVALID_FUEL_OPERATION    ///< invalid op for external fuel tank
+        #19 = LAUNCHER_LOADING          ///< added for multiplayer, loading from magazine
+        #20 = LAUNCHER_UNLOADING        ///< added for multiplayer, unloading to magazine
+        #21 = OUT_OF_FOV                ///< target is outside of field of view of this launcher
+        #22 = TOO_CLOSE                 ///< target is inside minimum range
+        #23 = LAUNCHER_EMPTY_AUTORELOAD ///< empty, try autoreload when ready, workaround to delay auto-reload until after launch
+        #24 = ROE_HOLD                  ///< ready, but launch violates ROE
+    weap_name = UI.GetLauncherWeaponName(launcher.Launcher)
+    launch_mode = launcher.LaunchMode
+
+    IsMissile = False
+    IsTorp = False
+    IsRocket = False
+    if mode is 0:
+        #used to validate the launcher for firing without the effort of validating the specific weapon loaded.
+        status = [2, 3, 9, 10, 11, 12, 13, 14, 15, 19, 20, 23]
+    else:
+        if launch_mode == 0:
+            if AntiShipMissile(UI, weap_name):
+                IsMissile = True
+            elif AntiLandMissile(UI, weap_name):
+                IsMissile = True
+            elif AntiAirMissile(UI, weap_name):
+                IsMissile = True
+            elif AntiMissileMissile(UI, weap_name):
+                IsMissile = True
+            elif AntiSubMissile(UI, weap_name):
+                IsMissile = True
+            elif AntiShipSubTorpedo(UI, weap_name):
+                IsTorp = True
+        elif launch_mode == 4:
+            if Rockets(UI, weap_name):
+                IsRocket = True
+
+                
+        #common status checks: empty, busy, too deep, too low, too high, damaged, invalid target, too close
+        if launch_mode == 0 and IsMissile:
+            status = [4, 16, 22]
+            #additional status checks:  No datum
+        elif launch_mode == 0 and not IsMissile:
+            status = [4, 16, 17, 22]
+            #additional status checks:  No datum, out of range
+        elif launch_mode == 4 and not IsRocket:
+            status = [4, 16, 21, 22]
+            #additional status checks:  No datum, Out of FoV
+        elif launch_mode == 4 and IsRocket:
+            status = [5, 16, 22]
+            #additional status checks:  No target
+        elif launch_mode == 0 and IsTorp:
+            status = [4, 16, 17, 22]
+            #additional status checks:  No target, Out of range
+        elif launch_mode == 1 or launch_mode == 2:
+            status = [5, 6, 7, 8, 11, 16, 21, 22]
+            #additional status checks:  no target, no FC lock, no Seeker lock, no FC, out of FoV
+        elif launch_mode == 3:
+            status = [4, 21, 22]
+            #additional status checks:  No datum, Out of FoV
+        else:
+            status = []
+        
+    status_num = launcher.Status
+    if status_num not in status:
+        excuse = 'firing as ordered'
+        return True, excuse
+    else:
+        status_strings = [
+            'Launcher ready to fire...',
+            'Launcher does not exist',
+            'Launcher empty',
+            'Launcher busy',
+            'no datum',
+            'no target',
+            'FC does not detect target',
+            'seeker does not detect target',
+            'all FC channels busy',
+            'Unknown launcher error',
+            'Launcher inactive',
+            'No Firecontrol',
+            'Too deep',
+            'Too low for launch',
+            'Too high for launch',
+            'Launcher is damaged',
+            'Invalid target',
+            'Target out of range',
+            'Invalid Fuel Operation',
+            'Launcher is Loading',
+            'Launcher is unLoading',
+            'target/datum outside FoV',
+            'Too close',
+            'Empty, Autoreload expected',
+            'ROE restrictions, holding fire']
+        excuse = status_strings[status_num]
+        return False, excuse
+
+def Use_Launcher_On_Target_Amram(UI, launcher, launch_type, *target):
+    #dependency on current set target removed.  Must now be handed target criteria.
+    launcher = UI.GetLauncherInfo(launcher)
+    launch_mode = launcher.LaunchMode
+    isdatum = False
+    if len(target) == 2:
+        datum = target
+        isdatum = True
+    elif len(target) == 1:
+        target_info = UI.GetTrackById(target[0])
+    else:
+        #use the assigned target
+        if UI.GetTarget() != -1:
+            target_info = UI.GetTargetTrackInfo()
+        
+    launch_qty = 1 # only launch one at a time for spacing
+    
+    if launch_type == -2:
+        #we need to determine our launch_type now.
+        weapon_name = UI.GetLauncherWeaponName(launcher.Launcher)
+        if Torpedo_Lead(UI, weapon_name) > 0:
+            #its a torpedo
+            launch_type = 2
+        elif (AntiShipMissile(UI, weapon_name) or
+              AntiLandMissile(UI, weapon_name) or
+              AntiAirMissile(UI, weapon_name) or
+              AntiMissileMissile(UI, weapon_name) or
+              AntiSubMissile(UI, weapon_name) ):
+             #its a missile
+             launch_type = 0
+        elif Rockets(UI, weapon_name):
+            #its a rocket
+            launch_type = 3
+        else:
+            #must be a ballistic if we get here
+            launch_type = 1
+            if not UI.IsAir():
+                #then we know they aren't bombs.
+                launch_qty = 5
+    
+
+    if launch_mode == 0:  # datum launch
+        if launch_type == 2:  #torpedo
+            if isdatum:
+                lon, lat = datum
+                alt = UI.GetMapTerrainElevation(datum[0], datum[1])
+                if alt < 0: alt = 0
+            else:
+                #is target, determine lead
+                speed_mps = Torpedo_Lead(UI, UI.GetLauncherWeaponName(launcher.Launcher))
+                range_km = UI.GetRangeToTrack(target_info)
+                travel_time_s = 1000.0 * range_km / speed_mps
+                travel_time_s = travel_time_s + 10.0 # add a little time for launch and altitude adjustment
+                target_info = target_info.PredictAhead(travel_time_s)
+                lat = target_info.Lat
+                lon = target_info.Lon
+                alt = target_info.Alt
+        elif launch_type == 1 or launch_type == 3:  #gun, rocket
+            # if the Speed_mps is non-zero in launcher info, then adjust datum based on expected travel time and target speed and heading
+            if isdatum:
+                lon, lat = datum
+                alt = UI.GetMapTerrainElevation(datum[0], datum[1])
+                if alt < 0: alt = 0
+            else:
+                range_km = UI.GetRangeToTrack(target_info)
+                if (launcher.Speed_mps > 0):
+                    travel_time_s = 1000.0 * range_km / launcher.Speed_mps
+                    travel_time_s = travel_time_s + 10.0 # add a little time for launch and altitude adjustment
+                    target_info = target_info.PredictAhead(travel_time_s)
+                lat = target_info.Lat
+                lon = target_info.Lon
+                alt = target_info.Alt
+                if alt < 0: alt = 0
+        else:  #launch_type = 0, missile
+            #confirm the missile is the type its supposed to be.....
+            if isdatum:
+                lon, lat = datum
+                alt = UI.GetMapTerrainElevation(datum[0], datum[1])
+                if alt < 0: alt = 0
+            else:
+                if target_info.IsSurface():
+                    ASM = AntiShipMissile(UI, UI.GetLauncherWeaponName(launcher.Launcher))
+                    if not ASM:
+                        return False
+                elif target_info.IsGround():
+                    AGM = AntiLandMissile(UI, UI.GetLauncherWeaponName(launcher.Launcher))
+                    if not AGM:
+                        return False
+                range_km = UI.GetRangeToTrack(target_info)
+                lat = target_info.Lat
+                lon = target_info.Lon
+                alt = target_info.Alt
+        if not isdatum:
+            UI.HandoffTargetToLauncher(launcher.Launcher) # to store intended target
+        UI.SendDatumToLauncher(lon, lat, alt, launcher.Launcher)
+        UI.Launch(launcher.Launcher, launch_qty)
+        return True
+    elif (launch_mode == 1) or (launch_mode == 2) or (launch_mode == 4):  # handoff to active seeker
+        if launch_type == 3:
+            if (launcher.Speed_mps > 0):
+                range_km = UI.GetRangeToTrack(target_info)
+                travel_time_s = 1000.0 * range_km / launcher.Speed_mps
+                travel_time_s = travel_time_s + 10.0 # add a little time for launch and altitude adjustment
+                target_info = target_info.PredictAhead(travel_time_s)
+            lat = target_info.Lat
+            lon = target_info.Lon
+            alt = target_info.Alt
+            if alt < 0: alt = 0
+            UI.SendDatumToLauncher(lon, lat, alt, launcher.Launcher)
+            UI.Launch(launcher.Launcher, launch_qty)
+            return True
+        elif launch_type is 0 or launch_type is 1:
+            UI.HandoffTargetToLauncher(launcher.Launcher)
+            UI.Launch(launcher.Launcher, launch_qty)
+            return True
+        else:
+            return False
+    else:
+        UI.DisplayMessage('Unrecognized launch mode: %d' % launch_mode)
+        return False
+        

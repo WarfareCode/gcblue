@@ -18,7 +18,7 @@ def GetTargetNear(UI, lon_rad, lat_rad, targetFlags, maxRange_km):
         classMask = classMask | 0x0080
     
     searchRange_km = 200
-    track_list = UI.GetTrackList(classMask, searchRange_km, 3)
+    track_list = UI.GetTrackList(classMask, searchRange_km, 100) # 100 for "valid by ROE"
 
     current_time = UI.GetTime()
     nTracks = track_list.Size()
@@ -53,7 +53,7 @@ def GetTargetNear(UI, lon_rad, lat_rad, targetFlags, maxRange_km):
 
 
 def SetAltitudeAndSpeedForLauncher(UI, launcher_idx):
-    min_alt_m = 300
+    min_alt_m = UI.GetTerrainElevation() + 300
     max_alt_m = 99999
 
     launcher_info = UI.GetLauncherInfo(launcher_idx)
@@ -69,9 +69,18 @@ def SetAltitudeAndSpeedForLauncher(UI, launcher_idx):
     elif (alt_m > max_alt_m):
         UI.SetAltitude(max_alt_m - 50)
     
+    if (launcher_info.LaunchMode == 4): # gun strafe or rocket attack
+        if (launcher_info.MaxRange_km > 3.0):
+            UI.SetAltitude(min_alt_m + 100*(launcher_info.MaxRange_km - 3.0))
+        else:
+            UI.SetAltitude(min_alt_m)
+    
     if (UI.HasThrottle() and (launcher_info.LaunchMode == 3)):
         UI.SetThrottle(max(UI.GetThrottle(), 0.75)) # use 75% throttle for dumb bomb runs
-
+    else:
+        UI.SetSpeedToMax()
+        
+            
 def IsTargetInRange(UI, lon_rad, lat_rad, launcher_idx):
     #bool IsTargetInRange(int nLauncher, float lon_rad, float lat_rad, float alt_m, float targetHeading_rad, float targetSpeed_kts);
     alt_m = UI.GetMapTerrainElevation(lon_rad, lat_rad) # since we're attacking a ground target
@@ -104,7 +113,13 @@ def AttackDatum(UI, lon_rad, lat_rad, launcher_idx):
     elif (launch_mode == 3):
         UI.DisplayMessage('Need bomb run')
     elif (launch_mode == 4):
-        UI.DisplayMessage('No support for aircraft gun attack')     
+        lat = lat_rad
+        lon = lon_rad
+        alt_m = UI.GetMapTerrainElevation(lon, lat) # since we're attacking a ground target
+        alt_m = max(alt_m, 0)
+        UI.SendDatumToLauncher(lon,lat,alt_m,launcher_idx)
+        UI.Launch(launcher_idx, launch_qty)
+        UI.SetActionText('Strafe')    
         
 def DropBombs2(UI, tgt_lon, tgt_lat, tgt_alt, qty):
     UI.DisplayMessage('Dropping bombs')
@@ -117,7 +132,31 @@ def DropBombs2(UI, tgt_lon, tgt_lat, tgt_alt, qty):
                 qty = 1 # force qty to 1 if nuclear
             UI.SendDatumToLauncher(tgt_lon,tgt_lat,tgt_alt,n)
             UI.Launch(n, qty)
-            
+
+# return maximum range of ground weapon in km (0 if none) and corresponding launcher_idx
+def GroundWeaponMaxRangeKm(UI):
+    maxRange_km = 0
+    nLaunchers = UI.GetLauncherCount()
+    launcher_idx = -1
+    for n in range(0, nLaunchers):
+        info = UI.GetLauncherInfo(n)
+        # TargetFlags 0x04 is effective vs land flag
+        if ((info.TargetFlags & 4) != 0) and (info.Quantity > 0) and (info.MaxRange_km > maxRange_km):
+            if (info.LaunchMode < 5):
+                maxRange_km = info.MaxRange_km
+                launcher_idx = n
+        
+    return (maxRange_km, launcher_idx)
+
+def GetHeadingError(UI, target_heading_deg):
+    current_heading = UI.GetHeading() # deg
+    heading_error = target_heading_deg - current_heading
+    if (heading_error < -180):
+        heading_error = heading_error + 360
+    elif (heading_error > 180):
+        heading_error = heading_error - 360
+    return heading_error
+    
 # more general version of BombDatum, attacks datum and targets near datum with ground weapons
 def GroundStrike(TI):
     UI = TI.GetPlatformInterface()
@@ -153,6 +192,7 @@ def GroundStrike(TI):
     tgt_alt = max(tgt_alt, 0)
     
     if (attack_state == 1): # search and close to target
+        UI.SetActionText('Searching')   
         # search for a sensor target near datum
         search_range_km = 20 # go after targets within this range of strike coordinates
         target_id = GetTargetNear(UI, tgt_lon, tgt_lat, 4, search_range_km)
@@ -160,6 +200,10 @@ def GroundStrike(TI):
             target_track = UI.GetTrackById(target_id)
             tgt_lon = target_track.Lon
             tgt_lat = target_track.Lat
+        else: # no targets found
+            UI.DisplayMessage('No target found')
+            TI.EndTask()
+            return
         TI.SetMemoryValue(20, tgt_lon) # set current best target coords
         TI.SetMemoryValue(21, tgt_lat)
                
@@ -187,6 +231,8 @@ def GroundStrike(TI):
             TI.SetUpdateInterval(20.0)
             if (info.LaunchMode == 3):
                 next_attack_state = 4 # start gravity bomb run
+            elif (info.LaunchMode == 4):
+                next_attack_state = 6 # strafe or rocket attack
             else:
                 next_attack_state = 2
         TI.SetMemoryValue(2, next_attack_state)
@@ -207,9 +253,17 @@ def GroundStrike(TI):
         TI.SetMemoryValue(2, next_attack_state)
         return
     if (attack_state == 3): # turn away/maintain fire control
-        UI.SetHeading(UI.GetHeading() + 90)
-        TI.SetUpdateInterval(180.0) # just assume 3 min is enough for testing
-        next_attack_state = 1
+        fireControlInfo = UI.GetFireControlInfo()
+        if (fireControlInfo.weaponsOut > 0):
+            next_attack_state = 3
+        else:
+            next_attack_state = 1
+        tgt_lon = TI.GetMemoryValue(20) # get current best target coords
+        tgt_lat = TI.GetMemoryValue(21)
+        tgt_bearing = UI.GetHeadingToDatum(tgt_lon, tgt_lat) # returns deg
+        UI.SetHeading(tgt_bearing + 90) # rough circle on target
+        UI.SetSpeed(UI.GetCruiseSpeedForAltitude(UI.GetAlt()))
+        TI.SetUpdateInterval(45.0)
         TI.SetMemoryValue(2, next_attack_state)
         return
     if (attack_state == 4): # bombing run approach
@@ -232,7 +286,7 @@ def GroundStrike(TI):
         d_alt_m = own_alt_m - tgt_alt
     
         if (d_alt_m < 0):  # normally should not happen
-            UI.SetAlt(tgt_alt + 2000.0)
+            SetAlt(UI, tgt_alt + 2000.0)
             UI.SetHeading(UI.GetHeading() + 180)
             TI.SetUpdateInterval(180.0) # try search again in 3 min
             next_attack_state = 1
@@ -270,7 +324,34 @@ def GroundStrike(TI):
         TI.SetMemoryValue(2, next_attack_state)
         UI.SetActionText('')
         return
-    
+    if (attack_state == 6): # gun or rocket strafe attack
+        tgt_lon = TI.GetMemoryValue(20) # get current best target coords
+        tgt_lat = TI.GetMemoryValue(21)
+        launcher_idx = int(TI.GetMemoryValue(22))
+        info = UI.GetLauncherInfo(launcher_idx)
+        fov_deg = info.SectorWidth
+        
+        tgt_bearing = UI.GetHeadingToDatum(tgt_lon, tgt_lat) # deg
+        heading_error = GetHeadingError(UI, tgt_bearing)
+        abs_heading_error = abs(heading_error)
+        UI.SetHeading(tgt_bearing)
+        
+        if (abs_heading_error > 90): # need to reposition and reattack
+            UI.SetHeading(tgt_bearing + 180)
+            next_attack_state = 1
+            TI.SetMemoryValue(2, next_attack_state)
+            TI.SetUpdateInterval(90.0)
+            return
+
+        if (abs_heading_error < (0.4*fov_deg)) and (IsTargetInRange(UI, tgt_lon, tgt_lat, launcher_idx)):
+            AttackDatum(UI, tgt_lon, tgt_lat, launcher_idx)
+            next_attack_state = 1
+            TI.SetUpdateInterval(90.0)
+        else:
+            next_attack_state = 6
+            TI.SetUpdateInterval(3.0) # wait and try again
+        TI.SetMemoryValue(2, next_attack_state)
+        return
 
 
 

@@ -3,6 +3,8 @@ from SubTactics import *
 from GCBcommon import *
 import math
 
+from Amram_Utilities import *
+
 #  added aerial refueling scripts to this, 
 # so now has both landing and aerial refueling with tanker aircraft
 
@@ -14,14 +16,25 @@ def CancelTasksForLanding(UI):
     UI.SetPitchLimit(85.0)
     UI.SetMaxTurnRate(360.0)
     UI.SetFormationLeader(-1) # leave formation if in formation
-    kill_list = ['Nav','InterceptTarget','IntC','PatrolCircle','AirPatrolArea','ASWPatrolArea','BarrierPatrol','GroundStrike','BombDatum']
+    kill_list = [   'Nav',
+                    'InterceptTarget',
+                    'IntC',
+                    'PatrolCircle',
+                    'AirPatrolArea',
+                    'ASWPatrolArea',
+                    'BarrierPatrol',
+                    'GroundStrike',
+                    'BombDatum', 
+                    'BombRun', 
+                    'Strafing', 
+                    'AirIntercept',
+                    'Air_Patrol']
 
     nKill = len(kill_list)
     for n in range(0, nKill):
         if (UI.TaskExists(kill_list[n])):
             UI.DeleteTask(kill_list[n])
-        
-        
+            
 # for non-helo aircraft
 def Land(TI):
     UI = TI.GetPlatformInterface()
@@ -32,8 +45,8 @@ def Land(TI):
         TI.EndTask()
         return
     
-    if (not GetConnControl(BB)):
-        return
+    #if (not GetConnControl(BB)):
+    #    return
 
     iteration = TI.GetMemoryValue(1) # will return 0 first time
     if (iteration == 0):  # do initialization
@@ -99,7 +112,7 @@ def Land(TI):
             goal_alt_m = cruise_alt_m
         else:
             goal_alt_m = 80*range_km + 1000 + alt_m
-        UI.SetAlt(goal_alt_m)
+        SetAlt(UI, goal_alt_m)
         if (UI.GetAltitude() > (goal_alt_m - 300)):
             cruiseSpeed_kts = UI.GetCruiseSpeedForAltitude(goal_alt_m)
             UI.SetSpeed(cruiseSpeed_kts)
@@ -110,12 +123,12 @@ def Land(TI):
         
     elif (land_state == 2):       
         track_info.Offset(6, landing_data.Heading_rad + 3.1416)
-        UI.SetAlt(300 + alt_m)
+        SetAlt(UI, 300 + alt_m)
         UI.SetPitchLimit(6)
         UI.SetThrottle(0.7)
         SetFractionalSpeed(UI,0.5)
     elif (land_state >= 3):
-        UI.SetAlt(18 + alt_m)
+        SetAlt(UI, 18 + alt_m)
         UI.SetPitchLimit(5)
         SetFractionalSpeed(UI,0.4)
         UI.SetThrottle(0.5)
@@ -133,8 +146,6 @@ def Land(TI):
         TI.SetUpdateInterval(3)
     else:
         TI.SetUpdateInterval(10)
-
-
 
 # modified this to adjust altitude based on altitude of landing
 # site
@@ -199,7 +210,7 @@ def LandHelo(TI):
         track_info.Offset(3, landing_data.Heading_rad + 3.1416)  # enter pattern at 3 km final
         range_km = UI.GetRangeToDatum(track_info.Lon, track_info.Lat)
         range_km = min(range_km, 10)
-        UI.SetAlt(50*range_km + 500 + alt_m) 
+        SetAlt(UI, 50*range_km + 500 + alt_m) 
         #if (land_state == 0):
         #    UI.DisplayMessage('Landing helo on platform %d' % track_info.ID) 
 
@@ -208,11 +219,11 @@ def LandHelo(TI):
     elif (land_state == 2):
         range_km = UI.GetRangeToDatum(track_info.Lon, track_info.Lat)
         range_km = min(range_km, 1)
-        UI.SetAlt(100*range_km + 100 + alt_m) 
+        SetAlt(UI, 100*range_km + 100 + alt_m) 
         UI.SetSpeed(track_info.Speed + 10 + 40*range_km)
     elif (land_state >= 3):  
         #UI.DisplayMessage('Final descent, platform %d' % track_info.ID)      
-        UI.SetAlt(50 + alt_m)
+        SetAlt(UI, 50 + alt_m)
         UI.SetSpeed(track_info.Speed + 2)
         if(UI.GetLandingState()==0):
             UI.SetLandingState(1)   # gear down  
@@ -231,7 +242,6 @@ def LandHelo(TI):
         TI.SetUpdateInterval(3)
     else:
         TI.SetUpdateInterval(10)
-
 
 def CheckBingo(UI, BB):
     if (not UI.IsAir()):
@@ -257,8 +267,11 @@ def CheckBingo(UI, BB):
         return 0
 
 def GetCruiseAltitude(UI):
-    if (UI.HasThrottle()):
-        cruise_alt_m = UI.GetCruiseAltitude()
+    if UI.HasThrottle():
+        if UI.GetPlatformClass() == 'SR-71':
+            cruise_alt_m = 27500
+        else:
+            cruise_alt_m = UI.GetCruiseAltitude()
     elif (UI.IsHelo()):
         cruise_alt_m = 2000.0
     else:
@@ -270,79 +283,25 @@ def ReturnToBase(TI):
 	UI.AddTask('RTB', 2.0, 0)
 	TI.EndTask()
 
-	
 # For aircraft, return to home base when at bingo fuel or after specified time
 def RTB(TI):
+    #given how much functionality has been replaced by other little functions for repurposing and modularising for the pilot script
+    #im just going to rewrite RTB entirely.  i pretty much have already, I just need to use the stuff I wrote in here too.
     UI = TI.GetPlatformInterface()
-    BB = TI.GetBlackboardInterface()
-    if (not UI.IsAir()):
+    TI.SetUpdateInterval(5)
+    if not UI.IsAir():
         TI.EndTask()
         return
 
-    iteration = TI.GetMemoryValue(1) # will return 0 first time
-    if (iteration == 0):  # do initialization
-        home_base = BB.ReadMessage('Home')
-        home_id = UI.LookupFriendlyId(home_base)
-        if (home_id == -1):
-            SetAlternateHomeBase(UI)
-            home_base = BB.ReadMessage('Home')
-            home_id = UI.LookupFriendlyId(home_base)
-        TI.SetMemoryValue(10, home_id)
-        TI.SetUpdateInterval(30)
-        cruise_alt_m = GetCruiseAltitude(UI)
-        TI.SetMemoryValue(15, cruise_alt_m)
-        reserve = UI.GetCruiseRangeForAltitude(cruise_alt_m) * 0.04 / UI.GetFuel()
-        TI.SetMemoryValue(16, reserve)
+    if UI.TaskExists('Land') or UI.TaskExists('LandHelo'):
+        return
+    else:
+        bingo, range_km = BingoFuel(UI)
+        if bingo == 1:
+            GoRefuel(UI, range_km)
+        elif bingo == 2:
+            GoHome(UI)
         
-    iteration = iteration + 1
-    TI.SetMemoryValue(1, iteration)
-    home_id = long(TI.GetMemoryValue(10))
-    home_track = UI.GetTrackById(home_id)
-    cruise_alt_m = TI.GetMemoryValue(15)
-    
-    if (UI.IsTankerAircraft(UI.LookupFriendlyId(UI.GetName()))):   #we are tanker
-        UI.SetActionText('Tanker Fuel %0.3f' % UI.GetFuel())
-    
-    if (not home_track.IsValid()):
-        SetAlternateHomeBase(UI)
-        home_base = BB.ReadMessage('Home')
-        home_id = UI.LookupFriendlyId(home_base)
-        home_track = UI.GetTrackById(home_id)
-        TI.SetMemoryValue(10, home_id)
-        if (home_id == -1):
-            UI.DisplayPopupMessage('Need alternate landing field')
-            TI.EndTask()
-            return
-
-    homeRange_km = UI.GetRangeToTrack(home_track)
-
-    altCheck_m = cruise_alt_m # use this as approx altitude for RTB
-    reserve = TI.GetMemoryValue(16)
-    cruiseRange_km = UI.GetCruiseRangeForAltitude(altCheck_m) - 85 - reserve# 85km reserve range, further 4% reserve
-
-    if ((homeRange_km >= cruiseRange_km - reserve - 75) and (UI.CanRefuelInFlight()) and (not UI.TaskExists('Refuel')) and (not UI.TaskExists('Land')) and (not UI.IsTankerAircraft(UI.LookupFriendlyId(UI.GetName())))):
-    #must be within refuel margin, able, not already refueling or landing, not a tanker
-        dest_name = GetNearbyTankers(UI)
-        if (len(dest_name) != 0):
-            tanker_name = dest_name[0].name
-            tanker_range = dest_name[0].range_km
-            dest_id = UI.LookupFriendlyId(tanker_name)
-            if (tanker_range < cruiseRange_km):
-                UI.DisplayPopupMessage('Tanking')
-                AddRefuelOrder(UI, dest_id)
-    if ((homeRange_km >= cruiseRange_km - reserve) and (not UI.TaskExists('Refuel'))):
-        home_base = BB.ReadMessage('Home')
-        dest_id = UI.LookupFriendlyId(home_base)
-        UI.DisplayPopupMessage('RTB')
-        BB_global = UI.GetBlackboardInterface() # so msg isn't erased on endtask
-        BB_global.Write('LandTarget', home_base)
-        UI.AddTask('Land', 2.0, 0)
-        CancelTasksForLanding(UI)
-        TI.EndTask()
-        
-    
-
-
 # return name of home airfield or '' if none
 def GetHomeBase(UI):
     BB = UI.GetBlackboardInterface()
@@ -356,7 +315,6 @@ def LandAtNamed(UI, base_name):
         UI.AddTask('LandHelo', 3.0, 0)
     else:
         UI.AddTask('Land', 3.0, 0)
-
 
 def CancelLanding(UI):
     if (UI.TaskExists('Land')):
@@ -372,7 +330,10 @@ def RangeNameCompare (x, y):
     return cmp(x.range_km, y.range_km)
 
 def SetAlternateHomeBase(UI):
+    BB = UI.GetBlackboardInterface()
     base_list = GetNearbyAirfields(UI)
+    
+    
     if (len(base_list) == 0):
         UI.DisplayMessage('%s needs home base' % UI.GetPlatformName())
     else:
@@ -429,18 +390,15 @@ def AddRefuelOrder(UI, dest_id):
     BB = UI.GetBlackboardInterface()
     BB.Write('RefuelTarget', dest_name)    
     
-    
 def RefuelFromNamed(UI, tanker_name):
     BB = UI.GetBlackboardInterface()
     BB.Write('RefuelTarget', tanker_name)
 
     UI.AddTask('Refuel', 2.0, 0)
 
-
 def CancelRefuel(UI):
     if (UI.TaskExists('Refuel')):
         UI.DeleteTask('Refuel')
-
 
 def Refuel(TI):
     UI = TI.GetPlatformInterface()
@@ -635,3 +593,63 @@ def tanking_approach_modifier(UI):
         #so its not in the list, feed 1 as default.
         modifier = 1
     return modifier
+    
+def BingoFuel(UI):
+    BB = UI.GetBlackboardInterface()
+    
+    if UI.GetFuel() == 0:
+        return -1, 0
+        
+    home_base = BB.ReadMessage('Home')
+    home_id = UI.LookupFriendlyId(home_base)
+    if (home_id == -1):
+        if not BB.KeyExists('HomeBaseSpam'):
+            SetAlternateHomeBase(UI)
+            home_base = BB.ReadMessage('Home')
+            home_id = UI.LookupFriendlyId(home_base)
+            BB.WriteGlobal('HomeBaseSpam', '1')
+    reserve = UI.GetCruiseRangeForAltitude(GetCruiseAltitude(UI)) * 0.04 / UI.GetFuel()
+        
+    home_track = UI.GetTrackById(home_id)
+    
+    bingo = 0
+    cruiseRange_km = UI.GetCruiseRangeForAltitude(GetCruiseAltitude(UI)) - 85 - reserve# 85km reserve range, further 4% reserve
+    if home_track.IsValid():
+        #yes, I know its separate from the previous block, and could easily be an else:
+        #I want this to run in the same pass in case we get a valid home_track from that previous block.
+        homeRange_km = UI.GetRangeToTrack(home_track)
+        if ((homeRange_km >= cruiseRange_km - reserve - 75) 
+            and (UI.CanRefuelInFlight()) and (not UI.TaskExists('Refuel')) 
+            and (not UI.TaskExists('Land')) and (not UI.IsTankerAircraft(UI.LookupFriendlyId(UI.GetName())))
+            ):
+            #go find a tanker if you can
+            bingo = 1
+        if ((homeRange_km >= cruiseRange_km - reserve) and (not UI.TaskExists('Refuel'))):
+            #go home
+            bingo = 2
+    if UI.GetFuel() < 0.05:
+        AddTask(UI, 'GlideSlope', 1, -1)
+    return bingo, cruiseRange_km
+        
+def GoRefuel(UI, cruiseRange_km):
+    if not UI.TaskExists('Refuel'):
+        dest_name = GetNearbyTankers(UI)
+        if (len(dest_name) != 0):
+            tanker_name = dest_name[0].name
+            tanker_range = dest_name[0].range_km
+            dest_id = UI.LookupFriendlyId(tanker_name)
+            if (tanker_range < cruiseRange_km):
+                UI.DisplayPopupMessage('Tanking')
+                AddRefuelOrder(UI, dest_id)
+
+def GoHome(UI):
+    if not UI.TaskExists('Land'):
+        UI.DisplayPopupMessage('RTB')
+        BB = UI.GetBlackboardInterface()
+        home_base = BB.ReadMessage('Home')
+        dest_id = UI.LookupFriendlyId(home_base)
+        if dest_id != -1:
+            BB_global = UI.GetBlackboardInterface() # so msg isn't erased on endtask
+            BB_global.Write('LandTarget', home_base)
+            AddTask(UI, 'Land')
+            CancelTasksForLanding(UI)    

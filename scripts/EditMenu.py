@@ -1,22 +1,44 @@
-import operator
+import sys, os, math, json, operator, datetime
+from os.path import dirname, abspath, join, normpath, isfile
+sys.path.append(abspath(join(dirname(__file__), 'Amram_Script_Data', '..', 'log')))
+    #script data in, well, script data, '..' to gain access to logs, and logs to access the scenario report file.
+from Amram_AI_Weapon_Lists import *
 from UnitCommands import *
 from GroupCommands import *
 from MissionEditCommands import *
 from HotKey import *
+import Amram_Menu
+from Amram_Utilities import *
+from service_period import *
 
-    
 
+#amram scenario report log file path    
+reportfile_path = 'log/scenario_script_report.txt'
 
 # top-level edit menu
 def BuildEditMenu(UnitMenu, SM):
     UnitMenu.Clear()
-
     UnitMenu.AddItem('Scenario', '')
     UnitMenu.BeginSubMenu()
-    UnitMenu.AddItem('Save scenario', 'SaveGame')
+    #UnitMenu.AddItem('Save scenario', 'SaveGame')
     UnitMenu.AddItemUI('Edit name', 'SetScenarioName', 'Text Scenario name')
     UnitMenu.AddItemUI('Edit description', 'SetScenarioDescription', 'Paragraph ScenarioDescription')
     UnitMenu.AddItemUI('Set date and time', 'SetDateTimeString', 'Text Enter YYYY/MM/DD HH:MM:SS')
+    
+    UnitMenu.AddItem('Filter','')
+    UnitMenu.BeginSubMenu()
+    filterByYearActive = SM.GetFilterByYear()
+    if (filterByYearActive):
+        UnitMenu.AddItemWithParam('Disable year filtering', 'SetFilterByYear', 0)
+    else:
+        UnitMenu.AddItemWithParam('Enable year filtering', 'SetFilterByYear', 1)
+    filterByCountryActive = SM.GetFilterByCountry()
+    if (filterByCountryActive):
+        UnitMenu.AddItemWithParam('Disable country filtering', 'SetFilterByCountry', 0)
+    else:
+        UnitMenu.AddItemWithParam('Enable country filtering', 'SetFilterByCountry', 1)  
+    UnitMenu.EndSubMenu()
+    
     UnitMenu.EndSubMenu()
 	
     current_team = SM.GetUserAlliance()
@@ -34,9 +56,19 @@ def BuildEditMenu(UnitMenu, SM):
     StartGoalTree(UnitMenu, SM)
     UnitMenu.EndSubMenu()
 
-    
-    BuildCreateUnitMenu(UnitMenu, SM)
-
+    Amram_Menu.AmramCreateAllianceUnitMenu(UnitMenu, SM)
+    #BuildCreateUnitMenu(UnitMenu, SM)
+    #UnitMenu.AddItemUI('Test GetUnits','GetAllUnits', 'Text Please input the date: YYYY/MM/DD')
+    UnitMenu.AddItem('Scenario Issue Reporting',''); UnitMenu.BeginSubMenu(); UnitMenu.SetStayOpen(1)
+    UnitMenu.AddItemWithTextParam('Generate Scenario Issue Report','GetAllUnits', '2014/09/13')
+    if isfile(reportfile_path):
+        mod_date = modification_date(reportfile_path)
+        UnitMenu.AddItemWithTextParam('Delete Report: %s' % mod_date,'read_write_scenario_issue_reports', 'Delete')
+        UnitMenu.AddItem('Report: %s' % mod_date,''); UnitMenu.BeginSubMenu(); UnitMenu.SetStayOpen(1)
+        report = read_write_scenario_issue_reports('', 'GetReport')
+        traverse_dict_report(UnitMenu, SM, report)
+        UnitMenu.EndSubMenu()
+    UnitMenu.EndSubMenu()
     UnitMenu.AddItem('Add graphic','')
     UnitMenu.BeginSubMenu()
     UnitMenu.AddItemUI('Dot', 'AddMapText', 'Datum');
@@ -53,15 +85,346 @@ def BuildEditMenu(UnitMenu, SM):
         else:
             UnitMenu.AddItem('%d [x]' % n, '')
     UnitMenu.EndSubMenu()
+    
+    UnitMenu.AddItem('Sonar SVP','')
+    UnitMenu.BeginSubMenu()
+    nTemplates = SM.GetNumberSonarTemplates()
+    currentTemplate = SM.GetSonarTemplate()
+    for n in range(0, nTemplates):
+        if (n == currentTemplate):
+            UnitMenu.AddItemWithParam('%s [x]' % SM.GetTemplateName(n), 'SetSonarTemplate', n)
+        else:
+            UnitMenu.AddItemWithParam(SM.GetTemplateName(n), 'SetSonarTemplate', n)
     UnitMenu.AddItem('Edit SVP', '*ShowSonarPanel')
     UnitMenu.EndSubMenu()
+    
+    UnitMenu.EndSubMenu()
+    
+def modification_date(filename):
+    t = os.path.getctime(filename)
+    t = datetime.datetime.fromtimestamp(t)
+    t = t.strftime("%y/%m/%d %H:%M:%S")
+    return t
+    
+def GetAllUnits(SM, date):
+    #iterative climb through the entire run of id's from 0 through 1e6
+    #repeated for all three alliances
+    date = DateString_DecimalYear(date)
+    
+    Units = {}
+    for id in xrange(1000):
+        try:
+            trackName = SM.GetUnitNameById(id)
+            gotunit = True
+        except:
+            gotunit = False
+        if gotunit:
+            id = SM.GetUnitIdByName(trackName)
+            UI = SM.GetUnitInterface(trackName)
+            num = UI.GetPlatformAlliance()
+            if id != -1:
+                try:
+                    Units[num][trackName] = id
+                except:
+                    Units[num] = {}
+                    Units[num][trackName] = id
+    
+    debug = open('log/Units.txt', 'w')
+    debug.write('')
+    debug = open('log/Units.txt', 'a')
+    problems = {}
+    for alliance in Units:
+        for track in Units[alliance]:
+            UI = SM.GetUnitInterface(track)
+            className = UI.GetPlatformClass()
+            service = check_service(UI, className, date)
+            if not service:
+                problems = recordprob(problems, alliance, 'Units', track, 'Unit Not in Service')
+            debug.write('%s, %s, In service: %s\n' % (alliance, track, service))
+            
+            if UI.GetLauncherCount() > 0:
+                for lnum in xrange(UI.GetLauncherCount()):
+                    weapon = UI.GetLauncherWeaponName(lnum)
+                    service = check_service(UI, weapon, date)
+                    if not service:
+                        problems = recordprob(problems, alliance, 'Launcher Items', weapon, track, 'Loaded Item not in service')
+                    debug.write('        %s, In Service: %s\n' % (weapon, service))
+            if UI.HasFlightPort():
+                FP = UI.GetFlightPortInfo()
+                debug.write('    Flightport:\n')
+                for n in xrange(FP.GetUnitCount()):
+                    UIn = FP.GetUnitPlatformInterface(n)
+                    childClass = UIn.GetPlatformClass()
+                    childName = UIn.GetPlatformName()
+                    service = check_service(UI, className, date)
+                    debug.write('        %s - %s In Service: %s\n' % (childClass, childName, service))
+                    if not service:
+                        problems = recordprob(problems, alliance, 'FlightPorts', className, childClass, childName, 'Aircraft Not in service')
+                    if UIn.GetLauncherCount() > 0:
+                        for lnum in xrange(UIn.GetLauncherCount()):
+                            weapon = UIn.GetLauncherWeaponName(lnum)
+                            service = check_service(UI, weapon, date)
+                            debug.write('            %s, In Service: %s\n' % (weapon, service))
+                            if not service:
+                                problems = recordprob(problems, alliance, 'Unit Armaments', className, childClass, childName, weapon, 'Loaded Item Not in service')
+            if UI.HasMagazine():
+                debug.write('    Magazine:\n')
+                items = UI.GetMagazineItems()
+                UnitName = UI.GetPlatformName()
+                for item_n in xrange(items.Size()):
+                    item = items.GetString(item_n)
+                    qty = UI.GetMagazineQuantity(item)
+                    debug.write('        %s : %s, In Service: %s\n' % (item, qty, check_service(UI, item, date)))
+                    if not service:
+                        problems = recordprob(problems, alliance, 'Magazine Items', className, UnitName, weapon, 'Supplied Not in service')
 
+    debug.write('\n\n')
+    for alliance in problems:
+        for sub1 in problems[alliance]:
+            if type(problems[alliance][sub1]) == type({}):
+                #go deeper
+                for sub2 in problems[alliance][sub1]:
+                    if type(problems[alliance][sub1][sub2]) == type({}):
+                        #go deeper:
+                        for sub3 in problems[alliance][sub1][sub2]:
+                            if type(problems[alliance][sub1][sub2][sub3]) == type({}):
+                                #go deeper:
+                                for sub4 in problems[alliance][sub1][sub2][sub3]:
+                                    if type(problems[alliance][sub1][sub2][sub3][sub4]) == type({}):
+                                        #go deeper:
+                                        for sub5 in problems[alliance][sub1][sub2][sub3][sub4]:
+                                            debug.write('%s, %s, %s, %s, %s, %s\n' % (sub1, sub2, sub3, sub4, sub5, problems[alliance][sub1][sub2][sub3][sub4][sub5]))
+                                    else:
+                                        debug.write('%s, %s, %s, %s, %s\n' % (sub1, sub2, sub3, sub4, problems[alliance][sub1][sub2][sub3][sub4]))
+                            else:
+                                debug.write('%s, %s, %s, %s\n' % (sub1, sub2, sub3, problems[alliance][sub1][sub2][sub3]))
+                    else:
+                        debug.write('%s, %s, %s\n' % (sub1, sub2, problems[alliance][sub1][sub2]))
+            else:
+                debug.write('%s, %s\n' % (sub1, problems[alliance][sub1]))
+    read_write_scenario_issue_reports(problems, 'WriteReport')
+    UI.DisplayMessage('Scan Complete')
+
+def recordprob(dd, *args):
+    #handled up to 6 args, minimum 2.
+    if len(args) == 2:
+        arg0, arg1 = args
+        dd[arg0] = arg1
+    elif len(args) == 3:
+        arg0, arg1, arg2 = args
+        try:
+            dd[arg0][arg1] = arg2
+        except:
+            dd[arg0] = {}
+            dd[arg0][arg1] = arg2
+    elif len(args) == 4:
+        arg0, arg1, arg2, arg3 = args
+        try:
+            dd[arg0][arg1][arg2] = arg3
+        except:
+            try:
+                dd[arg0][arg1] = {}
+                dd[arg0][arg1][arg2] = arg3
+            except:
+                dd[arg0] = {}
+                dd[arg0][arg1] = {}
+                dd[arg0][arg1][arg2] = arg3
+    elif len(args) == 5:
+        arg0, arg1, arg2, arg3, arg4 = args
+        try:
+            dd[arg0][arg1][arg2][arg3] = arg4
+        except:
+            try:
+                dd[arg0][arg1][arg2] = {}
+                dd[arg0][arg1][arg2][arg3] = arg4
+            except:
+                try:
+                    dd[arg0][arg1] = {}
+                    dd[arg0][arg1][arg2] = {}
+                    dd[arg0][arg1][arg2][arg3] = arg4
+                except:
+                    dd[arg0] = {}
+                    dd[arg0][arg1] = {}
+                    dd[arg0][arg1][arg2] = {}
+                    dd[arg0][arg1][arg2][arg3] = arg4
+    elif len(args) == 6:
+        arg0, arg1, arg2, arg3, arg4, arg5 = args
+        try:
+            dd[arg0][arg1][arg2][arg3][arg4] = arg5
+        except:
+            try:
+                dd[arg0][arg1][arg2][arg3] = {}
+                dd[arg0][arg1][arg2][arg3][arg4] = arg5
+            except:
+                try:
+                    dd[arg0][arg1][arg2] = {}
+                    dd[arg0][arg1][arg2][arg3] = {}
+                    dd[arg0][arg1][arg2][arg3][arg4] = arg5
+                except:
+                    try:
+                        dd[arg0][arg1] = {}
+                        dd[arg0][arg1][arg2] = {}
+                        dd[arg0][arg1][arg2][arg3] = {}
+                        dd[arg0][arg1][arg2][arg3][arg4] = arg5
+                    except:
+                        dd[arg0] = {}
+                        dd[arg0][arg1] = {}
+                        dd[arg0][arg1][arg2] = {}
+                        dd[arg0][arg1][arg2][arg3] = {}
+                        dd[arg0][arg1][arg2][arg3][arg4] = arg5
+                            
+    return dd
+    
+def classify_item(UI, item):
+    if Torpedo_Lead(UI, item) or AntiShipSubTorpedo(UI, item) or Mines(UI, item):
+        return True, 'torpedo'
+    elif AntiShipMissile(UI, item) or AntiLandMissile(UI, item) or AntiRadarMissile(UI, item) or AntiAirMissile(UI, item) or AntiMissileMissile(UI, item) or AntiSubMissile(UI, item) or NukeMis(UI, item):
+        return True, 'missile'
+    elif StratNuke(UI, item) or IronBomb(UI, item) or GuidedBomb(UI, item) or Rockets(UI, item) or GunRound(UI, item):
+        return True, 'ballistic'
+    elif CMs(UI, item):
+        return True, 'cm'
+    else:
+        return False, ''
+
+def traverse_dict_report(Menu, SM, problems):
+    for alliance in sorted(problems):
+        Menu.AddItem('%s: %s' % (str(alliance), SM.GetAllianceCountry(int(alliance))),'');Menu.BeginSubMenu();Menu.SetStayOpen(1)
+        for sub1 in sorted(problems[alliance]):
+            if type(problems[alliance][sub1]) == type({}):
+                #go deeper
+                Menu.AddItem('%s' % str(sub1),'');Menu.BeginSubMenu();Menu.SetStayOpen(1)
+                for sub2 in sorted(problems[alliance][sub1]):
+                    if type(problems[alliance][sub1][sub2]) == type({}):
+                        #go deeper:
+                        Menu.AddItem('%s' % str(sub2),'');Menu.BeginSubMenu();Menu.SetStayOpen(1)
+                        for sub3 in sorted(problems[alliance][sub1][sub2]):
+                            if type(problems[alliance][sub1][sub2][sub3]) == type({}):
+                                #go deeper:
+                                Menu.AddItem('%s' % str(sub3),'');Menu.BeginSubMenu();Menu.SetStayOpen(1)
+                                for sub4 in sorted(problems[alliance][sub1][sub2][sub3]):
+                                    if type(problems[alliance][sub1][sub2][sub3][sub4]) == type({}):
+                                        #go deeper:
+                                        Menu.AddItem('%s' % str(sub4),'');Menu.BeginSubMenu();Menu.SetStayOpen(1)
+                                        for sub5 in sorted(problems[alliance][sub1][sub2][sub3][sub4]):
+                                            Menu.AddItem('%s  Issue is  %s' % (str(sub5), str(problems[alliance][sub1][sub2][sub3][sub4][sub5])),'')
+                                        Menu.EndSubMenu()
+                                    else:
+                                        Menu.AddItem('%s  Issue is  %s' % (str(sub4), str(problems[alliance][sub1][sub2][sub3][sub4])),'')
+                                Menu.EndSubMenu()
+                            else:
+                                Menu.AddItem('%s  Issue is  %s' % (str(sub3), str(problems[alliance][sub1][sub2][sub3])),'')
+                        Menu.EndSubMenu()
+                    else:
+                        Menu.AddItem('%s  Issue is  %s' % (str(sub2), str(problems[alliance][sub1][sub2])),'')
+                Menu.EndSubMenu()
+            else:
+                Menu.AddItem('%s  Issue is  %s' % (str(sub1), str(problems[alliance][sub1])),'')
+        Menu.EndSubMenu()
+
+def read_write_scenario_issue_reports(dd, param):
+    debug = open('log/test.txt', 'w')
+    debug.write('%s = type(%s)' % (param, type(param)))
+    if param == 'GetReport':
+        #load up the report file, and provide the data to the player somehow.
+        #
+        #perhaps: if the file exists, read it in, and merge it with the menu automatically, with a disclaimer that the data was last generated on <recorded date/time>
+        with open(reportfile_path, 'r') as logfile:
+            return json.load(logfile)
+    elif param == 'Delete' and isfile(reportfile_path):
+        os.remove(reportfile_path)
+    elif param == 'WriteReport':
+        #take the provided dict file and write it down.
+        with open(reportfile_path, 'w') as logfile:
+            json.dump(dd, logfile, ensure_ascii=False, skipkeys=True, indent=2, sort_keys=True)
+                    
+def check_service(UI, className, date):
+    if className == UI.GetPlatformClass():
+        if UI.HasThrottle():
+            tab = 'air'
+        elif UI.IsSurface():
+            tab = 'ship'
+        elif UI.IsFixed() or UI.IsGroundVehicle():
+            tab = 'ground'
+        elif UI.IsSub():
+            tab = 'sub'
+        else:
+            tab = 'simpleair'
+        if not UI.IsGroundVehicle() or not UI.IsFixed() or not tab == 'ground':
+            date1 = UI.QueryDatabase(tab ,className, 'InitialYear')
+            try:
+                date1 = float(date1.GetString(0))
+            except:
+                #wtf...
+                debug = open('log/debugUnits.txt', 'a')
+                debug.write('%s, %s, %s, %s\n' % (tab, className, 'InitialYear', date1))
+            date2 = UI.QueryDatabase(tab ,className, 'FinalYear')
+            try:
+                date2 = float(date2.GetString(0))
+            except:
+                #wtf...
+                debug = open('log/debugUnits.txt', 'a')
+                debug.write('%s, %s, %s, %s\n' % (tab, className, 'InitialYear', date2))
+            if 'Fullback' in UI.GetName():
+                debug = open('log/debugUnits.txt', 'a')
+                debug.write('%s, %s, %s, %s, %s\n' % (className, date1, date, date2, date1 <= date <= date2))
+            return date1 <= date <= date2
+        else:
+            return True
+    else:
+        country = ''
+        if className == UI.GetPlatformClass():
+            if UI.HasThrottle():
+                tab = 'air'
+            elif UI.IsSurface():
+                tab = 'ship'
+            elif UI.IsFixed() or UI.IsGroundVehicle():
+                tab = 'ground'
+            elif UI.IsSub():
+                tab = 'sub'
+            else:
+                tab = 'simpleair'
+            if not UI.IsGroundVehicle() or not UI.IsFixed() or not tab == 'ground':
+                country = UI.QueryDatabase(tab, className, 'Country')
+                country = country.GetString(0)
+        if country in servicekit:
+            if item in servicekit[country]:
+                date1 = servicekit[country][item]['Entry']
+                date2 = servicekit[country][item]['Exit']
+                return date1 <= date <= date2
+            else:
+                return False
+        else:
+            classified, tab = classify_item(UI, className)
+            if classified:
+                date1 = UI.QueryDatabase(tab, className, 'InitialYear')
+                date2 = UI.QueryDatabase(tab, className, 'FinalYear')
+                try:
+                    date1 = float(date1.GetString(0))
+                except:
+                    #wtf...
+                    debug = open('log/debugUnits.txt', 'a')
+                    debug.write('%s, %s, %s, %s\n' % (tab, className, 'InitialYear', date1))
+                try:
+                    date2 = float(date2.GetString(0))
+                except:
+                    #wtf...
+                    debug = open('log/debugUnits.txt', 'a')
+                    debug.write('%s, %s, %s, %s\n' % (tab, className, 'InitialYear', date2))
+                return date1 <= date <= date2
+            else:
+                return True
+     
+def HookUnitFromMenu(SM, className):
+    id = SM.GetUnitIdByName(className)
+    UI = SM.GetUnitInterface(className)
+    alliance = UI.GetUnitAlliance()
+    SM.SetAlliance(alliance)
+    SM.HookUnit(id)
+    
 def BuildCreateUnitMenu(UnitMenu, SM):
     page_count = 25
     
-    UnitMenu.AddItem('Create unit','')
-    UnitMenu.BeginSubMenu()
-
     # Create surface ship submenu ###
     UnitMenu.AddItem('Surface','')
     BuildPagedCreateMenu(SM, UnitMenu, 'Surface', page_count)
@@ -85,6 +448,10 @@ def BuildCreateUnitMenu(UnitMenu, SM):
     UnitMenu.AddItem('Land','')
     BuildPagedCreateMenu(SM, UnitMenu, 'Land', page_count)
     
+    # Create underwater mines (subset of torpedo database class)
+    UnitMenu.AddItem('Mine','')
+    BuildPagedCreateMenu(SM, UnitMenu, 'Mine', page_count)
+    
     UnitMenu.EndSubMenu()
  
   
@@ -95,6 +462,9 @@ def BuildUnitEditMenu(UnitMenu, UnitInfo):
     
     if (not UnitInfo.IsValid()):
         return
+    Amram_Menu.BuildAmramMenu(UnitMenu, UnitInfo, EditMode = True)
+    return
+    UnitMenu.AddItem('Stock Menu','');UnitMenu.BeginSubMenu();UnitMenu.SetStayOpen(0)    
 
 
     # Multiplayer options
@@ -110,6 +480,7 @@ def BuildUnitEditMenu(UnitMenu, UnitInfo):
         UnitMenu.AddItem('Break formation','BreakAirFormation')
     
     UnitMenu.AddItemUI('Move unit', 'MovePlatform', 'Datum')
+    UnitMenu.AddItemUI('Move unit to coordinate', 'MovePlatformString', 'Text Enter Latitude Longitude')
     UnitMenu.AddItemUI('Set heading [h]','SetHeading','Heading')
     # Speed submenu
     UnitMenu.SetStayOpen(1)
@@ -156,11 +527,16 @@ def BuildUnitEditMenu(UnitMenu, UnitInfo):
     BuildRenameMenu(UnitMenu, UnitInfo)
     BuildRandomizeEditMenu(UnitMenu, UnitInfo)
     
-    if (UnitInfo.IsFixed()):
+    UnitMenu.AddItem('Special', '')
+    UnitMenu.BeginSubMenu()
+    if (UnitInfo.IsFixed() or UnitInfo.IsGroundVehicle()):
         if (UnitInfo.GetAlwaysVisible()):
             UnitMenu.AddItemWithParam('Clear always visible', 'SetAlwaysVisible', 0)
         else:
             UnitMenu.AddItemWithParam('Set always visible', 'SetAlwaysVisible', 1)
+    cost_millions = 1e-6 * UnitInfo.GetCost()
+    UnitMenu.AddItemUI('Set Custom Cost (%.1f)' % cost_millions, 'SetCustomCost', 'Text Enter Custom Cost in Millions')
+    UnitMenu.EndSubMenu()
     
     if (UnitInfo.HasFlightPort()):
         UnitMenu.AddItem('Add mission', '')
@@ -235,7 +611,6 @@ def BuildUnitEditMenu(UnitMenu, UnitInfo):
         UnitMenu.AddItemUI('Set target', 'AddBombDatumTaskTargetID', 'Target')
         UnitMenu.EndSubMenu()
         UnitMenu.SetStayOpen(1)
-    UnitMenu.AddItemUI('Missile alert', 'AddMissileWarnTask','Null')
     UnitMenu.AddItemUI('Clear all tasks','ClearTasks','Null')
     UnitMenu.SetStayOpen(0)
     UnitMenu.AddItemUI('Add by name', 'AddTaskByName','Text Enter new task name')
@@ -343,25 +718,41 @@ def BuildLoadoutMenu(UnitMenu, UnitInfo):
         loadouts.PushBack('ASW')
         loadouts.PushBack('Strike')
         loadouts.PushBack('Nuclear')
-        if (loadouts.Size() > 0):
-            UnitMenu.AddItem('Preset','')
-            UnitMenu.BeginSubMenu()
-            for k in range(0, loadouts.Size()):
-                item_k = loadouts.GetString(k)
-                UnitMenu.AddItemWithTextParam('%s' % item_k, 'EquipLoadout', item_k)
-            UnitMenu.EndSubMenu()
+        
+        UnitMenu.AddItem('Preset','')
+        UnitMenu.BeginSubMenu()
+        BuildPagedLoadoutMenu(UnitMenu, loadouts, 20, 'EquipLoadout', '')
+        UnitMenu.EndSubMenu()
     
     for n in range(0, nLaunchers):
         UnitMenu.AddItem('L%d' % (n+1), '')
         UnitMenu.BeginSubMenu()
         UnitMenu.AddItemWithParam('Unload', 'Unload', n)
         equipment = UnitInfo.GetCompatibleItemList(n)
-        for k in range(0, equipment.Size()):
-            item_k = equipment.GetString(k)
-            UnitMenu.AddItemWithTextParam('%s' % item_k, 'ReloadLauncher', '%d%s' % (n, item_k))
+        BuildPagedLoadoutMenu(UnitMenu, equipment, 20, 'ReloadLauncher', '%d' % n)
         UnitMenu.EndSubMenu()
     UnitMenu.EndSubMenu()
 
+# items is tcStringArray
+def BuildPagedLoadoutMenu(Menu, items, page_count, command, prefix):
+    nItems = items.Size()
+    if (nItems > page_count):
+        nPages = nItems/page_count + 1
+        for p in range(0, nPages):
+            Menu.AddItem('Page %d' % (p+1),'')
+            Menu.BeginSubMenu()
+            nItemsPage = min(page_count, nItems - p*page_count)
+            for n in range(0, nItemsPage):
+                itemName = items.GetString(n+p*page_count)
+                Menu.AddItemWithTextParam('%s' % itemName, command, prefix + itemName)
+            Menu.EndSubMenu()
+    else:
+        for n in range(0, nItems):
+            itemName = items.GetString(n)
+            Menu.AddItemWithTextParam('%s' % itemName, command, prefix + itemName)
+            
+
+    
 def BuildRandomizeEditMenu(UnitMenu, UnitInfo):
     include_prob = 100.0*UnitInfo.GetIncludeProbability()
     
@@ -459,6 +850,16 @@ def BuildFormationMenu(UnitMenu, UnitInfo):
             leaderId = UnitInfo.GetFormationLeader()
             UnitMenu.AddItemWithParam('Leave formation', 'SetFormationLeader', -2)
             UnitMenu.AddItemUI('Change formation leader', 'SetFormationLeader', 'Target')
+            UnitMenu.AddItem('Formation mode','')
+            current_mode = UnitInfo.GetFormationMode()
+            UnitMenu.BeginSubMenu()
+            if (current_mode == 1): # FOLLOW mode
+                UnitMenu.AddItemWithParam('Follow [x]', 'SetFormationMode', 1)
+                UnitMenu.AddItemWithParam('Sprint-drift', 'SetFormationMode', 2)
+            else:
+                UnitMenu.AddItemWithParam('Follow', 'SetFormationMode', 1)
+                UnitMenu.AddItemWithParam('Sprint-drift [x]', 'SetFormationMode', 2)
+            UnitMenu.EndSubMenu()
             if (formEditId == leaderId):
                 UnitMenu.AddItem('Clear formation edit', 'DisableFormationEdit')
             else:
@@ -584,6 +985,7 @@ def StartGoalTree(Menu, SM):
     
     
 def BuildGoalTree(Menu, SM, goal):
+    Menu.SetStayOpen(1)
     goal_type = goal.GetTypeString()
     if (goal_type == 'Compound'):
         compound_goal = goal.AsCompoundGoal()
@@ -603,28 +1005,34 @@ def BuildGoalTree(Menu, SM, goal):
         Menu.EndSubMenu()
     elif (goal_type == 'Destroy'):
         destroy_goal = goal.AsDestroyGoal()
-        description = 'Destroy %s' % destroy_goal.GetTargetString()
+        description = 'Destroy %d/%d' % (destroy_goal.GetQuantity(), destroy_goal.GetTargetCount())
         Menu.AddItem(description, '')
         Menu.BeginSubMenu()
         Menu.AddItemWithParam('Delete', 'DeleteGoal', destroy_goal.GetId())
-        Menu.AddItemUIWithParam('Change target', 'ChangeGoalTarget', 'Target', destroy_goal.GetId())
+        InsertGoalTargetMenu(Menu, SM, destroy_goal)
         Menu.EndSubMenu()
     elif (goal_type == 'Protect'):
         protect_goal = goal.AsProtectGoal()
-        description = 'Protect %s' % protect_goal.GetTargetString()
+        description = 'Protect %d/%d' % (protect_goal.GetQuantity(), protect_goal.GetTargetCount())
         Menu.AddItem(description, '')
         Menu.BeginSubMenu()
         Menu.AddItemWithParam('Delete', 'DeleteGoal', protect_goal.GetId())
-        Menu.AddItemUIWithParam('Change target', 'ChangeGoalTarget', 'Target', protect_goal.GetId())
+        InsertGoalTargetMenu(Menu, SM, protect_goal)
         Menu.EndSubMenu()        
     elif (goal_type == 'Time'):
         time_goal = goal.AsTimeGoal()
-        description = 'Time +%.0f m,-%.0f m' % ((1.0/60.0)*time_goal.GetPassTimeout(), (1.0/60.0)*time_goal.GetFailTimeout())
+        pass_minutes = (1.0/60.0)*time_goal.GetPassTimeout()
+        fail_minutes = (1.0/60.0)*time_goal.GetFailTimeout()
+        
+        if (pass_minutes < fail_minutes):
+            description = 'Time +%.0f m' % pass_minutes
+        else:
+            description = 'Time -%.0f m' % fail_minutes
         Menu.AddItem(description, '')
         Menu.BeginSubMenu()
         Menu.AddItemWithParam('Delete', 'DeleteGoal', time_goal.GetId())
-        Menu.AddItemUIWithParam('Set pass time', 'ChangePassTime', 'Text', time_goal.GetId())
-        Menu.AddItemUIWithParam('Set fail time', 'ChangeFailTime', 'Text', time_goal.GetId())        
+        Menu.AddItemUIWithParam('Set pass time', 'ChangePassTime', 'Text Enter pass minutes', time_goal.GetId())
+        Menu.AddItemUIWithParam('Set fail time', 'ChangeFailTime', 'Text Enter fail minutes', time_goal.GetId())        
         Menu.EndSubMenu()
     elif (goal_type == 'Area'):
         area_goal = goal.AsAreaGoal()
@@ -659,10 +1067,20 @@ def BuildGoalTree(Menu, SM, goal):
         Menu.AddItemWithTextParam('Add all surface', 'SetAreaTargets', '%04dSurface' % area_goal_id)
         Menu.AddItemWithTextParam('Add all sub', 'SetAreaTargets', '%04dSub' % area_goal_id)
         Menu.AddItemWithTextParam('Add all ground', 'SetAreaTargets', '%04dGround' % area_goal_id)
+        
+        quantity = area_goal.GetQuantity()
+        Menu.AddItem('Set quantity (%d)' % quantity,'')
+        Menu.BeginSubMenu()
+        Menu.AddItemUIWithParam('Enter', 'SetGoalQuantity2', 'Text', goal.GetId()) 
+        for n in range(1, 9):
+            arg_string = '%08d%02d' % (goal.GetId(), n)
+            Menu.AddItemWithTextParam('%d' % n, 'SetGoalQuantity', arg_string)
+        Menu.EndSubMenu()        
+        
         Menu.EndSubMenu()
         
         Menu.EndSubMenu()       
-        
+        Menu.SetStayOpen(0)
     
 def InsertAddGoalMenu(Menu, SM, compound_goal):
     Menu.AddItem('Add goal','')
@@ -686,9 +1104,26 @@ def InsertAddGoalAllianceMenu(Menu, SM):
     Menu.EndSubMenu()    
     
     
+def InsertGoalTargetMenu(Menu, SM, goal):
+    Menu.AddItemUIWithParam('Add target', 'AddGoalTarget', 'Target', goal.GetId())
+    Menu.AddItemUIWithParam('Add targets in area', 'AddGoalTargetArea', 'Box', goal.GetId())
+    nTargets = goal.GetTargetCount()
+    Menu.AddItem('Remove targets (%d)' % nTargets,'')
+    Menu.BeginSubMenu()
+    for n in range(0,nTargets):
+        target_n = goal.GetTargetName(n)
+        arg_string = '%08d%s' % (goal.GetId(), target_n)
+        Menu.AddItemWithTextParam(target_n, 'RemoveGoalTarget', arg_string)
+    Menu.EndSubMenu()
+    quantity = goal.GetQuantity()
+    Menu.AddItem('Set Quantity (%d)' % quantity,'')
+    Menu.BeginSubMenu()
+    Menu.AddItemUIWithParam('Enter', 'SetGoalQuantity2', 'Text', goal.GetId()) 
+    for n in range(1, 9):
+        arg_string = '%08d%02d' % (goal.GetId(), n)
+        Menu.AddItemWithTextParam('%d' % n, 'SetGoalQuantity', arg_string)
+    Menu.EndSubMenu()
     
-    
-
 def BuildGroupEditMenu(GroupMenu, GroupInfo):
     GroupMenu.Clear()
     
@@ -696,6 +1131,9 @@ def BuildGroupEditMenu(GroupMenu, GroupInfo):
     if (unit_count <= 0):
         return
     
+    
+    Amram_Menu.BuildAmramMenu(GroupMenu, GroupInfo, EditMode = True)
+    return
     #determine number of carriers, helos, subs etc. in group
     #used to build menu depending on group configuration
     carrier_count = 0
@@ -710,7 +1148,7 @@ def BuildGroupEditMenu(GroupMenu, GroupInfo):
         if(UI.IsAir()):
             air_count = air_count + 1
 
-    #GroupMenu.AddItem('Total units: %d' % unit_count, '')
+    GroupMenu.AddItem('Total units: %d' % unit_count, '')
 
     # display info if group consists only of aircraft/helo 
     if(air_count==unit_count and helo_count == 0):
@@ -798,6 +1236,18 @@ def BuildROEMenu(UnitMenu, SM):
         
     # UnitMenu.EndSubMenu()
     
+def BuildWeaponEditMenu(UnitMenu, WeaponInfo):
+    UnitMenu.Clear()
+    if (not WeaponInfo.IsValid()):
+        return
     
+    weapon_type = WeaponInfo.GetWeaponType()
+    UnitMenu.AddItem('Weapon Type: %s' % weapon_type, '')
+    UnitMenu.AddItemUI('Move unit', 'MovePlatform', 'Datum')
+    UnitMenu.AddItemUI('Move unit to coordinate', 'MovePlatformString', 'Text Enter Latitude Longitude')
+    UnitMenu.AddItem('Delete unit', 'DeletePlatform')
+    UnitMenu.AddItemUI('Rename', 'RenamePlatform', 'Text Enter unit name')
+    UnitMenu.AddItemUI('Duplicate', 'CopyPlatform', 'Datum')
     
+
     

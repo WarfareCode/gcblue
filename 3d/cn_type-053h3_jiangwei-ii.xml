@@ -1,0 +1,24 @@
+<Model File="Cn_type-53H3_Jiangwei-II.tvm"/>
+<Info Author="gnombat" Notes="Chinese Frigate"/>
+
+<Submodel File="Cn_light_radar.tvm" Object="type360_radar" X="0" Y="2.5" Z="1.6" Yaw="0" Pitch="0" Roll="0"/>
+<Submodel File="Cn_kniferest.tvm" Object="knife_rest_radar" X="0" Y="1.7" Z="-1.05" Yaw="0" Pitch="0" Roll="0"/>
+
+<Animation Object="type360_radar" Type="Rotor" SensorIndex="0" AxisX="0" AxisY="-1" AxisZ="0" AngleRate="3"/>
+<Animation Object="knife_rest_radar" Type="Rotor" SensorIndex="0" AxisX="0" AxisY="1" AxisZ="0" AngleRate="0.5"/>
+
+
+<Smoke X="-0.744" Z="-7.493" Y="0.618"/>
+<Smoke X="0.668" Z="-7.493" Y="0.618"/>
+
+<Launcher X="-1.949" Z="-0.834" Y="-0.416"/>
+<Launcher X="-2.969" Z="-0.834" Y="-0.416"/>
+
+<Launcher X="-0.532" Z="1.46" Y="-0.246"/>
+<Launcher X="0.498" Z="1.46" Y="-0.246"/>
+<Launcher X="-0.814" Z="-3.396" Y="-0.307"/>
+<Launcher X="0.78" Z="-3.396" Y="-0.302"/>
+
+<Launcher X="1.808" Z="-0.834" Y="-0.416"/>
+<Launcher X="2.828" Z="-0.834" Y="-0.416"/>
+

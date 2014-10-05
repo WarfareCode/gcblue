@@ -9,8 +9,7 @@ from Landing import *
 from DevMode import *
 from GroupMenu import *
 from EditMenu import *
-#from Amram_AI_Scripts import Weapons_Officer_Toggle, Helm_Officer_Toggle, Flagfree1_Toggle, Flagfree2_Toggle, Flagfree4_Toggle, Flagfree8_Toggle, Flagfree16_Toggle, error_km_Toggle, ROE_Set_100, ROE_Set_4, ROE_Set_3, ROE_Set_2, ROE_Set_1, ROE_Set_0
-
+from Amram_Menu import *
 
 ###### Track menu scripts #####
 def BuildTrackMenu(TrackMenu, HookedTrackInfo):
@@ -39,16 +38,18 @@ def DropTrack(TrackInfo):
 def UpdateAmbiguityList(TrackInfo):
     TrackInfo.UpdateAmbiguityList()
 
+
 ###### Unit menu scripts #####
 def BuildUnitMenu(UnitMenu, UnitInfo):
-    BB = UnitInfo.GetBlackboardInterface()
     UnitMenu.Clear()
-    UnitMenu.SetStayOpen(0)
 
+    BuildAmramMenu(UnitMenu, UnitInfo)
+    return
+    UnitMenu.AddItem('Stock Menu','');UnitMenu.BeginSubMenu()
+    UnitMenu.SetStayOpen(0)
+    
     if (not UnitInfo.IsValid()):
         return
-
-    Amram_AI_Core_Menu(UnitMenu, UnitInfo)
 
     # Multiplayer options
     if (UnitInfo.IsMultiplayerActive()):
@@ -60,6 +61,7 @@ def BuildUnitMenu(UnitMenu, UnitInfo):
                 controller = UnitInfo.GetController()
                 UnitMenu.AddItem('Unavailable unit (%s)' % controller, '')
                 return
+
 
     if (not UnitInfo.IsFixed()):
         UnitMenu.AddItem('Navigate','')
@@ -76,17 +78,8 @@ def BuildUnitMenu(UnitMenu, UnitInfo):
     # Orders test
     UnitMenu.AddItem('Tasks','')
     UnitMenu.BeginSubMenu()
-
-    if UnitInfo.TaskExists('Weapon_Officer'):
-        UnitMenu.AddItemUI('Stop Weapons_Officer', 'Weapons_Officer_Toggle','Null')
-    else:
-        UnitMenu.AddItemUI('Start Weapons_Officer', 'Weapons_Officer_Toggle','Null')
-    if UnitInfo.TaskExists('Helm_Officer'):
-        UnitMenu.AddItemUI('Stop Helm_Officer', 'Helm_Officer_Toggle','Null')
-    else:
-        UnitMenu.AddItemUI('Start Helm_Officer', 'Helm_Officer_Toggle','Null')
-        
-    UnitMenu.AddItemUI('EngageAll [e]', 'AddEngageAllOrder','UI')
+    
+    UnitMenu.AddItemUI('EngageAll [e]', 'AddEngageAllOrder','Null')
     if (not UnitInfo.IsFixed()):
         UnitMenu.AddItemUI('Patrol station','AddPatrolStation', 'Datum')
         UnitMenu.AddItemUI('Set patrol area', 'SetPatrolArea', 'Box')
@@ -101,9 +94,9 @@ def BuildUnitMenu(UnitMenu, UnitInfo):
         BuildLandMenu(UnitMenu, UnitInfo)
         
 
-#    # Submarine menu
-#    if (UnitInfo.IsSub()):
-#        BuildSubmarineMenu(UnitMenu, UnitInfo)
+    # Submarine menu
+    if (UnitInfo.IsSub()):
+        BuildSubmarineMenu(UnitMenu, UnitInfo)
 
     UnitMenu.AddItem('Platform panel [s]', 'ShowPlatformPanel')
 
@@ -115,37 +108,6 @@ def BuildUnitMenu(UnitMenu, UnitInfo):
 
     if (UnitInfo.IsMultiplayerActive() and UnitInfo.IsPlayerControlled()):
         UnitMenu.AddItem('Release control', 'ReleaseControl')
-    
-    if UnitInfo.GetLauncherCount() > 0:
-        UnitMenu.AddItem('Mounts','')
-        UnitMenu.BeginSubMenu()
-        nCount = UnitInfo.GetLauncherCount()
-        for n in range(0, nCount):
-            launcher_info = UnitInfo.GetLauncherInfo(n)
-            weap_name = UnitInfo.GetLauncherWeaponName(n)
-            weap_qty = launcher_info.Quantity
-            isLoadingUnloading = launcher_info.IsLoading
-            if (weap_qty == 0):
-                if (not isLoadingUnloading):
-                    nTypes = UnitInfo.GetLauncherTypesCount(n)
-                    for k in range(0, nTypes):
-                        type_name = UnitInfo.GetLauncherTypeName(n, k)
-                        reload_qty = UnitInfo.GetMagazineQuantity(type_name)
-                        #UnitInfo.DisplayMessage('%s %d' % (type_name, reload_qty))
-                        if (reload_qty > 0):
-                            UnitMenu.AddItemWithTextParam('Load %s [%d]' % (type_name, reload_qty), 'Reload%d' % n, type_name)
-                else:
-                    UnitMenu.AddItemWithParam('Cancel load %s' % weap_name, 'Unload', n)
-            else:
-                if (not isLoadingUnloading):
-                    if (UnitInfo.CanMagazineAcceptItem(weap_name)):
-                        UnitMenu.AddItemWithParam('Unload %s' % weap_name, 'Unload', n)
-                    else:
-                        UnitMenu.AddItem('Cannot Unload %s' % weap_name, '')
-                else:
-                    UnitMenu.AddItemWithTextParam('Cancel unload %s' % weap_name, 'Reload%d' % n, weap_name)
-        UnitMenu.EndSubMenu()
-    
 
     # Formation
     BuildFormationMenu(UnitMenu, UnitInfo)
@@ -182,6 +144,7 @@ def BuildMissionMenu(UnitMenu, UnitInfo):
         
         UnitMenu.EndSubMenu()
 
+    
 def BuildNavMenu(UnitMenu, UnitInfo):
     if (UnitInfo.IsInFormation() and ~UnitInfo.IsFormationLeader()):
         UnitMenu.AddItem('Break formation','BreakAirFormation')
@@ -210,14 +173,6 @@ def BuildNavMenu(UnitMenu, UnitInfo):
         UnitMenu.AddItem('Very low','AltitudeVeryLow') 
         UnitMenu.EndSubMenu()
         UnitMenu.AddItemUI('Join air formation','AddAirFormationTaskId','Target')
-    elif (UnitInfo.IsSub()):
-        UnitMenu.AddItem('Set depth','')
-        UnitMenu.BeginSubMenu()
-        UnitMenu.AddItem('Surface','DepthSurface')
-        UnitMenu.AddItem('Periscope','DepthPeriscope')
-        UnitMenu.AddItem('Medium','DepthMedium')
-        UnitMenu.AddItem('Deep','DepthDeep') 
-        UnitMenu.EndSubMenu()        
         
     UnitMenu.AddItem('Waypoints','')
     UnitMenu.BeginSubMenu()
@@ -249,6 +204,7 @@ def BuildRefuelMenu(UnitMenu, UnitInfo):
             UnitMenu.EndSubMenu()
         
     UnitMenu.EndSubMenu()
+    
     
 def BuildLandMenu(UnitMenu, UnitInfo):
     # Land submenu
@@ -337,6 +293,7 @@ def BuildSubmarineMenu(UnitMenu, UnitInfo):
                 UnitMenu.AddItemWithTextParam('Cancel unload %s' % weap_name, 'Reload%d' % n, weap_name)
     UnitMenu.EndSubMenu()
 
+
 def BuildLaunchMenu(UnitMenu, UnitInfo):
     nCount = UnitInfo.GetLauncherCount()
     if (nCount == 0):
@@ -365,6 +322,8 @@ def BuildLaunchMenu(UnitMenu, UnitInfo):
 
     hasGravityBombs = HasGravityBombs(UnitInfo)
     if (hasGravityBombs):
+        UnitMenu.AddItemUI('Bomb datum', 'AddBombDatumTask', 'Datum')
+        UnitMenu.AddItemUI('Bomb datum', 'AddBombDatumTask', 'Datum')
         UnitMenu.AddItemUI('Bomb datum', 'AddBombDatumTask', 'Datum')
 
     # "Engage target with" menu lists launchers that are effective vs. selected target
@@ -409,6 +368,8 @@ def BuildLaunchMenu(UnitMenu, UnitInfo):
             UnitMenu.AddItemUIWithParam(launcherText[n], 'TargetAndEngageWith', 'Target', launcherIdx[n])
         UnitMenu.EndSubMenu()  
 
+
+
 def BuildTargetMenu(UnitMenu, UnitInfo):
     UnitMenu.AddItem('Target','')
     UnitMenu.BeginSubMenu()
@@ -422,6 +383,9 @@ def BuildTargetMenu(UnitMenu, UnitInfo):
             UnitMenu.AddItem('Intercept','AddInterceptTask')
     UnitMenu.EndSubMenu()
     
+
+
+
 def BuildFormationMenu(UnitMenu, UnitInfo):
     if (not UnitInfo.IsSurface()):
         return
@@ -481,13 +445,14 @@ def BuildDeveloperMenu(UnitMenu, UnitInfo):
     BuildLaunchAtMeMenu(UnitMenu, UnitInfo)
     UnitMenu.EndSubMenu()
     
+    
 def BuildWeaponMenu(UnitMenu, WeaponInfo):
     UnitMenu.Clear()
     if (not WeaponInfo.IsValid()):
         return
     
     weapon_type = WeaponInfo.GetWeaponType()
-    UnitMenu.AddItem('Weapon type: %s\n' % weapon_type, '')
+    UnitMenu.AddItem('Weapon Type: %s' % weapon_type, '')
     if (WeaponInfo.IsLinkActive()):
         UnitMenu.AddItem('LINK IS ACTIVE', '')
         UnitMenu.AddItemUI('Update target datum', 'UpdateWeaponTargetDatum', 'Datum')

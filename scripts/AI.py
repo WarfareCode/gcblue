@@ -7,9 +7,10 @@ from AirManagement import *
 from AirMissions import *
 from MissionAI import *
 from GroundStrike import *
-from EditMenu import *
+from Amram_Utilities import *
 from Amram_AI_Scripts import *
 import math
+
 
     
     
@@ -46,6 +47,9 @@ def TestTask(TI):
     iteration = iteration + 1
     TI.SetMemoryValue(1, iteration)
 
+
+
+
 def AirEvade(TI):
     UI = TI.GetPlatformInterface()
 
@@ -76,6 +80,8 @@ def AirEvade(TI):
         else:
             UI.SetHeading(bearing_deg - 90)
 
+
+
 # patrol task, roughly circles same point, stays within 10 km of station
 def PatrolCircle(TI):
     UI = TI.GetPlatformInterface()
@@ -96,13 +102,11 @@ def PatrolCircle(TI):
         TI.SetMemoryValue(11, station_lat)
         TI.SetMemoryValue(12, station_alt)
         TI.SetMemoryValue(13, station_speed)
-        Name = UI.GetName()
-        ID = UI.LookupFriendlyId(UI.GetName())
         
 
     iteration = iteration + 1
     TI.SetMemoryValue(1, iteration)
-    
+
     # activate all sensors
     can_radiate = GetSensorControl(BB)
     if (can_radiate and not UI.IsSub()):
@@ -121,7 +125,7 @@ def PatrolCircle(TI):
 
     if (UI.IsAir()):
         if (station_alt > 0):
-        	UI.SetAlt(station_alt)
+        	SetAlt(UI, station_alt)
 
     if (station_speed > 0):
         UI.SetSpeed(station_speed)
@@ -154,16 +158,12 @@ def PatrolCircle(TI):
 
     UI.SetHeading(new_heading)
     UI.SetMaxTurnRate(1.0)
-    #tacking on a piece to try and read a message set by a tanker customer, to boost the speed of a tanker to accomodate them.  Should give tankers a dedicated patrol task eventually
+    
 
-    Name = UI.GetName()
-    ID = UI.LookupFriendlyId(UI.GetName())
-        
 # warn if non-friendly missiles nearby
 def MissileWarning(TI):
     UI = TI.GetPlatformInterface()
-#    if (UI.IsPlayerControlled()):
-#        TI.EndTask()
+    UI = TI.GetPlatformInterface()
     BB = TI.GetBlackboardInterface()
 
     iteration = TI.GetMemoryValue(1) # will return 0 first time
@@ -176,28 +176,23 @@ def MissileWarning(TI):
     iteration = iteration + 1
     TI.SetMemoryValue(1, iteration)
 
-    closest_id, closest_range = ClosestOfType(UI, 0x0040, 120)
+    closest_id, closest_range = ClosestOfType(UI, 0x0040, 80)
 
     if (closest_id == -1):
         BB.Erase('MissileWarning')
-        TI.SetUpdateInterval(15.0)
+        TI.SetUpdateInterval(45.0)        
+        if (TI.GetMemoryValue(10) == 1):
+            if (UI.TaskExists('EngageAll')):
+                TI.SetMemoryValue(10, 0)
+            else:
+                UI.AddTask('EngageAll', 3.0, 0)
+                TI.SetUpdateInterval(3.0) 
         return
     elif (closest_range > 40):
         # missiles between 40 km and 80 km, increase update rate
-        BB.Erase('MissileWarning')
+        BB.Erase('MissileWarning')  
         TI.SetUpdateInterval(5.0)
-        track = UI.GetTrackById(closest_id)
-        if track.TrackErrorKm() > 5:
-            for n in range(0,UI.GetSensorCount()):
-                sensor = UI.GetSensorInfo(n)
-                if sensor.type != 8:
-                    UI.SetSensorState(n, 1)
         return
-    else:
-        for n in range(0,UI.GetSensorCount()):
-            sensor = UI.GetSensorInfo(n)
-            if sensor.type != 8:
-                UI.SetSensorState(n, 1)
 
     TI.SetUpdateInterval(5.0)
     
@@ -205,10 +200,10 @@ def MissileWarning(TI):
     
     if (UI.TaskExists('EngageAll')):
         TI.SetMemoryValue(10, 1) # set this to 1 to reload EngageAll when missiles clear
-
+        
     if (not UI.TaskExists('EngageAllAir')):
         UI.AddTask('EngageAllAir', 4.0, 0)
-        
+    
     UI.SetAllSensorState(1)
     
     current_time = UI.GetTime()
@@ -234,16 +229,19 @@ def MissileWarning(TI):
             cmLaunched = LaunchShipCM(UI, minLifeTime_s)
         if (cmLaunched > 0):
             TI.SetMemoryValue(3, current_time) # update cm launch time
- 
- 
     
-#    last_warning = TI.GetMemoryValue(2)
+    
+    last_warning = TI.GetMemoryValue(2)
 
-#    if (UI.IsPlayerControlled() and (current_time - last_warning > 30.0)):
-#        TI.SetMemoryValue(2, current_time)
-#        UI.PlaySound('Alarm')
-#        UI.DisplayPopupMessage('Missile alert')
-       
+    if (UI.IsPlayerControlled() and (current_time - last_warning > 30.0)):
+        TI.SetMemoryValue(2, current_time)
+        UI.PlaySound('Alarm')
+        UI.DisplayPopupMessage('Missile alert')
+        
+
+
+    
+
 # shoot hostiles and unknowns within range, but do not intercept.
 # Turn if necessary to position launchers
 def EngageAll(TI):
@@ -257,7 +255,8 @@ def EngageAllAir(TI):
     if (UI.TaskExists('EngageAll')):
         UI.DeleteTask('EngageAll')
     EngageAllWrapper(TI, 'air')
-
+        
+        
 # shoot hostiles and unknowns within range, but do not intercept.
 # Turn if necessary to position launchers
 # type: 'all' everything, 'air' just engage aircraft
@@ -352,23 +351,20 @@ def EngageAllWrapper(TI, type):
             
             
         if (GetConnControl(BB)):
-            if UI.IsSurface():
-                pass
-            else:
-                UI.SetHeading(goal_heading)
-                alt_m = UI.GetAltitude()
-                if (alt_m < launcher_info.MinLaunchAlt_m):
-                    UI.SetAltitude(launcher_info.MinLaunchAlt_m + 1.0)
-                    return
-                elif (alt_m > launcher_info.MaxLaunchAlt_m):
-                    UI.SetAltitude(launcher_info.MaxLaunchAlt_m - 1.0)
-                    return
-                if (UI.IsAir() and target_track.IsAir() and (target_track.Alt > 0)):
-                    range_km = UI.GetRangeToTarget()
-                    if (alt_m < target_track.Alt):
-                        UI.SetAltitude(target_track.Alt)
-                    elif (alt_m > (target_track.Alt + 200*range_km)):
-                        UI.SetAltitude(target_track.Alt)
+            UI.SetHeading(goal_heading)
+            alt_m = UI.GetAltitude()
+            if (alt_m < launcher_info.MinLaunchAlt_m):
+                UI.SetAltitude(launcher_info.MinLaunchAlt_m + 1.0)
+                return
+            elif (alt_m > launcher_info.MaxLaunchAlt_m):
+                UI.SetAltitude(launcher_info.MaxLaunchAlt_m - 1.0)
+                return
+            if (UI.IsAir() and target_track.IsAir() and (target_track.Alt > 0)):
+                range_km = UI.GetRangeToTarget()
+                if (alt_m < target_track.Alt):
+                    UI.SetAltitude(target_track.Alt)
+                elif (alt_m > (target_track.Alt + 200*range_km)):
+                    UI.SetAltitude(target_track.Alt)
   
         engagement_angle = target_bearing - UI.GetHeading() - launcher_angle
         engagement_angle = ((engagement_angle + 180) % 360) - 180 # force to -180 to 180
@@ -385,11 +381,13 @@ def EngageAllWrapper(TI, type):
             pass
             #UI.DisplayMessage('Out of sector')
 
+
 # Used by Engage tasks
 def RejoinFormation(TI, UI):
     formation_leader = long(TI.GetMemoryValue(14))
     if (formation_leader != -1):
         UI.SetFormationLeader(formation_leader)
+
 
 # Adjust heading toward target, maintain altitude and speed to release point, 
 # release ALL bombs at release point, and then reverse course
@@ -476,6 +474,7 @@ def BombTarget(TI):
     else:
         TI.SetUpdateInterval(9.0)
         UI.SetActionText('Bomb %.0f s' % t_release)
+
 
 # Version that bombs a datum without requiring a target based on a sensor map track
 def BombDatum(TI):
@@ -670,8 +669,12 @@ def BombDatumDive(TI):
     elif (range_left_m < 3000.0):
         TI.SetUpdateInterval(5.0)
 
+        
+
+
 def DropAllBombs(UI, tgt_lon, tgt_lat, tgt_alt):
     DropBombs(UI, tgt_lon, tgt_lat, tgt_alt, 99)
+
 
 def DropBombs(UI, tgt_lon, tgt_lat, tgt_alt, qty):
     UI.DisplayMessage('Dropping bombs')
@@ -722,6 +725,8 @@ def FireAutoCannon(UI):
         if (launcher_info.LaunchMode == 4):
             UI.Launch(n, 2)
 
+        
+        
 # return max range and classification mask based on loaded weapon capability
 def MaxRangeForNonAir(UI):
     maxRange_km = 0
@@ -845,6 +850,9 @@ def GetImmediateTarget(UI):
     
     return (best_target, best_launcher)
 
+
+
+
 # returns id of closest target that is in-range, engageable, not already
 # overwhelmingly engaged, and not a stale track
 # returns -1 if none
@@ -927,6 +935,8 @@ def GetImmediateAirTarget(UI):
     UI.SetTarget(best_target)
     
     return (best_target, best_launcher)
+
+
     
 def Emcon(TI):
     UI = TI.GetPlatformInterface()
@@ -942,8 +952,11 @@ def Emcon(TI):
         if (not sensor_info.IsPassive()):  # deactivate active sensors
             UI.SetSensorState(n, 0)
 
+
 def AirPatrol(TI):
     UI = TI.GetPlatformInterface()
+
+
 
 def SAM_Defense(UI):
     UI = TI.GetPlatformInterface()
@@ -980,6 +993,8 @@ def SAM_Defense(UI):
         UI.SetHeadingToInterceptTarget()
         TI.SetUpdateInterval(4.0)
 
+
+
 def AvoidGround(UI):
     if (UI.IsAir()):
         terrainElevation = UI.GetTerrainElevation()
@@ -987,7 +1002,9 @@ def AvoidGround(UI):
             terrainElevation = 0
         alt = UI.GetAlt()
         if ((alt - terrainElevation) < 80):
-           UI.SetAlt(terrainElevation + 100)
+            SetAlt(UI, terrainElevation + 100)
+
+     
 
 # abs() of difference between two radian headings
 def RadianHeadingDiff(h1, h2):
@@ -999,6 +1016,7 @@ def RadianHeadingDiff(h1, h2):
     if (delta < 0):
         delta = -delta
     return delta
+
 
 # Run from hostile missiles (will run from supersonic antiship missiles too!)
 # return 1 if evading, 0 otherwise
@@ -1053,7 +1071,7 @@ def JetTakeoff(TI):
         TI.SetMemoryText('Description', 'Jet takeoff script') 
         TI.SetUpdateInterval(30.0)
         SetFractionalSpeed(UI, 2.0)  # activate max AB
-        UI.SetAlt(3000) # about 10000 ft
+        SetAlt(UI, 3000) # about 10000 ft
         UI.SetPitchLimit(5)
         
     iteration = iteration + 1
@@ -1066,6 +1084,8 @@ def JetTakeoff(TI):
         TI.EndTask()
         return
         
+    
+    
 # this version iterates through all tracks
 def GetSuitableTargetAll(UI, class_mask):
     # anAffiliation: UNKNOWN = 0, FRIENDLY = 1, NEUTRAL = 2, HOSTILE = 3, ALL NONFRIENDLY = 4, VALID ROE = 100
@@ -1121,6 +1141,7 @@ def GetTargetBearing(UI):
     lon = track_info.Lon
     bearing = UI.GetHeadingToDatum(lon,lat)
     return bearing
+
 
 # set heading relative to target bearing
 def SetHeadingOffTarget(UI, heading_offset):
@@ -1181,6 +1202,7 @@ def ScoreTarget(UI, target_info):
         
     score = score * 0.2 * (5-engaged_count)
     return score
+
 
 def InterceptTarget(TI):
     UI = TI.GetPlatformInterface()
@@ -1260,7 +1282,7 @@ def InterceptTarget(TI):
         else:
             TI.SetUpdateInterval(8.0)
     elif (adjust_depth):
-        UI.SetAlt(-launcher_info.MaxDepth_m + 1)
+        SetAlt(UI, -launcher_info.MaxDepth_m + 1)
     else:
         target_is_engaged = TI.GetMemoryValue(2)
         if target_is_engaged:
@@ -1327,6 +1349,8 @@ def InterceptTarget(TI):
             UI.DisplayMessage('Bad launch mode (%d), aborting attack' % launch_mode)
             TI.EndTask()
 
+
+    
 # move to close range and form air formation
 def AirFormation(TI):
     UI = TI.GetPlatformInterface()
@@ -1340,6 +1364,7 @@ def AirFormation(TI):
     UI.SetFormationMode(1) # 1 is follow, 2 is sprint-drift
     TI.EndTask()
     
+            
 # intercept and close with target, lining up on tail for easy gun shot
 def IntC(TI):
     UI = TI.GetPlatformInterface()
@@ -1391,12 +1416,13 @@ def IntC(TI):
     if ((target_track.Flags & 1) != 0):
         UI.SetAltitude(target_track.Alt)
 
+
 # return max simultaneous weapon count to engage target with
 def GetEngageLimit(target_info):
     if target_info.IsAir():
-        return 1
+        return 2
     elif target_info.IsMissile():
-        return 1
+        return 2
     elif target_info.IsSurface():
         return 15
     elif target_info.IsGround():
@@ -1404,6 +1430,7 @@ def GetEngageLimit(target_info):
     else:
         return 1
 
+        
 def GetStaleLimit(target_info):
     if target_info.IsAir():
         return 60
@@ -1466,6 +1493,11 @@ def EngageTargetWithLauncher(UI, launcher):
 def AutoLoiter(TI):
     UI = TI.GetPlatformInterface()
     TI.SetUpdateInterval(30.0)
+    init = TI.GetMemoryValue(97)
+    if not init:
+        #enforce a single 30 second delay on the initiation of loitering to allow other scripts/the player a chance to prevent its interference.
+        TI.SetMemoryValue(97,1)
+        return
     if (UI.IsAir()):
         UI.SetHeading(UI.GetHeading() + 30.0)
         if (not UI.IsHelo()):
@@ -1495,3 +1527,7 @@ def TestClimbCmd(TI):
         UI.SetClimbDeg(angle_deg)
     else:
         TI.EndTask()
+
+
+
+

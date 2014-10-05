@@ -1,7 +1,6 @@
 
 
 def RefuelAllAircraft(TI):
-    return # disable this for now, simulation engine will auto refuel any aircraft outside of hangar
     UI = TI.GetPlatformInterface()
     FP = UI.GetFlightPortInfo()
     if (not FP.IsValid()):
@@ -18,7 +17,15 @@ def RefuelAllAircraft(TI):
         UI_n = FP.GetUnitPlatformInterface(n)
         if (UI_n.GetFuel() < 1.0) and (not UI_n.IsRefueling()) and (not UI_n.MaintenanceHold()) and (UI_n.GetWeightMargin() > 10):
             #UI_n.DisplayMessage('Refueling %s' % unitName)
-            UI_n.LoadOther('Fuel', 999999)
+            #UI_n.LoadOther('Fuel')   -LoadOther was changed, now requires quantity to stock.  Determine fuel need before attempting to load.
+            name = UI_n.GetPlatformClass()
+            if UI_n.HasThrottle():
+                fuel_capacity = UI.QueryDatabase('air',name,'FuelCapacity_kg')
+            else:
+                fuel_capacity = UI.QueryDatabase('simple_air',name,'FuelCapacity_kg')
+            fuel_capacity = float(fuel_capacity.GetString(0))
+            fuel_qty = int((1 - UI_n.GetFuel()) * fuel_capacity + 1)
+            UI_n.LoadOther('Fuel', fuel_qty)
             return # only start one refueling at a time
             
 

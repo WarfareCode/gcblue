@@ -59,13 +59,13 @@ def SubPatrol(TI):
             else:
                 SI.SetSnorkelState(0)
                 UI.SetSpeed(5)
-                UI.SetAlt(-patrolDepth)
+                SetAlt(UI, -patrolDepth)
         elif (battery < 0.2):
             SI.GoToPeriscopeDepth()
             UI.SetSpeed(5)
             updateInterval = 0.5 * updateInterval
     else: # nuclear sub
-        UI.SetAlt(-patrolDepth)
+        SetAlt(UI, -patrolDepth)
 
 
 
@@ -104,12 +104,6 @@ def EvadeTorpedoes(TI):
 def SubEvade(TI):
     UI = TI.GetPlatformInterface()
     
-    for n in range(0,UI.GetSensorCount()):
-        sensor = UI.GetSensorInfo(n)
-#        UI.DisplayMessage('Sensor Type %d' % sensor.type)
-        if sensor.type == 4:
-            UI.SetSensorState(n, 1)
-
     threatExists, track = GetClosestTorpedoThreat(UI)
 
     #track = UI.GetClosestTrack(15, 130, 3, 0)  # 15 km range, 130 is torpedo class, 3 is hostile, 0 ignores "engagement count"
@@ -120,7 +114,7 @@ def SubEvade(TI):
                 TI.SetMemoryValue(1, 0)
                 UI.SetSpeed(TI.GetMemoryValue(2)) 
                 UI.SetHeading(TI.GetMemoryValue(3))
-                UI.SetAlt(TI.GetMemoryValue(4))
+                SetAlt(UI, TI.GetMemoryValue(4))
         return
 
     if (TI.GetMemoryValue(1) == 0):
@@ -136,7 +130,7 @@ def SubEvade(TI):
     bearing_deg = UI.GetHeadingToDatum(track.Lon, track.Lat)
 
     #UI.DisplayMessage('Missile %.1f km' % range_km)
-    
+
     if (range_km < 1.0):
         # break left or right to force high turn rate from torpedo
         dRight_deg = 90 + bearing_deg - UI.GetHeading()
@@ -154,7 +148,7 @@ def SubEvade(TI):
         
     terrain_m = UI.GetTerrainElevation()
     UI.SetSpeedToMax()
-    UI.SetAlt(terrain_m + 15) # go deep
+    SetAlt(UI, terrain_m + 15) # go deep
         
 def GetClosestTorpedoThreat(UI):
     threatTrack = []
@@ -214,7 +208,7 @@ def SubBattery(TI):
             SI.SetSnorkelState(0)
             alt_m = TI.GetMemoryValue(1)
             if (alt_m < 0):
-                UI.SetAlt(alt_m)
+                SetAlt(UI, alt_m)
                 
 # set speed to avoid cavitation
 def AvoidCav(TI):

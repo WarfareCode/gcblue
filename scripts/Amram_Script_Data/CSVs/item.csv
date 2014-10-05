@@ -1,0 +1,3 @@
+DatabaseClass text primary key,NATO_ASCC text,ModelClassId integer,ClassificationId integer,Cost numeric,Weight_kg numeric,Volume_m3 real,InitialYear numeric,FinalYear numeric,Country text,Designation text,ImageList text,IconFileName text,ModelFileName text,Description text,Notes text
+"Fuel","","0","0","5","1","0.32906","1900","2999","","","","fuel.jpg","","Generic fuel for everything",""
+"Spare parts","","0","0","10000","100","2","1900","2999","","","null","unknown.jpg","null","Generic spare parts for repair",""

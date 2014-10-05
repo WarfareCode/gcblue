@@ -68,7 +68,7 @@ def CAP(TI):
     if (UI.IsAir()):
         if (UI.GetAlt() < 5500):
             UI.SetThrottle(1.0)
-            UI.SetAlt(6000)
+            SetAlt(UI, 6000)
         else:
             UI.SetThrottle(0.8)
 

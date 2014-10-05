@@ -40,27 +40,67 @@ def ProcessHotKey(UnitInfo, key):
     elif (key == 'R'):
         ToggleRadars(UnitInfo)
     elif (key == 'w'):
-        UnitInfo.GetUserInput('AddWaypointOrder','Datum')        
+        UnitInfo.GetUserInput('CreateWaypointScript','Datum')        
     elif (key == 'x'):
         EraseLastOrder(UnitInfo)
     elif (key == 'C'):
         UnitInfo.ClearTasks()
     # Raven58's mods:
     elif (key == 'H'):
-        UnitInfo.SetAlt(10000)
+        AltitudeHigh(UnitInfo)
+        if UnitInfo.HasThrottle():
+            alt = 10000
+            if UnitInfo.GetSpeed() == UnitInfo.GetCruiseSpeedForAltitude(UnitInfo.GetAlt()):
+                throttle = -1
+            else:
+                throttle = UnitInfo.GetThrottle()
+            if throttle < 1.0 and alt > UnitInfo.GetAlt():
+                UnitInfo.SetThrottle(1.0)
+            OptionHandler(UnitInfo,'ClimbInitThrottle|Set|%s;ClimbInitAlt|Set|%s;cruiseclimb|Task|Start~0.2~-1' % (throttle, alt))
     elif (key == 'L'):
-        UnitInfo.SetAlt(150)
+        AltitudeLow(UnitInfo)
+        if UnitInfo.HasThrottle():
+            alt = 150
+            if UnitInfo.GetSpeed() == UnitInfo.GetCruiseSpeedForAltitude(UnitInfo.GetAlt()):
+                throttle = -1
+            else:
+                throttle = UnitInfo.GetThrottle()
+            if throttle < 1.0 and alt > UnitInfo.GetAlt():
+                UnitInfo.SetThrottle(1.0)
+            OptionHandler(UnitInfo,'ClimbInitThrottle|Set|%s;ClimbInitAlt|Set|%s;cruiseclimb|Task|Start~0.2~-1' % (throttle, alt))
     elif (key == 'M'):
-        UnitInfo.SetAlt(4000)
+        AltitudeMedium(UnitInfo)
+        if UnitInfo.HasThrottle():
+            alt = 4000
+            if UnitInfo.GetSpeed() == UnitInfo.GetCruiseSpeedForAltitude(UnitInfo.GetAlt()):
+                throttle = -1
+            else:
+                throttle = UnitInfo.GetThrottle()
+            if throttle < 1.0 and alt > UnitInfo.GetAlt():
+                UnitInfo.SetThrottle(1.0)
+            OptionHandler(UnitInfo,'ClimbInitThrottle|Set|%s;ClimbInitAlt|Set|%s;cruiseclimb|Task|Start~0.2~-1' % (throttle, alt))
     elif (key == 'v'):
         ReverseOurCourse(UnitInfo)
     elif (key == 'b'):
         UnitInfo.AddTask('BombTarget', 3.0)
     elif (key == 't'):
-        UnitInfo.SetAlt(4000)
+        if UnitInfo.GetSpeed() == UnitInfo.GetCruiseSpeedForAltitude(UnitInfo.GetAlt()):
+            throttle = -1
+        else:
+            throttle = UnitInfo.GetThrottle()
         ToggleRadars(UnitInfo)
     elif (key == 127): # DEL
+        OptionHandler(UnitInfo,'DeleteUnit|Function|Yes')
         UnitInfo.DeletePlatform() # only works in edit mode
+    elif (key == ')'):
+        alt = GetCruiseAltitude(UnitInfo)
+        OptionHandler(UnitInfo, 'CruiseEnforcement|Task|Start~5~-1')
+        UnitInfo.SetAlt(alt)
+        if UnitInfo.HasThrottle():
+            throttle = '-1'
+            if throttle < 1.0 and alt > UnitInfo.GetAlt():
+                UnitInfo.SetThrottle(1.0)
+            OptionHandler(UnitInfo,'ClimbInitThrottle|Set|%s;ClimbInitAlt|Set|%s;cruiseclimb|Task|Start~0.2~-1' % (throttle, alt))
     else:
         msg = 'unrecognized key: %s' % key
         UnitInfo.DisplayMessage(msg)
@@ -91,6 +131,7 @@ def ProcessHotKeyGroup(GI, key):
 # Keys for non-platform object hooked, or not own alliance
 # This needs to be reworked
 #def ProcessHotKeyOther(key):
+    
 
 # flags : bitfield  1 - shift pressed, 2 - ctrl pressed, 4 - alt pressed
 #         e.g. flags == 6 indicates ctrl and alt were pressed during dclick
