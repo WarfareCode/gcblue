@@ -3868,7 +3868,15 @@ namespace scriptinterface {
 			result.AddString(resultWx[n].ToStdString());
 		}
 
-		return result;
+		if (result.Size() > 0)
+		{
+			return result;
+		}
+		else
+		{
+			result.AddString("Error");
+			return result;
+		}
 	}
 
 

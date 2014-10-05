@@ -152,7 +152,7 @@
       <DisableSpecificWarnings>4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>C:\projects\gcblue\GCblue\include;include;$(WXWIN)\include;$(WXWIN)\contrib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(WXWIN)\include;$(WXWIN)\contrib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ShowProgress>false</ShowProgress>
     </ResourceCompile>
     <Link>
@@ -224,7 +224,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>C:\projects\gcblue\GCblue\include;include;$(WXWIN)\include;$(WXWIN)\contrib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(WXWIN)\include;$(WXWIN)\contrib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>boost_python-vc110-1_55.lib;python27.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wxmsw30u_core.lib;wxbase30u.lib;wxbase30u_net.lib;wxbase30u_xml.lib;wxmsw30u_adv.lib;wxzlib.lib;wxpng.lib;wxjpeg.lib;wxtiff.lib;wxexpat.lib;sqlite.lib;OpenAL32.lib;ALut.lib;oalpp_gcb.lib;libogg_static.lib;libvorbis_static.lib;libvorbisfile_static.lib;TV3D65.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
