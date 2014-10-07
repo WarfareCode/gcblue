@@ -1093,7 +1093,7 @@ void tcSimPythonInterface::ProcessCallback(const std::string& command, const std
 	}
 	else
 	{
-		sprintf(zBuff,"Menu.%s(%s,%d%s)\n", command.c_str(), zObject, anData, textParam.c_str());
+		sprintf(zBuff,"Menu.%s(%s,%d,%s)\n", command.c_str(), zObject, anData, textParam.c_str());
 	}
 
 
