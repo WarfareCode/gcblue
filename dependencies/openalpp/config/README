@@ -1,0 +1,3 @@
+
+This file is here so that cvs will create this directory so that
+autogen.sh can put generated files here.

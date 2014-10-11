@@ -1,0 +1,27 @@
+/Makefile.am/1.8/Thu Mar 24 11:47:48 2005//
+/alpp.h/1.10/Thu Mar 24 11:47:48 2005//
+/audiobase.h/1.8/Thu Mar 24 11:47:48 2005//
+/audioconvert.h/1.5/Thu Mar 24 11:47:48 2005//
+/audioenvironment.h/1.6/Thu Mar 24 11:47:48 2005//
+/config.h/1.6/Thu Mar 24 11:47:48 2005//
+/deviceupdater.h/1.5/Thu Mar 24 11:47:48 2005//
+/error.h/1.7/Thu Mar 24 11:47:48 2005//
+/export.h/1.4/Thu Mar 24 11:47:48 2005//
+/filestream.h/1.9/Thu Mar 24 11:47:48 2005//
+/filestreamupdater.h/1.7/Thu Mar 24 11:47:48 2005//
+/groupsource.h/1.8/Thu Mar 24 11:47:48 2005//
+/inputdevice.h/1.9/Thu Mar 24 11:47:48 2005//
+/listener.h/1.5/Thu Mar 24 11:47:48 2005//
+/netstream.h/1.9/Thu Mar 24 11:47:48 2005//
+/netupdater.h/1.5/Thu Mar 24 11:47:48 2005//
+/positionedobject.h/1.7/Thu Mar 24 11:47:48 2005//
+/ref_ptr.h/1.2/Thu Mar 24 11:47:48 2005//
+/referenced.h/1.2/Thu Mar 24 11:47:48 2005//
+/sample.h/1.7/Thu Mar 24 11:47:48 2005//
+/sounddata.h/1.5/Thu Mar 24 11:47:48 2005//
+/source.h/1.6/Thu Mar 24 11:47:48 2005//
+/sourcebase.h/1.7/Thu Mar 24 11:47:48 2005//
+/stream.h/1.8/Thu Mar 24 11:47:48 2005//
+/streamupdater.h/1.8/Thu Mar 24 11:47:48 2005//
+/windowsstuff.h/1.6/Thu Mar 24 11:47:48 2005//
+D

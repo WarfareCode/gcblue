@@ -1,0 +1,88 @@
+<Options>
+    <ViewMode Value="2" />
+    <CommandMode Value="1" />
+    <MapMode Value="1" />
+    <FillRangeCircles Value="0" />
+    <SymbologyType Value="0" />
+    <CheatMode3D Value="1" />
+    <SonarRayTracingEnabled Value="1" />
+    <TerrainMaskingEnabled Value="1" />
+    <AccurateCrossSectionEnabled Value="0" />
+    <SurfVelocityLeader Value="3" />
+    <AirVelocityLeader Value="2" />
+    <DrawNavPointsMode Value="0" />
+    <FastAircraftReady Value="0" />
+    <FastMaintenance Value="0" />
+    <FastLoad Value="0" />
+    <SoundDisabled Value="0" />
+    <MusicEnabled Value="0" />
+    <MusicVolume Value="0.500000" />
+    <EffectVolume Value="1.000000" />
+    <WindowedMode Value="0" />
+    <Max3DRange Value="0" />
+    <ShadersEnabled Value="1" />
+    <WaterShaderOn Value="1" />
+    <ShadowsEnabled Value="0" />
+    <FogEnabled Value="1" />
+    <ReduceZFighting Value="0" />
+    <Vsync Value="0" />
+    <Antialiasing Value="0" />
+    <RenderSurface Value="1" />
+    <TextureFilter3d Value="2" />
+    <TextureFilter2d Value="0" />
+    <AutoScrollTheater Value="1" />
+    <TacticalMapSize Value="2" />
+    <Minimal3D Value="0" />
+    <ManualLighting Value="0" />
+    <BumpMapLighting Value="1" />
+    <SunAmbientR Value="1.000000" />
+    <SunAmbientG Value="1.000000" />
+    <SunAmbientB Value="1.000000" />
+    <SunDiffuseR Value="1.000000" />
+    <SunDiffuseG Value="1.000000" />
+    <SunDiffuseB Value="1.000000" />
+    <SunSpecularR Value="1.000000" />
+    <SunSpecularG Value="1.000000" />
+    <SunSpecularB Value="1.000000" />
+    <AdjustWaterColor Value="0" />
+    <WaterReflectionR Value="1.000000" />
+    <WaterReflectionG Value="1.000000" />
+    <WaterReflectionB Value="1.000000" />
+    <WaterReflectionA Value="1.000000" />
+    <WaterRefractionR Value="1.000000" />
+    <WaterRefractionG Value="1.000000" />
+    <WaterRefractionB Value="1.000000" />
+    <WaterRefractionA Value="1.000000" />
+    <WaterFresnel Value="0.500000" />
+    <ManualFOV Value="0" />
+    <FOV Value="45.000000" />
+    <AdjustMaxView Value="0" />
+    <MaxView Value="45.000000" />
+    <SpeedUnits Value="1" />
+    <AltitudeUnits Value="0" />
+    <DistanceUnits Value="0" />
+    <MassUnits Value="0" />
+    <NATONames Value="0" />
+    <EventContactAny Value="6" />
+    <EventContactAir Value="6" />
+    <EventContactMissile Value="6" />
+    <EventContactSurface Value="6" />
+    <EventContactSubmarine Value="6" />
+    <EventContactTorpedo Value="6" />
+    <EventContactGround Value="6" />
+    <EventDamage Value="6" />
+    <EventLaunchWeapon Value="6" />
+    <EventIdlePlatform Value="6" />
+    <QuickTarget Value="0" />
+    <EdgeScroll Value="1" />
+    <SyncClient Value="1" />
+    <SendTrackDetails Value="0" />
+    <SensorUpdateRate Value="2" />
+    <DisplaySettings>default</DisplaySettings>
+    <UserName>Observer</UserName>
+    <HostAddress>192.168.1.2</HostAddress>
+    <LastScenarioPath>SinglePlayer.ColdWar.Backfires.py</LastScenarioPath>
+    <LastScenarioName>Backfires</LastScenarioName>
+    <LastScenarioExtension>py</LastScenarioExtension>
+    <ScenarioSavePath>scenarios/SinglePlayer/ColdWar/Backfires.py</ScenarioSavePath>
+</Options>

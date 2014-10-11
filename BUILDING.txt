@@ -1,0 +1,34 @@
+
+Dependencies
+
+* libogg 1.3.1
+* libvorbis 1.3.3
+* openal 1.1 sdk
+* openalpp (not sure of version, has some gcb-specific mods, included in repository dependencies/openalpp)
+* openthreads 1.2 (OSG_OP_OT-1.2)
+* python 2.7
+* boost 1.55
+* wxwidgets 3.0.0
+* sqlite 3.2.5
+* truevison3d 6.5 (in repository: dependencies/TV3D65)
+
+
+Microsoft Visual Studio Express 2012 for Windows Desktop
+
+* Solution file is BlueII.sln
+* Update paths to dependency include files and libaries
+* Copy (or set build targets in dependencies) dlls to /bin
+
+alut.dll
+boost_python-vc110-1_55.dll
+oalpp_gcb.dll
+OpenThreadsWin32.dll
+python27.dll
+sqlite.dll
+TV3D65.dll
+
+Debug:
+boost_python-vc110-mt-gd-1_55.dll
+oalpp_gcbd.dll
+OpenThreadsWin32d.dll
+sqlited.dll

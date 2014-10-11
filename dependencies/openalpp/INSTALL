@@ -1,0 +1,94 @@
+Installation instructions for OpenAL++
+**************************************
+OpenAL++ uses the libraries OpenAL, PortAudio and OpenThreads. However, it is possible to compile OpenAL++ without PortAudio, but then some features will be disabled.
+
+
+Dependencies
+-----------
+
+OpenAL - http://www.openal.org
+  Portable low level sound library. Similar to OpenGL.
+  OpenAL also depends on ogg-vorbis.
+
+OggVorbis - http://www.vorbis.com/ 
+  Portable library for reading/writing ogg/vorbis files. Which is similar to MP3 in quality and compression, but FREE.
+
+OpenThreads -  http://openthreads.sourceforge.net/
+  Portable thread library
+
+Deprecated:
+(Portaudio - 
+  Portable library for handling input/output devices in a platform independent way.)
+
+Download
+---------
+To build OpenAL++ you first need to download and install OggVorbis, OpenAL, OpenThreads.
+
+(The use of Portaudio is not well tested and should be considered unstable!)
+
+Building OpenAL++ under Linux/Unix
+-----------------------------------
+Start by running configure ($ is the prompt):
+ $ ./autogen.sh
+This will create the Makefiles. Run configure --help to get information on the
+(optional) arguments. Now make the library:
+ $ make
+If you want to generate documentation, do the following:
+ $ make docs
+This will create html, latex and man directories with the documentation.
+The next step is to install. You probably have to log in as root to do this:
+ $ su
+ $ make install
+If you have created documentation, the man-files can also be installed:
+ $ make install-docs
+
+On some systems we have experienced problems with locking files. ("waiting for audioenvironment.o.lock) supplying --disable-libtool-lock to configure will remove that problem. This is done for you in the autogen.sh script.
+
+By default, all the files will be installed under /usr/local (e.g. the include-files under /usr/local/include). This can be changed by using the --prefix flag for autogen.sh (e.g. ./autogen.sh --prefix=/usr).
+
+The CMake configurationfiles should be considered out of date.
+
+Windows
+-------
+Portaudio is not included by default.
+If you want to use it, edit config.h to reflect your usage.
+Also you have to add the necessary includepath, libpath and library to the project.
+
+
+DISCLAIMER!!
+
+Recently (november 2003) there is a wrapper system for OpenAL.
+It searches for .dll files called *openal*.dll and loads them, thinking it is an implementation
+of OpenAL32. This does not work with the previous library name of this project (openalpp.lib/.dll).
+So for now it is called oalpp.dll. Its not a nice name, but I cant find out any better solution to this
+problem.
+
+
+OpenAL++ has been successfully compiled using Visual C++ 6.0/.NET2000/.NET2003. 
+It should work using other compilers too.
+
+1. Make sure that the necessary paths (include, lib etc.) are correct. 
+   For example (in DOS) by using: 
+
+     DOS> set INCLUDE=%INCLUDE%;path to openal,oggvorbis, openthreads header files
+     DOS> set LIB=%LIB%;path to openal, oggvorbis, openthreads libraries
+     DOS> set PATH=%PATH%;path to openal, oggvorbis, openthreads  dll files
+
+
+2. Now open up the workspace/projects in your prefered build environment with the /useenv flag (for .NET)
+  
+     DOS> devenv /useenv visualstudio/openalpp.sln
+
+3. Build the projec with the sample projects
+
+The library and dll files are named oalpp.lib oalpp.dll and resides in the lib and the bin directory in the project root.
+
+To use OpenAL++ in your own project, add the include, lib and bin directory to the INCLUDE, LIB and PATH environment variables and restart your build environment, dont forget to use the /useenv flag.
+
+
+Other platforms
+---------------
+OpenAL++ has not been tested on other platforms than Linux and Windows. If you get it to work on another platform, contact me with information on how you did, and I'll add information to this file. Also be sure to tell me about any necessary changes to configure.in and other files to get it to work.
+
+/Anders Backman, VRlab, 2004
+(andersb@cs.umu.se)

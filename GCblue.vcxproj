@@ -105,12 +105,13 @@
     <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>Debug\</OutDir>
+    <OutDir>.\bin\</OutDir>
     <IntDir>Debug\</IntDir>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>D:\Python27\libs;D:\libogg-1.3.1\libs;D:\libvorbis-1.3.3\libs;$(LibraryPath)</LibraryPath>
     <IncludePath>D:\TV3D65;$(IncludePath)</IncludePath>
+    <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
@@ -673,15 +674,13 @@
     <ResourceCompile Include="GCblue.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="res\resource.h" />
+    <ClInclude Include="include\common\resource.h" />
     <ClInclude Include="include\stdwx.h" />
     <ClInclude Include="include\common\AError.h" />
     <ClInclude Include="include\common\gctypes.h" />
     <ClInclude Include="include\common\math_constants.h" />
     <ClInclude Include="include\common\nsNav.h" />
     <ClInclude Include="include\common\randfn.h" />
-    <ClInclude Include="include\common\Resource.h" />
     <ClInclude Include="include\common\simmath.h" />
     <ClInclude Include="include\common\tc3DPoint.h" />
     <ClInclude Include="include\common\tcFile.h" />
