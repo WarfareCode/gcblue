@@ -823,8 +823,12 @@ void tcFlightPortGui::OpenPlatformGui(tcContainerItem* item)
 	gui->SetParentItem(item);
 
     // group selection mode, add all selected platforms of the same database class as the main platform
-    std::vector<size_t> selectedIdx = GetSelected();
-    if (selectedIdx.size() <= 1) return;
+	std::vector<size_t> selectedIdx = GetSelected();
+	if (selectedIdx.size() <= 1) 
+	{
+		gui->UpdateLoadoutList();
+		return;
+	}
 
     bool selectionContainsPlatform = false; // check if group selection includes selected platform for platform GUI
     std::vector<long> groupId;
@@ -853,7 +857,7 @@ void tcFlightPortGui::OpenPlatformGui(tcContainerItem* item)
 
     gui->SetGroupPlatforms(groupId);
 
-	gui->UpdateLoadoutList(); // moved here to have list account for group size
+	gui->UpdateLoadoutList(); // For groups, updated here to have list account for group size
 }
 
 void tcFlightPortGui::ReadGuiParameters()
