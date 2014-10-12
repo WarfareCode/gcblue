@@ -120,7 +120,7 @@
     <IncludePath>D:\TV3D65;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>Release\</OutDir>
+    <OutDir>.\bin\</OutDir>
     <IntDir>Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>

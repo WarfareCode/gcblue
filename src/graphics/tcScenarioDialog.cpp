@@ -85,7 +85,7 @@ tcScenarioDialog::tcScenarioDialog (wxWindow * parent, wxWindowID id, const wxSt
  
 
     // scenario name
-    scenarioName = new wxTextCtrl(this, -1, startText, wxPoint(0, 0), wxSize(200, 20), 0);
+    scenarioName = new wxTextCtrl(this, -1, startText, wxPoint(0, 0), wxSize(250, 20), 0);
     scenarioName->SetValue("Enter scenario name.");
 
     // side selection
@@ -94,11 +94,28 @@ tcScenarioDialog::tcScenarioDialog (wxWindow * parent, wxWindowID id, const wxSt
     database->GetCountryList(sideChoices);
     sideChoices.push_back("");
 
+	// calculate size in pixels of longest side name
+	int maxSizePixels = 100; // use this as a default max size to start
+	if (parent != 0)
+	{
+		wxWindowDC dc(parent);
+		dc.SetFont(parent->GetFont());
+		
+		for (size_t n=0; n<sideChoices.size(); n++)
+		{
+			wxSize sideSize = dc.GetTextExtent(sideChoices[n]);
+			maxSizePixels = std::max(maxSizePixels, sideSize.GetWidth() + 1);
+		}
+	}
+
+
+	
+
     wxBoxSizer* sideSizer = new wxBoxSizer(wxHORIZONTAL);    
 
     for (size_t n=0; n<MAX_COUNTRIES; n++)
     {
-        wxComboBox* cb = new wxComboBox(this, -1, "", wxPoint(0, 0), wxSize(90, 30), sideChoices, wxCB_READONLY);
+        wxComboBox* cb = new wxComboBox(this, -1, "", wxPoint(0, 0), wxSize(maxSizePixels, 30), sideChoices, wxCB_READONLY);
         countrySelection.push_back(cb);
         sideSizer->Add(cb, 0, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL );
     }

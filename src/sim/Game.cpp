@@ -861,7 +861,7 @@ void tcGame::StartGameEdit(wxCommandEvent& event)
 void tcGame::StartGameEditCreate(wxCommandEvent& event)
 {
     tcScenarioDialog scenarioDialog(this, -1, "Create New Scenario", "",
-            wxPoint(200, 150), wxSize(550, 500));
+            wxPoint(200, 150), wxSize(750, 550));
 
     if (scenarioDialog.ShowModal() != wxID_OK)
     {
