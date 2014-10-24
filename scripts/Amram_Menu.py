@@ -186,7 +186,7 @@ def NavigationCommands(Menu, interface, Selected, EditMode):
                 if Selected['Depth+'] >=  depth:Menu.AddItemWithTextParam('Set Depth %dm' % depth, 'OptionHandler', 'AltitudeStandard|Function|-%d' % depth)
             Menu.AddItemWithTextParam('Set Depth Max(%dm)' % Selected['Depth+'], 'OptionHandler', 'AltitudeStandard|Function|-%d' % Selected['Depth+'])
             Menu.EndSubMenu()
-    if Selected['Speed+'] > 0:
+    if Selected['Speed+'] > 0 or Selected['Speed-'] > 0:
         Menu.AddItem('Speed Options','')
         if 1==1:
             Menu.BeginSubMenu(); Menu.SetStayOpen(1)
@@ -216,7 +216,6 @@ def NavigationCommands(Menu, interface, Selected, EditMode):
                         Menu.AddItemWithTextParam('Speed   -%dkts' % speed,  'OptionHandler', 'SetSpeed+|Function|-%d' % speed)
                 Menu.EndSubMenu()
             Menu.EndSubMenu()
-
 
     Menu.AddItem('Waypoint Options','')
     if Selected['Ship'] > 0 or Selected['Air'] > 0 or Selected['Sub'] > 0 and Selected['Speed+'] > 0:
@@ -312,8 +311,8 @@ def SystemsMenuItems(Menu, interface, Selected):
             Menu.EndSubMenu()
         if Selected['HasECM']:
             Menu.AddItem('ECM','');Menu.BeginSubMenu();Menu.SetStayOpen(1)
-            Menu.AddItemWithTextParam('All On','OptionHandler','SensorState|Function|0~1')
-            Menu.AddItemWithTextParam('All Off','OptionHandler','SensorState|Function|0~0')
+            Menu.AddItemWithTextParam('All On','OptionHandler','SensorState|Function|32~1')
+            Menu.AddItemWithTextParam('All Off','OptionHandler','SensorState|Function|32~0')
             Menu.EndSubMenu()
         Menu.EndSubMenu()
     if Selected['UnitCount'] == 1 and Selected['Launchers'] and (Selected['Ship'] or Selected['Sub'] or Selected['FixedLand'] or Selected['MobileLand']):
@@ -371,6 +370,15 @@ def ManagementMenuItems(Menu, interface, Selected):
     Menu.AddItem('Management','');Menu.BeginSubMenu();Menu.SetStayOpen(1)
     if 1==1:
         Menu.AddItem('Add Tasks','');Menu.BeginSubMenu();Menu.SetStayOpen(1)
+        Menu.AddItem('Patrol','');Menu.BeginSubMenu();Menu.SetStayOpen(1)
+        if Selected["UnitCount"] == 1 and not interface.IsFixed():
+            Menu.AddItemUI('Patrol station','AddPatrolStation', 'Datum')
+            Menu.AddItemUI('Set patrol area', 'SetPatrolArea', 'Box')
+            Menu.AddItem('Clear patrol area', 'ClearPatrolArea')
+        Menu.EndSubMenu()
+        if Selected["UnitCount"] == 1 and interface.IsAir():
+            menu.BuildRefuelMenu(Menu, interface)
+            menu.BuildLandMenu(Menu, interface)
         if 1==1:
             Menu.AddItemUI('By Name','AddTask', 'Text Name of Task to Add')
             Menu.AddItem('From List','');Menu.BeginSubMenu();Menu.SetStayOpen(1)
@@ -443,8 +451,6 @@ def Amram_Paged_Loadout_Menu(Menu, UI, loadouts_dict, aircraft_dict, additive = 
         if FP.GetUnitCount() > 0:
             Children = True
     BB = UI.GetBlackboardInterface()
-
-    
     
     if additive:
         if not Children:
@@ -687,31 +693,29 @@ def Suggested_Items_Menu(Menu, UI, loadouts_dict):
         Menu.EndSubMenu()
     
 def Add_To_FlightDeck(Menu, UI):
-        Menu.AddItem('Add to flight deck',''); Menu.BeginSubMenu(); Menu.SetStayOpen(1)
-        
-        
-        group_name = UI.GetAirGroupName()
-        group_count = UI.GetAirGroupCount()
-        start_id = UI.GetAirUnitId()
-        Menu.AddItem('Set group (%s-%d x%d)' % (group_name, start_id, group_count), ''); Menu.BeginSubMenu(); Menu.SetStayOpen(1)
-        Menu.AddItemUI('Name', 'SetAirGroupNameUnit', 'Text')
-        
-        Menu.SetStayOpen(1)
-        Menu.AddItem('Size',''); Menu.BeginSubMenu(); Menu.SetStayOpen(1)
-        Menu.AddItemWithParam('1', 'SetAirGroupSizeUnit', 1)
-        Menu.AddItemWithParam('2', 'SetAirGroupSizeUnit', 2)
-        Menu.AddItemWithParam('4', 'SetAirGroupSizeUnit', 4)
-        Menu.AddItemUI('Enter value', 'SetAirGroupSizeUnit', 'Text')
-        Menu.EndSubMenu()
-        Menu.EndSubMenu()
+    Menu.AddItem('Add to flight deck',''); Menu.BeginSubMenu(); Menu.SetStayOpen(1)
+    group_name = UI.GetAirGroupName()
+    group_count = UI.GetAirGroupCount()
+    start_id = UI.GetAirUnitId()
+    Menu.AddItem('Set group (%s-%d x%d)' % (group_name, start_id, group_count), ''); Menu.BeginSubMenu(); Menu.SetStayOpen(1)
+    Menu.AddItemUI('Name', 'SetAirGroupNameUnit', 'Text')
     
-        # Create fixed wing air on carrier or airstrip ###
-        Menu.AddItem('Air fixed wing','')
-        BuildPagedCreateChildMenuUnit(UI, Menu, 'AirFW', 25)
-        # Create helo on carrier or airstrip ###
-        Menu.AddItem('Helo','')
-        BuildPagedCreateChildMenuUnit(UI, Menu, 'Helo', 25)
-        Menu.EndSubMenu()
+    Menu.SetStayOpen(1)
+    Menu.AddItem('Size',''); Menu.BeginSubMenu(); Menu.SetStayOpen(1)
+    Menu.AddItemWithParam('1', 'SetAirGroupSizeUnit', 1)
+    Menu.AddItemWithParam('2', 'SetAirGroupSizeUnit', 2)
+    Menu.AddItemWithParam('4', 'SetAirGroupSizeUnit', 4)
+    Menu.AddItemUI('Enter value', 'SetAirGroupSizeUnit', 'Text')
+    Menu.EndSubMenu()
+    Menu.EndSubMenu()
+
+    # Create fixed wing air on carrier or airstrip ###
+    Menu.AddItem('Air fixed wing','')
+    BuildPagedCreateChildMenuUnit(UI, Menu, 'AirFW', 25)
+    # Create helo on carrier or airstrip ###
+    Menu.AddItem('Helo','')
+    BuildPagedCreateChildMenuUnit(UI, Menu, 'Helo', 25)
+    Menu.EndSubMenu()
     
 def Add_Mission_Menu(Menu, UI):
     Menu.AddItem('Add mission', '')
@@ -817,27 +821,6 @@ def SelectedUnitInventory(interface):
                 'HasESM':0,
                 'HasFlightPort':0,
                 'HasMagazine':0,
-                'PermAtkShp':0,
-                'PermAtkAir':0,
-                'PermAtkGnd':0,
-                'PermAtkMis':0,
-                'PermAtkSub':0,
-                'PermMisUse':0,
-                'PermMisOff':0,
-                'PermMisDefAir':0,
-                'PermMisDefMis':0,
-                'PermMisStk':0,
-                'MisOffRange':0,
-                'MisDefAirRange':0,
-                'MisDefMisRange':0,
-                'MisStkRange':0,
-                'TrackError':0,
-                'ROE0':0,
-                'ROE1':0,
-                'ROE2':0,
-                'ROE3':0,
-                'ROE4':0,
-                'ROE5':0,
                 'FormLeader':0,
                 'FormMember':0,
                 'FormModeSprint':0,
@@ -902,9 +885,14 @@ def PerformInventory(UI, Selected):
         Selected['MobileLand'] += 1
     speeds = [1,5,10,50,100,200,500]
     for speed in speeds:
-        if UI.GetSpeed() + speed <= UI.GetMaxSpeed():
-            if speed > Selected['Speed+']:
-                Selected['Speed+'] = speed
+        if UI.IsAir() and UI.HasThrottle():
+            if UI.GetSpeed() + speed <= max(UI.GetMaxSpeedForAltitude(UI.GetAlt()), UI.GetMaxSpeedForAltitudeAB(UI.GetAlt())):
+                if speed > Selected['Speed+']:
+                    Selected['Speed+'] = speed
+        else:
+            if UI.GetSpeed() + speed <= UI.GetMaxSpeed():
+                if speed > Selected['Speed+']:
+                    Selected['Speed+'] = speed
         if UI.GetSpeed() >= speed:
             if speed > Selected['Speed-']:
                 Selected['Speed-'] = speed
@@ -957,9 +945,7 @@ def PerformInventory(UI, Selected):
                 Selected['Tasks'][task_name] = 1
     for sensor_num in xrange(UI.GetSensorCount()):
         sensor = UI.GetSensorInfo(sensor_num)
-        if sensor.type == 0:
-            Selected['HasECM'] = 1
-        elif sensor.type == 1:
+        if sensor.type == 1:
             Selected['HasRadar'] = 1
         elif sensor.type == 2:    
             Selected['HasESM'] = 1
@@ -969,6 +955,8 @@ def PerformInventory(UI, Selected):
             Selected['HasSonarA'] = 1
         elif sensor.type == 16:    
             Selected['HasOptical'] = 1
+        elif sensor.type == 32:
+            Selected['HasECM'] = 1
     if UI.IsInFormation() or UI.IsFormationLeader():
         if UI.IsFormationLeader():
             Selected['FormLeader'] += 1
@@ -978,8 +966,6 @@ def PerformInventory(UI, Selected):
                 Selected['FormModePace'] += 1
             else:
                 Selected['FormModeSprint'] += 1
-            
-            
     Selected['UnitCount'] = Selected['UnitCount']+1
     return Selected
 
@@ -994,7 +980,6 @@ def DateString_DecimalYear(string):
     return dec_date
     
 def Get_Relevant_Stock(UI, loadouts_dict):
-
     #do we have children?
     children = 0
     if UI.HasFlightPort():
@@ -1047,56 +1032,46 @@ def Get_Relevant_Stock(UI, loadouts_dict):
         done = False
         #just primary categories for now.
         if not done:
-            if AntiMissileMissile(UI, stock):
-                classified['Parent']['MIS'][stock] = None
+            if ('Nuclear' in UI.QueryDatabase('missile',stock,'DamageModel').GetString(0) or
+               'Nuclear' in UI.QueryDatabase('ballistic',stock,'DamageModel').GetString(0) or
+               'Nuclear' in UI.QueryDatabase('torpedo',stock,'DamageModel').GetString(0)):  #nuke
+                classified['Parent']['NUC'][stock] = None
                 done = True
-            elif AntiAirMissile(UI, stock):
-                classified['Parent']['MIS'][stock] = None
-                done = True
-            elif AntiShipMissile(UI, stock):
-                classified['Parent']['MIS'][stock] = None
-                done = True
-            elif AntiLandMissile(UI, stock):
-                classified['Parent']['MIS'][stock] = None
-                done = True
-            elif AntiSubMissile(UI, stock):
+        if not done:
+            if UI.QueryDatabase('missile',stock,'ClassificationId').GetString(0) == '64':  #missile
                 classified['Parent']['MIS'][stock] = None
                 done = True
         if not done:
-            if IronBomb(UI, stock):
+            if UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '1':  #unguided bomb
                 classified['Parent']['UBU'][stock] = None
                 done = True
-            elif GuidedBomb(UI, stock):
+            elif UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '3':  #guided bomb
                 classified['Parent']['GBU'][stock] = None
                 done = True
         if not done:
-            if StratNuke(UI, stock):
-                classified['Parent']['NUC'][stock] = None
-                done = True
-            elif NukeMis(UI, stock):
-                classified['Parent']['NUC'][stock] = None
-                done = True
-        if not done:
-            if Torpedo_Lead(UI, stock) > 0:
+            if UI.QueryDatabase('torpedo',stock,'ClassificationId').GetString(0) == '130':  #torpedo
                 classified['Parent']['TRP'][stock] = None
                 done = True
-            elif Mines(UI, stock) > 0:
+            elif UI.QueryDatabase('torpedo',stock,'ClassificationId').GetString(0) == '138':  #mine
                 classified['Parent']['MIN'][stock] = None
                 done = True
         if not done:
-            if GunRound(UI, stock):
+            if (UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '0' or
+            UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '2'):  #gun round, autocannon round
                 classified['Parent']['GUN'][stock] = None
                 done = True
         if not done:
-            if CMs(UI, stock):
+            if (UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '4' or
+                UI.QueryDatabase('cm',stock,'ClassificationId').GetString(0) == '36' or
+                UI.QueryDatabase('cm',stock,'ClassificationId').GetString(0) == '136'):  #gun cm, air cm, water cm
                 classified['Parent']['CM'][stock] = None
                 done = True
         if not done:
-            if Rockets(UI, stock):
+            if UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '5':  #rockets
                 classified['Parent']['ROC'][stock] = None
                 done = True
         if not done:
-            if 'onobu' in stock:
+            if UI.QueryDatabase('sonobuoy',stock,'ClassificationId').GetString(0) == '132':  #sonobuoy
                 classified['Parent']['BUI'][stock] = None
                 done = True
         if not done:
@@ -1106,56 +1081,46 @@ def Get_Relevant_Stock(UI, loadouts_dict):
             done = False
             #just primary categories for now.
             if not done:
-                if AntiMissileMissile(UI, stock):
-                    classified['Child']['MIS'][stock] = None
+                if ('Nuclear' in UI.QueryDatabase('missile',stock,'DamageModel').GetString(0) or
+                   'Nuclear' in UI.QueryDatabase('ballistic',stock,'DamageModel').GetString(0) or
+                   'Nuclear' in UI.QueryDatabase('torpedo',stock,'DamageModel').GetString(0)):  #nuke
+                    classified['Child']['NUC'][stock] = None
                     done = True
-                elif AntiAirMissile(UI, stock):
-                    classified['Child']['MIS'][stock] = None
-                    done = True
-                elif AntiShipMissile(UI, stock):
-                    classified['Child']['MIS'][stock] = None
-                    done = True
-                elif AntiLandMissile(UI, stock):
-                    classified['Child']['MIS'][stock] = None
-                    done = True
-                elif AntiSubMissile(UI, stock):
+            if not done:
+                if UI.QueryDatabase('missile',stock,'ClassificationId').GetString(0) == '64':  #missile
                     classified['Child']['MIS'][stock] = None
                     done = True
             if not done:
-                if IronBomb(UI, stock):
+                if UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '1':  #unguided bomb
                     classified['Child']['UBU'][stock] = None
                     done = True
-                elif GuidedBomb(UI, stock):
+                elif UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '3':  #guided bomb
                     classified['Child']['GBU'][stock] = None
                     done = True
             if not done:
-                if StratNuke(UI, stock):
-                    classified['Child']['NUC'][stock] = None
-                    done = True
-                elif NukeMis(UI, stock):
-                    classified['Child']['NUC'][stock] = None
-                    done = True
-            if not done:
-                if Torpedo_Lead(UI, stock) > 0:
+                if UI.QueryDatabase('torpedo',stock,'ClassificationId').GetString(0) == '130':  #torpedo
                     classified['Parent']['TRP'][stock] = None
                     done = True
-                elif Mines(UI, stock) > 0:
+                elif UI.QueryDatabase('torpedo',stock,'ClassificationId').GetString(0) == '138':  #mine
                     classified['Parent']['MIN'][stock] = None
                     done = True
             if not done:
-                if GunRound(UI, stock):
+                if (UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '0' or
+                UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '2'):  #gun round, autocannon round
                     classified['Child']['GUN'][stock] = None
                     done = True
             if not done:
-                if CMs(UI, stock):
+                if (UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '4' or
+                    UI.QueryDatabase('cm',stock,'ClassificationId').GetString(0) == '36' or
+                    UI.QueryDatabase('cm',stock,'ClassificationId').GetString(0) == '136'):  #gun cm, air cm, water cm
                     classified['Child']['CM'][stock] = None
                     done = True
             if not done:
-                if Rockets(UI, stock):
+                if UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '5':  #rockets
                     classified['Child']['ROC'][stock] = None
                     done = True
             if not done:
-                if 'onobu' in stock:
+                if UI.QueryDatabase('sonobuoy',stock,'ClassificationId').GetString(0) == '132':  #sonobuoy
                     classified['Child']['BUI'][stock] = None
                     done = True
             if not done:
@@ -1187,7 +1152,15 @@ def MenuLaunchCommand(interface, *args):
         #we are given a datum to engage
         Lon = args[0]
         Lat = args[1]
+        Alt = -1
         weapon_n = args[2]
+        target = False
+    elif len(args) == 4:
+        #we are given a datum to engage, includes altitude
+        Lon = args[0]
+        Lat = args[1]
+        Alt = args[2]
+        weapon_n = args[3]
         target = False
 
     #group or single?
@@ -1238,8 +1211,8 @@ def MenuLaunchCommand(interface, *args):
                 target_lon = Lon
                 target_lat = Lat
                 target_alt = UI.GetMapTerrainElevation(Lon, Lat)
-            if target_alt < 0:
-                target_alt = 0
+            if target_alt < -400:
+                target_alt = -400
             target_alt = target_alt * 0.001
             
             map_range = UI.GetRangeToDatum(Lon, Lat)
@@ -1257,6 +1230,8 @@ def MenuLaunchCommand(interface, *args):
             want_shoot = False
             excuses = []
             name = UI.GetPlatformName()
+            if Alt == -1:
+                Alt = UI.GetMapTerrainElevation(Lon, Lat)+1
             for launcher_n in xrange(UI.GetLauncherCount()):
                 if weapon_name == UI.GetLauncherWeaponName(launcher_n):
                     #then we have the chosen weapon, proceed to launch.
@@ -1265,6 +1240,7 @@ def MenuLaunchCommand(interface, *args):
                     if target:
                         UI.SetTarget(target_id)
                         UI.HandoffTargetToLauncher(launcher_n)
+                        launcher = UI.GetLauncherInfo(launcher_n)
                         status, excuse = Check_Status(UI, launcher, 1)
                         if status and Use_Launcher_On_Target_Amram(UI, launcher_n, -2, target_id):
                             UI.DisplayMessage('%s, %s' % (name,excuse))
@@ -1272,7 +1248,8 @@ def MenuLaunchCommand(interface, *args):
                         else:
                             excuses.append(excuse)
                     else:
-                        UI.SendDatumToLauncher(Lon, Lat, 0, launcher_n)
+                        UI.SendDatumToLauncher(Lon, Lat, Alt, launcher_n)
+                        launcher = UI.GetLauncherInfo(launcher_n)
                         status, excuse = Check_Status(UI, launcher, 1)
                         if status and Use_Launcher_On_Target_Amram(UI, launcher_n, -2, Lon, Lat):
                             UI.DisplayMessage('%s, %s' % (name,excuse))
@@ -1285,6 +1262,8 @@ def MenuLaunchCommand(interface, *args):
         #its just the one unit, proceed direct to launcher selection.
         #try to get the weapon name back from weapon_n
         UI = interface
+        if Alt == -1:
+            Alt = UI.GetMapTerrainElevation(Lon, Lat)+1
         excuses = []
         name = UI.GetPlatformName()
         #proceed to determining launcher to fire.
@@ -1292,22 +1271,30 @@ def MenuLaunchCommand(interface, *args):
             if weapon_name == UI.GetLauncherWeaponName(launcher_n):
                 #then we have the chosen weapon, proceed to launch.
                 launcher = UI.GetLauncherInfo(launcher_n)
-                if target:
-                    UI.SetTarget(targe_idD)
-                    UI.HandoffTargetToLauncher(launcher_n)
-                    status, excuse = Check_Status(UI, launcher, 1)
-                    if status and Use_Launcher_On_Target_Amram(UI, launcher_n, -2, target_id):
-                        UI.DisplayMessage('%s, %s' % (name,excuse))
-                        return
+                #check basic status
+                status, excuse = Check_Status(UI, launcher, 0)
+                if status:
+                    if target:
+                        UI.SetTarget(targe_idD)
+                        UI.HandoffTargetToLauncher(launcher_n)
+                        launcher = UI.GetLauncherInfo(launcher_n)
+                        #recheck status after assigning launcher.
+                        status, excuse = Check_Status(UI, launcher, 1)
+                        if status and Use_Launcher_On_Target_Amram(UI, launcher_n, -2, target_id):
+                            UI.DisplayMessage('%s, %s' % (name,excuse))
+                            return
+                        else:
+                            excuses.append(excuse)
                     else:
-                        excuses.append(excuse)
+                        UI.SendDatumToLauncher(Lon, Lat, Alt, launcher_n)
+                        launcher = UI.GetLauncherInfo(launcher_n)
+                        status, excuse = Check_Status(UI, launcher, 1)
+                        if status and Use_Launcher_On_Target_Amram(UI, launcher_n, -2, Lon, Lat):
+                            UI.DisplayMessage('%s, %s' % (name,excuse))
+                            return
+                        else:
+                            excuses.append(excuse)
                 else:
-                    UI.SendDatumToLauncher(Lon, Lat, 0, launcher_n)
-                    status, excuse = Check_Status(UI, launcher, 1)
-                    if status and Use_Launcher_On_Target_Amram(UI, launcher_n, -2, Lon, Lat):
-                        UI.DisplayMessage('%s, %s' % (name,excuse))
-                        return
-                    else:
-                        excuses.append(excuse)
+                    excuses.append(excuse)
         UI.DisplayMessage('%s did not shoot, reasons:%s' % (name, excuses))
     return    

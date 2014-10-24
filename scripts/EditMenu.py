@@ -2,7 +2,6 @@ import sys, os, math, json, operator, datetime
 from os.path import dirname, abspath, join, normpath, isfile
 sys.path.append(abspath(join(dirname(__file__), 'Amram_Script_Data', '..', 'log')))
     #script data in, well, script data, '..' to gain access to logs, and logs to access the scenario report file.
-from Amram_AI_Weapon_Lists import *
 from UnitCommands import *
 from GroupCommands import *
 from MissionEditCommands import *
@@ -60,7 +59,7 @@ def BuildEditMenu(UnitMenu, SM):
     #BuildCreateUnitMenu(UnitMenu, SM)
     #UnitMenu.AddItemUI('Test GetUnits','GetAllUnits', 'Text Please input the date: YYYY/MM/DD')
     UnitMenu.AddItem('Scenario Issue Reporting',''); UnitMenu.BeginSubMenu(); UnitMenu.SetStayOpen(1)
-    UnitMenu.AddItemWithTextParam('Generate Scenario Issue Report','GetAllUnits', '2014/09/13')
+    UnitMenu.AddItemWithTextParam('Generate Scenario Issue Report','GetAllUnits', 'Text Please input the date: YYYY/MM/DD')
     if isfile(reportfile_path):
         mod_date = modification_date(reportfile_path)
         UnitMenu.AddItemWithTextParam('Delete Report: %s' % mod_date,'read_write_scenario_issue_reports', 'Delete')
@@ -129,9 +128,6 @@ def GetAllUnits(SM, date):
                     Units[num] = {}
                     Units[num][trackName] = id
     
-    debug = open('log/Units.txt', 'w')
-    debug.write('')
-    debug = open('log/Units.txt', 'a')
     problems = {}
     for alliance in Units:
         for track in Units[alliance]:
@@ -140,7 +136,6 @@ def GetAllUnits(SM, date):
             service = check_service(UI, className, date)
             if not service:
                 problems = recordprob(problems, alliance, 'Units', track, 'Unit Not in Service')
-            debug.write('%s, %s, In service: %s\n' % (alliance, track, service))
             
             if UI.GetLauncherCount() > 0:
                 for lnum in xrange(UI.GetLauncherCount()):
@@ -148,60 +143,53 @@ def GetAllUnits(SM, date):
                     service = check_service(UI, weapon, date)
                     if not service:
                         problems = recordprob(problems, alliance, 'Launcher Items', weapon, track, 'Loaded Item not in service')
-                    debug.write('        %s, In Service: %s\n' % (weapon, service))
             if UI.HasFlightPort():
                 FP = UI.GetFlightPortInfo()
-                debug.write('    Flightport:\n')
                 for n in xrange(FP.GetUnitCount()):
                     UIn = FP.GetUnitPlatformInterface(n)
                     childClass = UIn.GetPlatformClass()
                     childName = UIn.GetPlatformName()
                     service = check_service(UI, className, date)
-                    debug.write('        %s - %s In Service: %s\n' % (childClass, childName, service))
                     if not service:
                         problems = recordprob(problems, alliance, 'FlightPorts', className, childClass, childName, 'Aircraft Not in service')
                     if UIn.GetLauncherCount() > 0:
                         for lnum in xrange(UIn.GetLauncherCount()):
                             weapon = UIn.GetLauncherWeaponName(lnum)
                             service = check_service(UI, weapon, date)
-                            debug.write('            %s, In Service: %s\n' % (weapon, service))
                             if not service:
                                 problems = recordprob(problems, alliance, 'Unit Armaments', className, childClass, childName, weapon, 'Loaded Item Not in service')
             if UI.HasMagazine():
-                debug.write('    Magazine:\n')
                 items = UI.GetMagazineItems()
                 UnitName = UI.GetPlatformName()
                 for item_n in xrange(items.Size()):
                     item = items.GetString(item_n)
                     qty = UI.GetMagazineQuantity(item)
-                    debug.write('        %s : %s, In Service: %s\n' % (item, qty, check_service(UI, item, date)))
                     if not service:
                         problems = recordprob(problems, alliance, 'Magazine Items', className, UnitName, weapon, 'Supplied Not in service')
 
-    debug.write('\n\n')
-    for alliance in problems:
-        for sub1 in problems[alliance]:
-            if type(problems[alliance][sub1]) == type({}):
-                #go deeper
-                for sub2 in problems[alliance][sub1]:
-                    if type(problems[alliance][sub1][sub2]) == type({}):
-                        #go deeper:
-                        for sub3 in problems[alliance][sub1][sub2]:
-                            if type(problems[alliance][sub1][sub2][sub3]) == type({}):
-                                #go deeper:
-                                for sub4 in problems[alliance][sub1][sub2][sub3]:
-                                    if type(problems[alliance][sub1][sub2][sub3][sub4]) == type({}):
-                                        #go deeper:
-                                        for sub5 in problems[alliance][sub1][sub2][sub3][sub4]:
-                                            debug.write('%s, %s, %s, %s, %s, %s\n' % (sub1, sub2, sub3, sub4, sub5, problems[alliance][sub1][sub2][sub3][sub4][sub5]))
-                                    else:
-                                        debug.write('%s, %s, %s, %s, %s\n' % (sub1, sub2, sub3, sub4, problems[alliance][sub1][sub2][sub3][sub4]))
-                            else:
-                                debug.write('%s, %s, %s, %s\n' % (sub1, sub2, sub3, problems[alliance][sub1][sub2][sub3]))
-                    else:
-                        debug.write('%s, %s, %s\n' % (sub1, sub2, problems[alliance][sub1][sub2]))
-            else:
-                debug.write('%s, %s\n' % (sub1, problems[alliance][sub1]))
+#    for alliance in problems:
+#        for sub1 in problems[alliance]:
+#            if type(problems[alliance][sub1]) == type({}):
+#                #go deeper
+#                for sub2 in problems[alliance][sub1]:
+#                    if type(problems[alliance][sub1][sub2]) == type({}):
+#                        #go deeper:
+#                        for sub3 in problems[alliance][sub1][sub2]:
+#                            if type(problems[alliance][sub1][sub2][sub3]) == type({}):
+#                                #go deeper:
+#                                for sub4 in problems[alliance][sub1][sub2][sub3]:
+#                                    if type(problems[alliance][sub1][sub2][sub3][sub4]) == type({}):
+#                                        #go deeper:
+#                                        for sub5 in problems[alliance][sub1][sub2][sub3][sub4]:
+#                                            debug.write('%s, %s, %s, %s, %s, %s\n' % (sub1, sub2, sub3, sub4, sub5, problems[alliance][sub1][sub2][sub3][sub4][sub5]))
+#                                    else:
+#                                        debug.write('%s, %s, %s, %s, %s\n' % (sub1, sub2, sub3, sub4, problems[alliance][sub1][sub2][sub3][sub4]))
+#                            else:
+#                                debug.write('%s, %s, %s, %s\n' % (sub1, sub2, sub3, problems[alliance][sub1][sub2][sub3]))
+#                    else:
+#                        debug.write('%s, %s, %s\n' % (sub1, sub2, problems[alliance][sub1][sub2]))
+#            else:
+#                debug.write('%s, %s\n' % (sub1, problems[alliance][sub1]))
     read_write_scenario_issue_reports(problems, 'WriteReport')
     UI.DisplayMessage('Scan Complete')
 
@@ -276,13 +264,16 @@ def recordprob(dd, *args):
     return dd
     
 def classify_item(UI, item):
-    if Torpedo_Lead(UI, item) or AntiShipSubTorpedo(UI, item) or Mines(UI, item):
+    if UI.QueryDatabase('torpedo',item,'ClassificationId').GetString(0) == '130':  #torpedo
         return True, 'torpedo'
-    elif AntiShipMissile(UI, item) or AntiLandMissile(UI, item) or AntiRadarMissile(UI, item) or AntiAirMissile(UI, item) or AntiMissileMissile(UI, item) or AntiSubMissile(UI, item) or NukeMis(UI, item):
+    elif UI.QueryDatabase('torpedo',item,'ClassificationId').GetString(0) == '138':  #mine
+        return True, 'torpedo'
+    elif UI.QueryDatabase('missile',item,'ClassificationId').GetString(0) == '64':  #missile
         return True, 'missile'
-    elif StratNuke(UI, item) or IronBomb(UI, item) or GuidedBomb(UI, item) or Rockets(UI, item) or GunRound(UI, item):
+    elif UI.QueryDatabase('ballistic',item,'BallisticType').GetString(0) in ['1','2','3','5']:
         return True, 'ballistic'
-    elif CMs(UI, item):
+    if (UI.QueryDatabase('ballistic',item,'BallisticType').GetString(0) == '4' or
+        UI.QueryDatabase('cm',item,'ClassificationId').GetString(0)) != 'Error':  #gun cm, air cm, water cm
         return True, 'cm'
     else:
         return False, ''
@@ -323,8 +314,6 @@ def traverse_dict_report(Menu, SM, problems):
         Menu.EndSubMenu()
 
 def read_write_scenario_issue_reports(dd, param):
-    debug = open('log/test.txt', 'w')
-    debug.write('%s = type(%s)' % (param, type(param)))
     if param == 'GetReport':
         #load up the report file, and provide the data to the player somehow.
         #
@@ -351,23 +340,8 @@ def check_service(UI, className, date):
         else:
             tab = 'simpleair'
         if not UI.IsGroundVehicle() or not UI.IsFixed() or not tab == 'ground':
-            date1 = UI.QueryDatabase(tab ,className, 'InitialYear')
-            try:
-                date1 = float(date1.GetString(0))
-            except:
-                #wtf...
-                debug = open('log/debugUnits.txt', 'a')
-                debug.write('%s, %s, %s, %s\n' % (tab, className, 'InitialYear', date1))
-            date2 = UI.QueryDatabase(tab ,className, 'FinalYear')
-            try:
-                date2 = float(date2.GetString(0))
-            except:
-                #wtf...
-                debug = open('log/debugUnits.txt', 'a')
-                debug.write('%s, %s, %s, %s\n' % (tab, className, 'InitialYear', date2))
-            if 'Fullback' in UI.GetName():
-                debug = open('log/debugUnits.txt', 'a')
-                debug.write('%s, %s, %s, %s, %s\n' % (className, date1, date, date2, date1 <= date <= date2))
+            date1 = float(UI.QueryDatabase(tab ,className, 'InitialYear').GetString(0))
+            date2 = float(UI.QueryDatabase(tab ,className, 'FinalYear').GetString(0))
             return date1 <= date <= date2
         else:
             return True
@@ -385,8 +359,7 @@ def check_service(UI, className, date):
             else:
                 tab = 'simpleair'
             if not UI.IsGroundVehicle() or not UI.IsFixed() or not tab == 'ground':
-                country = UI.QueryDatabase(tab, className, 'Country')
-                country = country.GetString(0)
+                country = UI.QueryDatabase(tab, className, 'Country').GetString(0)
         if country in servicekit:
             if item in servicekit[country]:
                 date1 = servicekit[country][item]['Entry']
@@ -397,20 +370,8 @@ def check_service(UI, className, date):
         else:
             classified, tab = classify_item(UI, className)
             if classified:
-                date1 = UI.QueryDatabase(tab, className, 'InitialYear')
-                date2 = UI.QueryDatabase(tab, className, 'FinalYear')
-                try:
-                    date1 = float(date1.GetString(0))
-                except:
-                    #wtf...
-                    debug = open('log/debugUnits.txt', 'a')
-                    debug.write('%s, %s, %s, %s\n' % (tab, className, 'InitialYear', date1))
-                try:
-                    date2 = float(date2.GetString(0))
-                except:
-                    #wtf...
-                    debug = open('log/debugUnits.txt', 'a')
-                    debug.write('%s, %s, %s, %s\n' % (tab, className, 'InitialYear', date2))
+                date1 = float(UI.QueryDatabase(tab ,className, 'InitialYear').GetString(0))
+                date2 = float(UI.QueryDatabase(tab ,className, 'FinalYear').GetString(0))
                 return date1 <= date <= date2
             else:
                 return True

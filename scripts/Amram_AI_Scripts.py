@@ -1,7 +1,6 @@
 import random, time, csv, os, math, Landing, sys
 from os.path import dirname, abspath, join, normpath
 sys.path.append(abspath(join(dirname(__file__), 'Amram_Script_Data')))
-from Amram_AI_Weapon_Lists import *
 from Amram_Utilities import *
 from Menu import *
 from decimal import Decimal
@@ -9,7 +8,21 @@ from UnitCommands import *
 import json
     
 
-def bombing_lead(UI, track, offset = False):
+#sets an offsert lead based on number of bombs.
+#if offset is false, 
+#Attempts to center a capret bombing on the target.
+def bombing_lead(UI, track, offset=False):
+    """
+    bombing_lead(UI, track, offset=False)
+    Returns appropriate Lead
+    
+    if Offset==True:
+        Returns an offset in meters to begin dopping bombs early.
+        Useful in centering a carpet bombing run on a target.
+    else:
+        Returns a predicted track position using the estimated time of fall for the weapon.
+        Predicted position is where the track should be when the bomb gets there.
+    """
     if offset:
         maxbombs = DropBombs_Amram(UI, 0, 0, 0, 0)
         offset = maxbombs / 2 * 0.1 - 0.05
@@ -20,12 +33,26 @@ def bombing_lead(UI, track, offset = False):
         return track_lead
     
 def basic_track_lead(UI, track):
+    """
+    basic_track_lead(UI, track)
+    Returns a predicted track position based upon time to intercept the target track.
+    """
     track_m = round(UI.GetRangeToTrack(track) * 1000,9)
     leadTime = track_m / (UI.GetSpeed() * 0.514444)
     track_lead = track.PredictAhead(leadTime)
     return track_lead
     
 def Lawndart_detection(TI):
+    """
+    Lawndart_detection(TI)
+    Task script, prevents pitch orders from causing controlled flight into terrain
+    
+    GCB will not prevent a pitch order from slamming an aircraft into the ground,
+    and the bombing routine was not scripted to be wary of ground level.  This Script
+    will watch for sink rates that are dangerous and may commandeer the aircraft.
+    Typically idles until BB.KeyExists('uncontrolled_dive'), or positive climb angle
+    Will only idle if no fuel, or Land/landHelo exists
+    """
     #always active on aircraft, helps ensure they do not crash when diving under SetPitch
     UI = TI.GetPlatformInterface()
     BB = TI.GetBlackboardInterface()
@@ -53,13 +80,11 @@ def Lawndart_detection(TI):
         critical_rate = max(0.2, (alt / vertical_rate) / 2)
         TI.SetUpdateInterval(critical_rate)
 
-        
     if UI.GetAlt() < 2000 and UI.GetClimbDeg() < 0 and not Lawndart:
         terrain = UI.GetMapTerrainElevation(UI.GetLongitude(), UI.GetLatitude())
         min_alt = max(terrain,0)
         if abs((alt - min_alt) / vertical_rate) < 3 and vertical_rate < 0:   #needs to be negative....
             BB.Write('Lawndart', '1')
-        
         
     if Lawndart:
         if UI.GetClimbDeg() < 9.9:
@@ -68,7 +93,23 @@ def Lawndart_detection(TI):
             SetAlt(UI, UI.GetAlt() + 500)
             BB.Erase('Lawndart')
             
-def SetPitch(UI, theta, rate = 9, uncontrolled = True):
+def SetPitch(UI, theta, rate=9, uncontrolled=True):
+    """
+    SetPitch(UI, theta, rate=9, uncontrolled=True):
+    Takes desired pitch angles and controls the transition to them
+    
+    UI.SetClimbDeg is supposed to throttle its response, but this has proven untrue
+    140 degree pitch changes in 1/10 of a second have been witnessed.
+    rate is a multiplier, 9 seems reasonable for most applications.  Higher values
+    result in faster pitch rates being applied.
+    if uncontrolled==True:
+        Will create BB.Key('uncontrolled_dive') if it does not exist.
+        This serves to alert Lawndart detection so that it will prevent controlled
+        flight into terrain
+    else:
+        it will not alert Lawndart Detection, only set uncontrolled=False if the calling
+        script has its own means to prevent controlled flight into terrain
+    """
     BB = UI.GetBlackboardInterface()
     if uncontrolled:
         if not BB.KeyExists('uncontrolled_dive'):
@@ -87,6 +128,17 @@ def SetPitch(UI, theta, rate = 9, uncontrolled = True):
     return Fast            
 
 def cruiseclimb(TI):
+    """
+    cruiseclimb(TI)
+    A script to modulate the pitch of a climbing aircraft to keep its speed up.
+    
+    Both 1.25 and 1.26 throw caution to the wind and attempt to achieve the DB climbrate
+    at all times when ordered to climb, this means that with decreasing thrust as altitude
+    increases and speed decreases, GCB is not easing its climbrate to prevent stalls
+    
+    This script will attempt to hold cruise speed all the way to whatever altitude you request.
+    it is unable to intercept climbs ordered by using the hud interface, and so they remain prone to stalls
+    """
     UI = TI.GetPlatformInterface()
     BB = UI.GetBlackboardInterface()
     update = 0.2
@@ -172,19 +224,22 @@ def cruiseclimb(TI):
             if new_pitch > want_pitch:
                 new_pitch = want_pitch
     
-    
-
-        #current_climb_rate = (UI.GetSpeed() * 0.514444) * math.sin(math.radians(abs(pitch)))
-        #UI.DisplayMessage('alt %0.1f, Rate %0.1f, Pitch %0.1f' % (alt, current_climb_rate, pitch))
-        #UI.DisplayMessage('Alt %0.1f, cruise %0.2f, current %0.2f' % (UI.GetAlt(), cruise_spd, UI.GetSpeed()))
-        #UI.DisplayMessage('GLos %0.2f, amod %0.2f, acel %0.2f' % (gravity_losses, accel_mod, acceleration))
-        
-        
         SetPitch(UI, new_pitch, rate=rate_mod, uncontrolled=False)
         write_speed = str(UI.GetSpeed())
         BB.Write('Last_Speed',write_speed)
 
 def Flight_State(TI, reset = False):
+    """
+    Flight_State(TI, reset = False):
+    Saves or restores the current flight state when called.
+    
+    Intended for use with the bombing routines to return the aircraft to its previous flight conditions.
+    if reset==True:
+        It will read the saved altitude, speed, throttle, and heading.  It will attempt to restore these
+        conditions with one alteration, it will reverse the heading to leave the target area.
+    else:
+        It will save the speed, throttle if available, heading, and altitude for later recall.
+    """
     UI = TI.GetPlatformInterface()
     BB = TI.GetBlackboardInterface()
     #uses BB messages to secure an ongoing reset, or optional argument to temporarily reset flight state.
@@ -248,8 +303,28 @@ def Flight_State(TI, reset = False):
     return newspeed, newthrottle, newalt, speed, throttle, alt, restored
         
 def BombRun(TI):
-    #may be called by another script and will report what it wants
-    #alternatively, may be launched as its own task and will control the aircraft accordingly
+    """
+    BombRun(TI):
+    Replacement for the stock Bombing routine.  Capable of lofting, diving, and carpet bombing.
+    Very math heavy, very high update rate.
+    
+    if BB.KeyExists('BombDatum'):
+        it will proceed with a datum bombing run, setting or ordering a new bombing target will
+        have no effect if this key is not deleted as it will continue towards bombing this datum.
+        Currently drops every bomb it has and only terminates the attack once all are dropped.
+    else:
+        It will bomb the currently assigned target.  Setting a new target WILL trigger a change in
+        heading to proceed to and bomb the newly designated target. No target or an invalid(dead)
+        target will trigger self termination of the script, otherwise termination of the attack will
+        occur once it is killed or all bombs are dropped.
+        
+    if BB.KeyExists('Style'):
+        Setting the Style yourself allows player control over whether or not it will dive, loft, or carpet
+        bomb the target.  This must be set prior to initial operation of the script.
+    else:
+        The script will evaulate the target and its current conditions and attempt to determine the correct
+        style of attack.
+    """
     UI = TI.GetPlatformInterface()
     BB = TI.GetBlackboardInterface()
 
@@ -281,25 +356,13 @@ def BombRun(TI):
         TI.SetMemoryValue(2, offset)
     
     offset = TI.GetMemoryValue(2)
-    newheading = False
-    newpitch = False
-    newalt = False
-    newthrottle = False
-    newspeed = False
-    newupdate = False
-    SetAngle = False
-    heading = -1000
-    pitch = -1000
-    alt = -1000
-    throttle = -1000
-    speed = -1000
 
     if Lawndart_detection(TI) or UI.TaskExists('Lawndart_Correction'):
-        return newheading, newpitch, newalt, newthrottle, newspeed, update, heading, pitch, alt, throttle, speed
+        return
 
         
     current_speed = UI.GetSpeed() * 0.514444
-    max_speed = UI.GetMaxSpeed() * 0.514444
+    max_speed = max(UI.GetMaxSpeedForAltitude(UI.GetAlt()), UI.GetMaxSpeedForAltitudeAB(UI.GetAlt())) * 0.514444
     offset_m = current_speed * offset
 
     
@@ -311,7 +374,7 @@ def BombRun(TI):
             BB.Erase('Bombing_Complete')
             TI.EndTask()
         if UI.TaskExists('AI_Pilot'):
-            return newheading, newpitch, newalt, newthrottle, newspeed, update, heading, pitch, alt, throttle, speed
+            return
         else:
             #contains a copy of the final block here as well
             #since this section self terminates each run of the script at this point
@@ -344,7 +407,7 @@ def BombRun(TI):
     if BB.KeyExists('Style'):
         style = BB.ReadMessage('Style')
     else:
-        if isBomber(UI, UI.GetPlatformClass()):
+        if UI.QueryDatabase('air', UI.GetPlatformClass(),'Designation').GetString(0) == 'Bomber' or UI.QueryDatabase('simpleair', UI.GetPlatformClass(),'Designation').GetString(0) == 'Bomber':
             style = 'level'
         else:
             if target:
@@ -506,22 +569,27 @@ def BombRun(TI):
         time_s = (range_m - offset_m - level_m) / (UI.GetSpeed() * 0.514444)
     UI.SetActionText('%sbomb target %ds' % (style, time_s))
         
-    if UI.TaskExists('AI_Pilot'):
-        return newheading, newpitch, newalt, newthrottle, newspeed, update, heading, pitch, alt, throttle, speed
-    else:
-        TI.SetUpdateInterval(update)
-        if newheading:
-            UI.SetHeading(heading)
-        if newpitch:
-            SetPitch(UI, pitch)
-        if newthrottle:
-            UI.SetThrottle(throttle)
-        elif newspeed:
-            UI.SetSpeed(speed)
-        if newalt:
-            SetAlt(UI, alt)
+    TI.SetUpdateInterval(update)
+    if newheading:
+        UI.SetHeading(heading)
+    if newpitch:
+        SetPitch(UI, pitch)
+    if newthrottle:
+        UI.SetThrottle(throttle)
+    elif newspeed:
+        UI.SetSpeed(speed)
+    if newalt:
+        SetAlt(UI, alt)
             
 def Intercept(TI):
+    """
+    Intercept(TI)
+    A replacement script for the stock IntC.  Does not rely on formation functions to complete its intercept.
+    
+    Comes in hot, full throttle, does not attempt to match the target flight, merely tries to run it over
+    in order to line up for a gun shot in as little time as possible.  Will perform a lag pursuit within 5km
+    and match the target altitude if its able.
+    """
     UI = TI.GetPlatformInterface()
     BB = TI.GetBlackboardInterface()
     #control the aircraft to achieve a firing position for any sort of weapon
@@ -553,7 +621,7 @@ def Intercept(TI):
 
     track.Range = UI.GetRangeToTrack(track)
                 #returns the largest item that is smaller than the given range
-                #alt, 0 is maintain, 1 is within +30/-45 deg angular, 2 is match
+                #alt, 0 is cruise alt, 1 is within +30/-45 deg angular, 2 is match
                 #heading type 0 is lag, 1 is intercept, 2 is mach2 offset lead, 3 is calculated gun lead
                    #range_km    Heading_Type
                              #Alt-      Update
@@ -562,11 +630,11 @@ def Intercept(TI):
                    [  1.50,    2,    2,  0.2],
                    [  2.00,    2,    2,  0.3],
                    [  2.50,    2,    2,  0.6],
-                   [  5.00,    1,    2,  1.0],
+                   [  5.00,    2,    2,  1.0],
                    [  8.00,    1,    2,  2.0],
                    [ 15.00,    1,    2,  3.5],
-                   [ 23.00,    1,    1,  5.0],
-                   [ 60.00,    1,    1,  5.0],
+                   [ 23.00,    0,    1,  5.0],
+                   [ 60.00,    0,    1,  5.0],
                    [120.00,    0,    0,  5.0],
                    [100000,    0,    0,  5.0]
                    ]
@@ -651,15 +719,8 @@ def Intercept(TI):
             newheading = True
 
     if UI.IsAir() and track.IsAir:
-        if track.Range < 0.2:
-            throttle = UI.GetThrottle() * 0.9
-            newthrottle = True
-        elif track.Range > 5 or abs(UI.GetHeadingToDatum(track.Lon, track.Lat)) > 5:
-            throttle = 0.8
-            newthrottle = True
-        else:
-            throttle = 1
-            newthrottle = 1
+        throttle = 1
+        newthrottle = 1
         
     if newheading or newthrottle or newspeed or newalt:
         Flight_State(TI)
@@ -680,6 +741,10 @@ def Intercept(TI):
             SetAlt(UI, alt)
             
 def DropBombs_Amram(UI, tgt_lon, tgt_lat, tgt_alt, qty):
+    """
+    DropBombs_Amram(UI, tgt_lon, tgt_lat, tgt_alt, qty):
+    Provided target co-ordinate, drops the specified quantity of bombs.  Returns true when complete.
+    """
     #use qty to organise the drop into grouping/sets
     if qty == 'all':
         carpet = True
@@ -756,6 +821,26 @@ def DropBombs_Amram(UI, tgt_lon, tgt_lat, tgt_alt, qty):
             return False
                    
 def LoftedRange(UI, Lon, Lat, getTheta):
+    """
+    LoftedRange(UI, Lon, Lat, getTheta):
+    Computs trajectories.  May return level, loft, dive ranges, trajectories to hit target range, and bomb lead time
+    
+    if getTheta==1:
+        returns the two angles which will result in hitting the target distance.
+            returns [dive theta,loft theta] if possible to reach target distance, returns 90 if not.
+    elif getTheta==0:
+        returns ranges for current flight conditions: float(dive_m), float(level_m), float(loft_m), float(loft_max_m)
+            dive assumes -70 degrees dive angle
+            level assumes 0 degrees pitch angle
+            loft_m assumes current pitch angle
+            loft_max assumes optimum pitch angle
+    elif getTheta==2:
+        returns a solution of the quadratic formula for time, result may be negative, result should be rejected if so.
+        Provides lead time for dive bombing.
+    elif getTheta==3:
+        returns a solution of the quadratic formula for time, result may be negative, result should be rejected if so.
+        Provides lead time for loft bombing.
+    """
     v = Decimal(UI.GetSpeed() * 0.514444)
     try:
         alt = UI.GetMapTerrainElevation(Lon, Lat)
@@ -795,7 +880,8 @@ def LoftedRange(UI, Lon, Lat, getTheta):
         sinx = Decimal(sin(x))
         sinx2 = Decimal(pow(sinx,2))
         cosx = Decimal(cos(x))
-        loft_m = ((v * cosx) / g) * (v * sinx + (v2 * sinx2 + Decimal(2) * g * y).sqrt())
+        gy2 = Decimal(2) * g * y
+        loft_m = ((v * cosx) / g) * (v * sinx + (v2 * sinx2 + gy2).sqrt())
 
         sinx = Decimal(sin(0))
         cosx = Decimal(cos(0))
@@ -804,7 +890,7 @@ def LoftedRange(UI, Lon, Lat, getTheta):
         x = radians(-70)
         sinx = Decimal(sin(x))
         cosx = Decimal(cos(x))
-        dive_m = ((v * cosx) / g) * (v * sinx + (v2 * Decimal(pow(sinx,2)) + Decimal(2) * g * y).sqrt())
+        dive_m = ((v * cosx) / g) * (v * sinx + (v2 * sinx2 + gy2).sqrt())
 
         v = Decimal(UI.GetMaxSpeed() * 0.54444)
         v2 = Decimal(pow(v,2))
@@ -828,6 +914,24 @@ def LoftedRange(UI, Lon, Lat, getTheta):
         return float(time1)
 
 def CruiseEnforcement(TI, Speed_Only = False):
+    """
+    CruiseEnforcement(TI, Speed_Only = False):
+    Script Task, Ensures the aircraft reaches a cruise condition, terminates when finished.
+    
+    GCB has a tendancy to overshoot altitude changes.  As a result, it may climb at full throttle, 
+    level off, moss its altitude, set cruise, descend to correct altitude, overshoot again, climb, 
+    set full throttle, reach altitude.  Result is a failure to cruise, your left at full throttle.
+    
+    if Speed_Only==True:
+        Orders cruising speed, doesn't check or order altitude changes.
+        Special condition for SR-71, 100% throttle.
+        Self terminates once cruise speed is reached.
+    else:
+        Orders cruising altitude and cruising speed.  Waits for altitude to stabilize before re-ordering
+        cruising speed to ensure cruise speed is effectively set.
+        Special condition for SR-71, 100% throttle, 27500m.
+        Self terminates once cruise speed and altitude have been reached.
+    """
     UI = TI.GetPlatformInterface()
     TI.SetUpdateInterval(5)
     if not(UI.TaskExists('CruiseEnforcement')):
@@ -856,12 +960,18 @@ def CruiseEnforcement(TI, Speed_Only = False):
             SetAlt(UI, Landing.GetCruiseAltitude(UI))
             
 def GlideSlope(TI):
+    """
+    GlideSlope(TI):
+    Rudimentary anti-stall script for aircraft that have run out of fuel.
+    
+    It looks up the aircraft stall speed, and uses twice that if available.
+    and controls pitch to assure that the speed remains at that level.
+    """
     UI = TI.GetPlatformInterface()
     TI.SetUpdateInterval(3)
     if UI.GetFuel() > 0:
         return  #do nothing until we run out of fuel.
     TI.SetUpdateInterval(0.25)
-    
     init = TI.GetMemoryValue(174)
     if not init:
         UI.DisplayPopupMessage('Ditching')
@@ -871,134 +981,9 @@ def GlideSlope(TI):
         UI.SetClimbDeg(UI.GetClimbDeg() - 2)
         TI.SetMemoryValue(175,UI.GetSpeed())
     
-        #alt,   Rho,    Mach,   Rho.D, Mach.D
-    Atmo = {
-        -500  :(1.225, 340.300,  0,      0),
-        0     :(1.225, 340.300,  0,      0),
-        500   :(1.167, 338.400, -0.058, -1.900),
-        1000  :(1.112, 336.400, -0.056, -2.000),
-        1500  :(1.058, 334.500, -0.054, -1.900),
-        2000  :(1.006, 332.500, -0.052, -2.000),
-        2500  :(0.957, 330.600, -0.050, -1.900),
-        3000  :(0.909, 328.600, -0.048, -2.000),
-        3500  :(0.863, 326.600, -0.046, -2.000),
-        4000  :(0.819, 324.600, -0.044, -2.000),
-        4500  :(0.777, 322.600, -0.042, -2.000),
-        5000  :(0.736, 320.600, -0.041, -2.000),
-        5500  :(0.697, 318.500, -0.039, -2.100),
-        6000  :(0.660, 316.500, -0.037, -2.000),
-        6500  :(0.624, 314.400, -0.036, -2.100),
-        7000  :(0.590, 312.300, -0.034, -2.100),
-        7500  :(0.557, 310.200, -0.033, -2.100),
-        8000  :(0.526, 308.100, -0.031, -2.100),
-        8500  :(0.496, 306.000, -0.030, -2.100),
-        9000  :(0.467, 303.900, -0.029, -2.100),
-        9500  :(0.440, 301.700, -0.027, -2.200),
-        10000 :(0.413, 299.500, -0.026, -2.200),
-        10500 :(0.389, 297.400, -0.025, -2.100),
-        11000 :(0.365, 295.200, -0.024, -2.200),
-        11500 :(0.337, 295.100, -0.027, -0.100),
-        12000 :(0.312, 295.100, -0.025, 0),
-        12500 :(0.288, 295.100, -0.024, 0),
-        13000 :(0.267, 295.100, -0.022, 0),
-        13500 :(0.246, 295.100, -0.020, 0),
-        14000 :(0.228, 295.100, -0.019, 0),
-        14500 :(0.211, 295.100, -0.017, 0),
-        15000 :(0.195, 295.100, -0.016, 0),
-        15500 :(0.180, 295.100, -0.015, 0),
-        16000 :(0.166, 295.100, -0.014, 0),
-        16500 :(0.154, 295.100, -0.013, 0),
-        17000 :(0.142, 295.100, -0.012, 0),
-        17500 :(0.132, 295.100, -0.011, 0),
-        18000 :(0.122, 295.100, -0.010, 0),
-        18500 :(0.112, 295.100, -0.009, 0),
-        19000 :(0.104, 295.100, -0.008, 0),
-        19500 :(0.096, 295.100, -0.008, 0),
-        20000 :(0.089, 295.100, -0.007, 0),
-        20500 :(0.082, 295.400, -0.007, 0.300),
-        21000 :(0.076, 295.700, -0.006, 0.300),
-        21500 :(0.070, 296.000, -0.006, 0.300),
-        22000 :(0.065, 296.400, -0.005, 0.400),
-        22500 :(0.060, 296.700, -0.005, 0.300),
-        23000 :(0.055, 297.000, -0.005, 0.300),
-        23500 :(0.051, 297.400, -0.004, 0.400),
-        24000 :(0.047, 297.700, -0.004, 0.300),
-        24500 :(0.043, 298.100, -0.004, 0.400),
-        25000 :(0.040, 298.400, -0.003, 0.300),
-        25500 :(0.037, 298.700, -0.003, 0.300),
-        26000 :(0.034, 299.100, -0.003, 0.400),
-        26500 :(0.032, 299.400, -0.003, 0.300),
-        27000 :(0.029, 299.700, -0.002, 0.300),
-        27500 :(0.027, 300.100, -0.002, 0.400),
-        28000 :(0.025, 300.400, -0.002, 0.300),
-        28500 :(0.023, 300.700, -0.002, 0.300),
-        29000 :(0.021, 301.000, -0.002, 0.300),
-        29500 :(0.020, 301.400, -0.002, 0.400),
-        30000 :(0.018, 301.700, -0.001, 0.300),
-        30500 :(0.017, 302.000, -0.001, 0.300),
-        31000 :(0.016, 302.400, -0.001, 0.400),
-        31500 :(0.015, 302.700, -0.001, 0.300),
-        32000 :(0.014, 303.000, -0.001, 0.300),
-        32500 :(0.013, 303.800, -0.001, 0.800),
-        33000 :(0.012, 304.700, -0.001, 0.900),
-        33500 :(0.011, 305.600, -0.001, 0.900),
-        34000 :(0.010, 306.500, -0.001, 0.900),
-        34500 :(0.009, 307.400, -0.001, 0.900),
-        35000 :(0.008, 308.300, -0.001, 0.900),
-        35500 :(0.008, 309.200, -0.001, 0.900),
-        36000 :(0.007, 310.100, -0.001, 0.900),
-        36500 :(0.007, 311.000, -0.001, 0.900),
-        37000 :(0.006, 311.900, 0, 0.900),
-        37500 :(0.006, 312.800, 0, 0.900),
-        38000 :(0.005, 313.700, 0, 0.900),
-        38500 :(0.005, 314.500, 0, 0.800),
-        39000 :(0.005, 315.400, 0, 0.900),
-        39500 :(0.004, 316.300, 0, 0.900),
-        40000 :(0.004, 317.200, 0, 0.900),
-        40500 :(0.004, 318.000, 0, 0.800),
-        41000 :(0.003, 318.900, 0, 0.900),
-        41500 :(0.003, 319.800, 0, 0.900),
-        42000 :(0.003, 320.700, 0, 0.900),
-        42500 :(0.003, 321.500, 0, 0.800),
-        43000 :(0.003, 322.400, 0, 0.900),
-        43500 :(0.002, 323.200, 0, 0.800),
-        44000 :(0.002, 324.100, 0, 0.900),
-        44500 :(0.002, 325.000, 0, 0.900),
-        45000 :(0.002, 325.800, 0, 0.800),
-        45500 :(0.002, 326.700, 0, 0.900),
-        46000 :(0.002, 327.500, 0, 0.800),
-        46500 :(0.002, 328.400, 0, 0.900),
-        47000 :(0.001, 329.200, 0, 0.800),
-        47500 :(0.001, 329.800, 0, 0.600),
-        48000 :(0.001, 329.800, 0, 0),
-        48500 :(0.001, 329.800, 0, 0),
-        49000 :(0.001, 329.800, 0, 0),
-        49500 :(0.001, 329.800, 0, 0),
-        50000 :(0.001, 329.800, 0, 0)}
+    stall_speed = UI.GetStallSpeedForAltitude(UI.GetAlt())
+    descent_speed = stall_speed * 2.2
 
-    Alt_lower = int(UI.GetAlt()/500)*500
-    Alt_upper = (int(UI.GetAlt()/500)*500)+500
-    Atmo_lower = Atmo.get(Alt_lower)
-    Atmo_upper = Atmo.get(Alt_upper)
-    Atmo_delta = float(UI.GetAlt()%500) / 500
-    Rho = Atmo_lower[0] + (Atmo_upper[2] * Atmo_delta)
-    cruise_mod = pow(Rho / 1.225,0.25)
-    
-    aircraft = UI.GetPlatformClass()
-    if Aircraft_Speed(UI, aircraft) > 700:
-        cruise_min = 240 / cruise_mod
-    elif Aircraft_Speed(UI, aircraft) > 500:
-        cruise_min = 195 / cruise_mod
-    elif Aircraft_Speed(UI, aircraft) > 300:
-        cruise_min = 150 / cruise_mod
-    elif Aircraft_Speed(UI, aircraft) > 150:
-        cruise_min = 120 / cruise_mod
-    descent_speed = max(UI.GetCruiseSpeedForAltitude(UI.GetAlt()), cruise_min)
-    
-    ##cruisemin is inverted, it starts FAR too low at altitude, and increases with descent
-    ##should begin large and shrink with descent.
-    
-    
     last_speed = TI.GetMemoryValue(175)
     TI.SetMemoryValue(175, UI.GetSpeed())
     if last_speed < UI.GetSpeed():

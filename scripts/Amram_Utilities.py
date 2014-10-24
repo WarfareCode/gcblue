@@ -6,13 +6,11 @@ from UnitCommands import *
 import json, csv 
 
 
-def PointDefense(TI):
-    #just an attempt to hijack the stock point defence to get a script started.
-    UI = TI.GetPlatformInterface()
-    AddTask(UI, 'deadman_timer', 2,  -1)
-    
-
 def DeleteTask(interface, taskname):
+    """
+    DeleteTask(interface, taskname):
+    Deletes the named task, whether hidden or not, for entire groups or single units.
+    """
     try:
         test = interface.GetPlatformId()
         group = False
@@ -36,6 +34,12 @@ def DeleteTask(interface, taskname):
             UI.DeleteTask(taskname)
 
 def AddTask(interface, taskname, rate = 1, hidden = 0):
+    """
+    AddTask(interface, taskname, rate = 1, hidden = 0):
+    Adds the named task to all selected units.
+    rate is update interval, defaults to 1.
+    hidden=-1 sets task as hidden on start.
+    """
     try:
         test = interface.GetPlatformId()
         group = False
@@ -57,11 +61,20 @@ def AddTask(interface, taskname, rate = 1, hidden = 0):
             UI.AddTask(taskname, rate, hidden)
         
 def DeleteHiddenTask(UI, taskname):  #Thanks to 4rk for this function
+    """
+    DeleteHiddenTask(UI, taskname):  #Thanks to 4rk for this function
+    Unhides a task prior to attemptiong to delete it ensuring the task is deleted.
+    """
     if UI.TaskExists(taskname):
         UI.AddTask(taskname, -1, 0)   #unhides the hidden task so it can be removed.
         UI.DeleteTask(taskname)
         
 def Read_Message_List(BB, msg_name):
+    """
+    Read_Message_List(BB, msg_name):
+    Reads the named BB message contents, json.loads it, and returns the resulting list.
+    Returns an empty list if the message is not found or could not be read back.
+    """
     try:
         msg_item = BB.ReadMessage(msg_name)
         msg_item = json.loads(msg_item)
@@ -74,6 +87,11 @@ def Read_Message_List(BB, msg_name):
     return msg_item
     
 def Read_Message_Dict(BB, msg_name):
+    """
+    Read_Message_Dict(BB, msg_name):
+    Reads the named BB message contents, json.loads it, and returns the resulting dict.
+    Returns an empty dict if the message is not found or could not be read back.
+    """
     try:
         msg_item = BB.ReadMessage(msg_name)
         msg_item = json.loads(msg_item)
@@ -86,6 +104,13 @@ def Read_Message_Dict(BB, msg_name):
     return msg_item
 
 def Write_Message_List(BB, arg1, arg2):
+    """
+    Write_Message_List(BB, arg1, arg2):
+    Converts a list, tuple, or dictionary with json.dumps, then saves it to the named BB message name.
+    
+    arg1 or arg2 may be the message name, or the message itself.  This script type() checks arg2
+    and acts accordingly.  There is a 2048 character limit on the resulting dumps string.
+    """
     if type(arg2) == type(''):
         msg_list = json.dumps(arg1)
         BB.WriteGlobal(arg2, msg_list)
@@ -94,6 +119,20 @@ def Write_Message_List(BB, arg1, arg2):
         BB.WriteGlobal(arg1, msg_list)
         
 def Try_Read_Message(BB, msg_name, msg_type):
+    """
+    Try_Read_Message(BB, msg_name, msg_type):
+    Reads in a BB message and returns the result formatted in the desired type.
+    
+    if msg_type == 0:
+        returns the result formatted as a string
+        returns '' if the result was invalid or the key was not found.
+    elif msg_type == 1:
+        returns the result formatted as an int
+        returns 0 if the result was invalid or the key was not found.
+    elif msg_type == 2:
+        returns the result formatted as an float
+        returns 0.0 if the result was invalid or the key was not found.
+    """
     if msg_type == 0:  #string
         try:
             msg_item = BB.ReadMessage(msg_name)
@@ -108,32 +147,36 @@ def Try_Read_Message(BB, msg_name, msg_type):
         try:
             msg_item = float(BB.ReadMessage(msg_name))
         except:
-            msg_item = 0
+            msg_item = 0.0
     return msg_item
 
-def NavOverrideHandler(TI, reset=False):
-    BB = TI.GetBlackboardInterface()
-    try:
-        x = TI.GetMemoryValue(1)
-        UI = TI.GetPlatformInterface()
-    except:
-        #then we didn't get given TI, we got UI
-        UI = TI
-    if UI.TaskExists('AI_Navigation') and UI.TaskExists('Nav') and not(reset):
-        return
-    else:
-        active_nav_override = Try_Read_Message(BB, 'active_nav_override', 1)
-        if active_nav_override:
-            BB.WriteGlobal('active_nav_override', '0')
-            UI.DeleteNavWaypoint(0)
-            
 def OptionHandler(interface, params):
-
+    """
+    OptionHandler(interface, params):
+    Provides a method to issue multiple commands from a single menu item to single or groups of units.
+    
+    GCB's menu functions are limited to single actions, such as passing strings.  Passing strings with a set
+    structure allows a measure of language to be built in, and thus, the ability to format a single string to
+    contain multiple commands.
+    
+    It will iterate over all selected units and pass the same commands to each through the SetOption() function.
+    
+    example param string:
+    'BombRunInitialized|Erase|1;Bombing_Complete|Erase|1;BombDatum|Erase|1;Style|Set|dive;BombRun|Task|Start~1~0'
+    
+    resulting command list:
+    [['BombRunInitialized','Erase','1'],
+    ['Bombing_Complete','Erase','1'],
+    ['BombDatum','Erase','1'],
+    ['Style','Set','dive'],
+    ['BombRun','Task','Start~1~0']]
+    """
     params = [x.split('|') for x in params.split(';')]
 
     try:
         #GetPlatformId ONLY works on UnitInfo, so if we throw an error, we got called by GroupInfo instead
         test = interface.GetPlatformId()
+        test = interface.GetAlt()
         group = False
     except:
         group = True
@@ -149,7 +192,11 @@ def OptionHandler(interface, params):
             SetOption(UI, param)
         
 def SetOption(UI, params):
-
+    """
+    SetOption(UI, params):
+    Receives single commands in the format of ['command name', 'command type', 'command content'] and applies them to
+    the unit it is currently operating on.
+    """
     BB = UI.GetBlackboardInterface()
     if type(params) == type(''):
         #then we got passed back to ourself, so we used getinput last pass.
@@ -277,8 +324,8 @@ def SetOption(UI, params):
         #speed
         elif variable == 'SetSpeed':
             if value == 'Cruise':
-                CruiseEnforcement(TI, Speed_Only = True)
-#                UI.SetSpeed(UI.GetCruiseSpeedForAltitude(UI.GetAlt()))
+                BB.WriteGlobal('Cruise_Speed_Only')
+                AddTask('CruiseEnforcement', 5,-1)
             else:
                 UI.SetSpeed(float(value))
         elif variable == 'SetSpeed+':
@@ -302,7 +349,11 @@ def SetOption(UI, params):
                     cruise_alt_m = 2000.0
                 else:
                     cruise_alt_m = 10000.0
-                SetAlt(UI, cruise_alt_m)
+                try:
+                    SetAlt(UI, cruise_alt_m)
+                except:
+                    from UnitCommands import SetAlt
+                    SetAlt(UI, cruise_alt_m)
             elif value == 'Periscope':
                 if UI.IsSub():
                     SI = UI.GetSubInterface()
@@ -321,8 +372,8 @@ def SetOption(UI, params):
                     UI.SetAlt(max_depth[0])
                 else:
                     UI.DisplayMessage('No valid misisle depth')
-                    UI.DisplayMessage('%s going to -30m' % UI.GetName())
-                    UI.SetAlt(-30)
+                    UI.DisplayMessage('%s going to -27m' % UI.GetName())
+                    UI.SetAlt(-27)
             elif float(value) < 0:
                 SI = UI.GetSubInterface()
                 depth = float(value)
@@ -335,7 +386,11 @@ def SetOption(UI, params):
                 if UI.IsAir():
                     if alt > UI.GetMaxAlt():
                         alt = UI.GetMaxAlt()
-                    SetAlt(UI, alt)
+                    try:
+                        SetAlt(UI, alt)
+                    except:
+                        from UnitCommands import SetAlt
+                        SetAlt(UI, alt)
         elif variable == 'AltitudeInput':
             UI.GetUserInput('AltitudeGetInput', 'Text %s' % value)
             
@@ -382,14 +437,31 @@ def SetOption(UI, params):
             UI.SetTarget(int(value))
 
 def FormationLeaderInput(interface, target):
+    """
+    FormationLeaderInput(interface, target):
+    Receives a target track from a menu command, and forwards the result to Option handler to assign the target
+    as formation leader for all selected units.
+    """
     OptionHandler(interface, 'Formation_Member|Function|%s' % target)
             
 def HeadingGetInput(UI, arg):
+    """
+    HeadingGetInput(UI, arg):
+    Receives a heading from a menu command, and forwards the result to Option handler to assign the heading
+    for all selected units.
+    """
     params = 'HeadingSpecified|Function|%s' % arg
     #loop back into ourself after collecting the input..
     OptionHandler(UI, params)
 
 def AltitudeGetInput(UI, arg, param):
+    """
+    AltitudeGetInput(UI, arg, param):
+    Receives an altitude from a menmu command, and forwards the result to Option handler to assign the altitude
+    for all selected units.
+    
+    If paramn is negative, we received a depth instead, and it will be forced negative before forwarding it.
+    """
     if param == 2:
         #force it negative
         arg = str(abs(float(arg)) * -1)
@@ -400,6 +472,13 @@ def AltitudeGetInput(UI, arg, param):
     OptionHandler(UI, params)
     
 def OptionSetDatum(UI, Lon1, Lat1):
+    """
+    OptionSetDatum(UI, Lon1, Lat1):
+    Receives a datum from a menu command, and forwards the result to Option handler to assign the datum
+    for all selected units.
+    
+    Primarily intended for use with the currently defunct radius patrol.
+    """
     BB = UI.GetBlackboardInterface()
     datum = '%0.7f~%0.7f'% (Lon1, Lat1)
     variable = BB.ReadMessage('temp_var')
@@ -410,6 +489,11 @@ def OptionSetDatum(UI, Lon1, Lat1):
         OptionHandler(UI, '%s|SetPoint|%s' % (variable, datum))
 
 def OptionSetBox(UI, Lon1, Lat1, Lon2, Lat2):
+    """
+    OptionSetBox(UI, Lon1, Lat1, Lon2, Lat2):
+    Receives a box from a menu command, and forwards the result to Option handler to assign the box
+    for all selected units.
+    """
     BB = UI.GetBlackboardInterface()
     box = '%0.7f~%0.7f~%0.7f~%0.7f'% (Lon1, Lat1, Lon2, Lat2)
     variable = BB.ReadMessage('temp_var')
@@ -417,7 +501,11 @@ def OptionSetBox(UI, Lon1, Lat1, Lon2, Lat2):
     OptionHandler(UI, '%s|SetPoints|%s' % (variable, box))
 
 def CreateWaypointScript(interface, lon, lat):
-    interface.DisplayMessage('%0.3f, %0.3f' % (lon, lat))
+    """
+    CreateWaypointScript(interface, lon, lat):
+    Receives a datum from a menu command, and forwards the result to Option handler to assign the waypoint
+    for all selected units.
+    """
     from UnitCommands import AddWaypointOrder
     try:
         #GetPlatformId ONLY works on UnitInfo, so if we throw an error, we got called by GroupInfo instead
@@ -429,14 +517,16 @@ def CreateWaypointScript(interface, lon, lat):
     if group:
         for unit in xrange(interface.GetUnitCount()):
             UI = interface.GetPlatformInterface(unit)
-            NavOverrideHandler(UI, True)
             AddWaypointOrder(UI, lon, lat)
     else:
         UI = interface
-        NavOverrideHandler(UI, True)
         AddWaypointOrder(UI, lon, lat)
         
 def RemoveWaypointScript(interface, idx):
+    """
+    RemoveWaypointScript(interface, idx):
+    Receives a number from a menu command, and deletes the selected waypoint for all selected units
+    """
     try:
         #GetPlatformId ONLY works on UnitInfo, so if we throw an error, we got called by GroupInfo instead
         test = interface.GetPlatformId()
@@ -454,6 +544,14 @@ def RemoveWaypointScript(interface, idx):
         DeleteWaypoint(UI, idx)
 
 def OptionSetTargeting(interface, *args):
+    """
+    OptionSetTargeting(interface, *args):
+    Receives a target, datum, or box from a menu item, and forwards the result to all selected units.
+    
+    *args will contain the passed data.  1 arg will be a target, 2 will be a datum.
+    Should be expanded to accept 4 args and pass a box someday.
+    Should also be expanded to accept three args and pass a polar coordinate.
+    """
     try:
         test = interface.GetPlatformId()
         group = False
@@ -493,6 +591,13 @@ def OptionSetTargeting(interface, *args):
             Write_Message_List(BB, 'MissionTarget', missiontarget)
         
 def InputHandler(interface, input, param):
+    """
+    InputHandler(interface, input, param):
+    Takes an input and parameter and records it to the blackboard of all selected units.
+    
+    The parameter determines the name of the BB message given that until very recently
+    MenuItemUIWithTextParam delivered broken formatting necessitating use of the integer param item.
+    """
     variables = ['MissileOffenseAllowRange', 'MissileDefenseAllowAirRange', 'MissileDefenseAllowMisRange', 'MissileStrikeRange', 'error_km', 'InvMulti']
     variable = variables[param]
     input = ''.join([x for x in input if ord(x) < 128])
@@ -514,6 +619,17 @@ def InputHandler(interface, input, param):
         BB.WriteGlobal(variable, input)
 
 def LoadoutHandler(UI, param):
+    """
+    LoadoutHandler(UI, param):
+    Handler for complex usage of loadouts in the menu's, allows for additive loadout stocking, or loadout assignment.
+    
+    param is a complex formatted string:
+    armament, aircraft, loadout, count, InvMulti, additive = param.split('|')
+    if additive=='1':
+        adds the loadout content to the magazines
+    else:
+        assigns the loadout to the unit overwriting the launchers and stock contents
+    """
     armament, aircraft, loadout, count, InvMulti, additive = param.split('|')
     #aircraft, count, InvMulti, loadout = loads(param)
     BB = UI.GetBlackboardInterface()
@@ -529,6 +645,12 @@ def LoadoutHandler(UI, param):
         UI.EquipLoadout(loadout)
         
 def read_loadout_file(tgt_names, filter, filter_list):
+    """
+    read_loadout_file(tgt_names, filter, filter_list):
+    Reads in platform_setup.csv and launcher_loadout.csv, and returns a formatted dictionary of the contents
+    
+    This provides the information necessary to do additive loadouts, or to display the contents of a laodout
+    """
     #debug = open('log/loadout.txt', 'w')
     aircraft_dict = {}
     for each_name in tgt_names:
@@ -682,6 +804,11 @@ def read_loadout_file(tgt_names, filter, filter_list):
 #
 #    
 def DateString_DecimalYear(string):
+    """
+    DateString_DecimalYear(string):
+    A simple function to convert a text date value into a float year value.
+    YYYY/MM/DD in, YYYY.yyy out.
+    """
     #string formatted as YYYY/MM/DD
     import re
     date_time = re.split('\D+', string)
@@ -691,3 +818,21 @@ def DateString_DecimalYear(string):
     dec_date = (float(date.strftime("%j"))-1) / 366 + float(date.strftime("%Y"))
     return dec_date
  
+def has_target_flag(flag, val):
+    while flag > 0:
+        if flag ==  val:
+            return True
+        elif flag < val:
+            return False
+        else:
+            if flag >= 16:
+                flag -= 16
+            elif flag >= 8:
+                flag -= 8
+            elif flag >= 4:
+                flag -= 4
+            elif flag >= 2:
+                flag -= 2
+            elif flag >= 1:
+                flag -= 1
+    return False

@@ -1,7 +1,6 @@
 import os, sys
 from os.path import dirname, abspath, join, normpath
 sys.path.append(abspath(join(dirname(__file__), 'Amram_Script_Data')))
-from Amram_AI_Weapon_Lists import *
 from MissionTemplates import *
 from Amram_Utilities import *
 import math
@@ -739,9 +738,19 @@ def SetFractionalSpeed(UI, k, dispMessage=0):
         UI.SetSpeed(k*max_speed)
 
 
-def SetHeading(UI,h):
-    UI.DeleteTask('AutoLoiter')
-    UI.SetHeadingRad(h)
+def SetHeading(interface,h):
+    try:
+        UI = interface
+        UI.DeleteTask('AutoLoiter')
+        UI.SetHeadingRad(h)
+    except:
+        GI = interface
+        unit_count = GI.GetUnitCount()
+        for n in range(0, unit_count):
+            UnitInfo = GI.GetPlatformInterface(n)
+            UnitInfo.DeleteTask('AutoLoiter')
+            SetHeading(UnitInfo, h)
+
 
 def Altitude(UI):
     SetAlt(UI, 2345)
@@ -993,21 +1002,24 @@ def SetAlt(UI, alt):
             UI.SetThrottle(1.0)
         OptionHandler(UI,'ClimbInitThrottle|Set|%s;ClimbInitAlt|Set|%s;cruiseclimb|Task|Start~0.2~-1' % (throttle, alt))
 
-def CruiseEnforcement(TI, Speed_Only = False):
+def CruiseEnforcement(TI):
     from Landing import GetCruiseAltitude
     UI = TI.GetPlatformInterface()
+    BB = UI.GetBlackboardInterface()
     TI.SetUpdateInterval(5)
     if not(UI.TaskExists('CruiseEnforcement')):
         AddTask('CruiseEnforcement', 5,-1)
     if not(UI.TaskExists('TakeOff')):
         if UI.TaskExists('AutoLoiter'):
             DeleteHiddenTask(UI, 'AutoLoiter')
-    if Speed_Only:
+    
+    if BB.KeyExists('Cruise_Speed_Only'):
         if UI.GetClimbDeg() == 0:
             if UI.GetPlatformClass() == 'SR-71':
                 UI.SetThrottle(1.0)
             else:
                 UI.SetSpeed(UI.GetCruiseSpeedForAltitude(GetCruiseAltitude(UI)))
+            BB.Erase('Cruise_Speed_Only')
             TI.EndTask()
     else:
         if abs(UI.GetAlt() == GetCruiseAltitude(UI)) < 5 and UI.GetClimbDeg() == 0:  #matched altitude to within 5m, and have stopped changing altitude
@@ -1055,23 +1067,16 @@ def Check_Status(UI, launcher, mode):
         status = [2, 3, 9, 10, 11, 12, 13, 14, 15, 19, 20, 23]
     else:
         if launch_mode == 0:
-            if AntiShipMissile(UI, weap_name):
+            if UI.QueryDatabase('missile',weap_name,'ClassificationId').GetString(0) == '64':  #missile
                 IsMissile = True
-            elif AntiLandMissile(UI, weap_name):
-                IsMissile = True
-            elif AntiAirMissile(UI, weap_name):
-                IsMissile = True
-            elif AntiMissileMissile(UI, weap_name):
-                IsMissile = True
-            elif AntiSubMissile(UI, weap_name):
-                IsMissile = True
-            elif AntiShipSubTorpedo(UI, weap_name):
+            elif UI.QueryDatabase('torpedo',weap_name,'ClassificationId').GetString(0) == '130':  #torpedo
+                IsTorp = True
+            elif UI.QueryDatabase('torpedo',weap_name,'ClassificationId').GetString(0) == '138':  #mine
                 IsTorp = True
         elif launch_mode == 4:
-            if Rockets(UI, weap_name):
+            if UI.QueryDatabase('ballistic',weap_name,'BallisticType').GetString(0) == '5':  #rocket
                 IsRocket = True
 
-                
         #common status checks: empty, busy, too deep, too low, too high, damaged, invalid target, too close
         if launch_mode == 0 and IsMissile:
             status = [4, 16, 22]
@@ -1151,17 +1156,13 @@ def Use_Launcher_On_Target_Amram(UI, launcher, launch_type, *target):
     if launch_type == -2:
         #we need to determine our launch_type now.
         weapon_name = UI.GetLauncherWeaponName(launcher.Launcher)
-        if Torpedo_Lead(UI, weapon_name) > 0:
+        if UI.QueryDatabase('torpedo',weapon_name,'ClassificationId').GetString(0) == '130':
             #its a torpedo
             launch_type = 2
-        elif (AntiShipMissile(UI, weapon_name) or
-              AntiLandMissile(UI, weapon_name) or
-              AntiAirMissile(UI, weapon_name) or
-              AntiMissileMissile(UI, weapon_name) or
-              AntiSubMissile(UI, weapon_name) ):
+        elif UI.QueryDatabase('missile',weapon_name,'ClassificationId').GetString(0) == '64':
              #its a missile
              launch_type = 0
-        elif Rockets(UI, weapon_name):
+        elif UI.QueryDatabase('ballistic',weap_name,'BallisticType').GetString(0) == '5':  #rocket
             #its a rocket
             launch_type = 3
         else:
@@ -1171,7 +1172,6 @@ def Use_Launcher_On_Target_Amram(UI, launcher, launch_type, *target):
                 #then we know they aren't bombs.
                 launch_qty = 5
     
-
     if launch_mode == 0:  # datum launch
         if launch_type == 2:  #torpedo
             if isdatum:
@@ -1180,10 +1180,12 @@ def Use_Launcher_On_Target_Amram(UI, launcher, launch_type, *target):
                 if alt < 0: alt = 0
             else:
                 #is target, determine lead
-                speed_mps = Torpedo_Lead(UI, UI.GetLauncherWeaponName(launcher.Launcher))
+                speed1 = UI.QueryDatabase('torpedo',UI.GetLauncherWeaponName(launcher.Launcher),'preEnableSpeed_kts').GetString(0)
+                speed2 = UI.QueryDatabase('torpedo',UI.GetLauncherWeaponName(launcher.Launcher),'maxSpeed_kts').GetString(0)
+                speed_mps = 0.514444 / 2 * (float(speed1)+float(speed2))
                 range_km = UI.GetRangeToTrack(target_info)
                 travel_time_s = 1000.0 * range_km / speed_mps
-                travel_time_s = travel_time_s + 10.0 # add a little time for launch and altitude adjustment
+                travel_time_s = travel_time_s + 20.0 # add a little time to compensate for snaking.
                 target_info = target_info.PredictAhead(travel_time_s)
                 lat = target_info.Lat
                 lon = target_info.Lon
@@ -1211,13 +1213,13 @@ def Use_Launcher_On_Target_Amram(UI, launcher, launch_type, *target):
                 alt = UI.GetMapTerrainElevation(datum[0], datum[1])
                 if alt < 0: alt = 0
             else:
-                if target_info.IsSurface():
-                    ASM = AntiShipMissile(UI, UI.GetLauncherWeaponName(launcher.Launcher))
-                    if not ASM:
+                flag = int(UI.QueryDatabase('missile',UI.GetLauncherWeaponName(launcher.Launcher),'targetFlags').GetString(0))
+                if target_info.IsSurface() and flag != 'Error':
+                    
+                    if not has_target_flag(flag, 1):
                         return False
-                elif target_info.IsGround():
-                    AGM = AntiLandMissile(UI, UI.GetLauncherWeaponName(launcher.Launcher))
-                    if not AGM:
+                elif target_info.IsGround() and flag != 'Error':
+                    if not has_target_flag(flag, 4):
                         return False
                 range_km = UI.GetRangeToTrack(target_info)
                 lat = target_info.Lat
