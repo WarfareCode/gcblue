@@ -225,6 +225,7 @@ namespace scriptinterface
             .def("DeleteGoalById", &tcScenarioInterface::DeleteGoalById)
             .def("SetDateTime",&tcScenarioInterface::SetDateTime)
             .def("SetDateTimeByString",&tcScenarioInterface::SetDateTimeByString)
+			.def("GetScenarioDateAsString",&tcScenarioInterface::GetScenarioDateAsString)
             .def("SetPerfectScore",&tcScenarioInterface::SetPerfectScore)
             .def("SetScenarioDescription",&tcScenarioInterface::SetScenarioDescription)
             .def("SetScenarioLoaded",&tcScenarioInterface::SetScenarioLoaded)
@@ -1243,6 +1244,16 @@ namespace scriptinterface
         //simState->SetDateTime(tcDateTime(parsed.GetYear(), parsed.GetMonth()+1, parsed.GetDay(),
         //    parsed.GetHour(), parsed.GetMinute(), parsed.GetSecond()));
     }
+
+	std::string tcScenarioInterface::GetScenarioDateAsString() const
+	{
+		std::string result;
+
+		tcDateTime dt = simState->GetDateTime();
+		result = dt.asString();
+
+		return result;
+	}
 
     void tcScenarioInterface::SetPerfectScore(float score)
     {

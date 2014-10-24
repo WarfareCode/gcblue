@@ -403,7 +403,16 @@ Section "GCB2 (required)"
   
   File "scripts\*.py"
   File "scripts\*.txt"
+
+  SetOutPath $INSTDIR\scripts\Amram_Script_Data
+  File "scripts\Amram_Script_Data\*.py"
   
+  SetOutPath $INSTDIR\scripts\Amram_Script_Data\Aircraft
+  File "scripts\Amram_Script_Data\Aircraft\*.csv"
+
+  SetOutPath $INSTDIR\scripts\Amram_Script_Data\CSVs
+  File "scripts\Amram_Script_Data\CSVs\*.csv"
+
   !ifdef RELEASE_VERSION
 ; ----- sound\ogg directory -----
   SetOutPath $INSTDIR\sound\ogg

@@ -164,6 +164,7 @@ namespace scriptinterface
 
         void SetDateTime(int year, int month, int day, int hour, int min, int sec);
         void SetDateTimeByString(const char* s);
+		std::string GetScenarioDateAsString() const;
         void SetPerfectScore(float score);
         void SetScenarioDescription(std::string s);
         void SetScenarioLoaded(bool state);
