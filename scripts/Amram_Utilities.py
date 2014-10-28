@@ -1,5 +1,5 @@
 #relocating my utility scripts.  i'm beginning to have a few of them, and would like to try and avoid having to constantly refer back and forth between my files, and overgrow my core files.
-import sys, os, math
+import sys, os, math, re
 from os.path import dirname, abspath, join, normpath
 sys.path.append(abspath(join(dirname(__file__), '..', 'bin', 'lib')))
 from UnitCommands import *
@@ -836,3 +836,32 @@ def has_target_flag(flag, val):
             elif flag >= 1:
                 flag -= 1
     return False
+    
+def expand_wildcard(wildstring, items):
+    """
+    expand_wildcard(wild, item_dict):
+    takes a wildcard entry, and iterates over the entire list of possible
+    items to find all of the items for which it may stand.
+    """
+    if type(items) == type([]) or type(items) == type(()):
+        #already an iterable list/tuple
+        stringlist = items
+    elif type(items) == type({}):
+        #its a dict
+        stringlist = items.keys()
+    searchstring = ''
+    for character in wildstring:
+        if character == '*':
+            searchstring += '[A-Za-z0-9_]*'
+        else:
+            searchstring += character
+    wildcard_items = []
+    if type(items) == type(''):
+        #we only got a string, so test if that string is a match
+        return re.match(searchstring, items)
+    else:
+        #we got a list, return all matches found.
+        for item in stringlist:
+            if re.match(searchstring, item):
+                wildcard_items.append(item)
+        return wildcard_items    
