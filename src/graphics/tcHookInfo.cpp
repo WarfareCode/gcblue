@@ -281,8 +281,6 @@ void tcHookInfo::DrawTrack(long anID)
 */
 void tcHookInfo::DrawTrackEngaged(const tcSensorMapTrack *smtrack, float& x, float& y)
 {
-
-    char zBuff[128];
     wxSize textSize;
 	Vec4 color(1, 0, 0, 1);
 
@@ -296,10 +294,11 @@ void tcHookInfo::DrawTrackEngaged(const tcSensorMapTrack *smtrack, float& x, flo
     if (drawEngagedMode == 0)
     {        
         x += float(textSize.GetWidth()) + 3.0f;
+		wxString zBuff;
         for (int nE=0; nE<nEngaged; nE++)
         {
-            sprintf(zBuff,"%d ",smtrack->engaged[nE]);
-			DrawTextR(zBuff, x, y, defaultFont.get(), color, fontSize, LEFT_BASE_LINE);
+			zBuff += wxString::Format("%d ", smtrack->engaged[nE]);
+			DrawTextR(zBuff.c_str(), x, y, defaultFont.get(), color, fontSize, LEFT_BASE_LINE);
 			MeasureText(defaultFont.get(), fontSize, zBuff, textSize);
            
             x += float(textSize.GetWidth()) + 2.0f;
@@ -352,8 +351,9 @@ void tcHookInfo::DrawTrackEngaged(const tcSensorMapTrack *smtrack, float& x, flo
     y += 15;
     for (unsigned k=0; k<classID.size(); k++)
     {
-        sprintf(zBuff,"   %s (%d)", className[k].c_str(), quantity[k]);
-		DrawTextR(zBuff, x, y, defaultFont.get(), color, fontSize, LEFT_BASE_LINE);
+		wxString zBuff;
+		zBuff.Printf("   %s (%d)", className[k].ToAscii(), quantity[k]);
+		DrawTextR(zBuff.c_str(), x, y, defaultFont.get(), color, fontSize, LEFT_BASE_LINE);
 		MeasureText(defaultFont.get(), fontSize, zBuff, textSize);
 
         y += float(textSize.GetHeight()) + 2.0f;
