@@ -127,6 +127,13 @@ namespace scriptinterface {
           .def("GetTrack",&tcTrackList::GetTrack)
           ;
 
+	  class_<tcFormationPosition>("FormationPosition")
+		  .def_readwrite("range_km",&tcFormationPosition::range_km)
+		  .def_readwrite("span_km",&tcFormationPosition::span_km)
+		  .def_readwrite("bearing_rad",&tcFormationPosition::bearing_rad)
+		  .def_readwrite("span_rad",&tcFormationPosition::span_rad)
+		  ;
+
       class_<GeoPoint>("GeoPoint")
          .def_readonly("Alt",&GeoPoint::mfAlt_m)
          .def_readonly("Lon",&GeoPoint::mfLon_rad)

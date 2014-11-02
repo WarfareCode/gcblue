@@ -579,6 +579,16 @@ namespace scriptinterface {
         mpPlatformObj->SetFormationAltitudeOffset(dh_m);
     }
 
+	/**
+	* @return formation altitude offset in meters
+	*/
+    float tcPlatformInterface::GetFormationAltitudeOffset() const
+    {
+        if (mpPlatformObj == 0) {return 0;}
+
+        return mpPlatformObj->formation.altitudeOffset_m;
+    }
+
     /**
     *
     */
@@ -648,11 +658,42 @@ namespace scriptinterface {
         mpPlatformObj->formation.SetUseNorthBearing(state);
     }
 
+	bool tcPlatformInterface::IsFormationUsingNorthBearing() const
+	{
+		if (mpPlatformObj != 0) 
+		{
+			return mpPlatformObj->formation.useNorthBearing;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
     void tcPlatformInterface::SetFormationPosition(float range_km, float span_km, float bearing_rad, float span_rad)
     {
         if (mpPlatformObj == 0) {return;}
 
         mpPlatformObj->SetFormationPosition(range_km, span_km, bearing_rad, span_rad);
+    }
+
+    tcFormationPosition tcPlatformInterface::GetFormationPosition() 
+	{
+		tcFormationPosition result;
+		result.bearing_rad = 0;
+		result.range_km = 0;
+		result.span_km = 0;
+		result.span_rad = 0;
+
+		if (mpPlatformObj != 0)
+		{
+			result.bearing_rad = 0;
+			result.range_km = 0;
+			result.span_km = 0;
+			result.span_rad = 0;
+		}
+
+		return result;
     }
 
     bool tcPlatformInterface::IsInFormation() const

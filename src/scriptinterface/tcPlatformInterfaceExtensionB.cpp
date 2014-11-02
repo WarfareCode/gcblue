@@ -101,10 +101,13 @@ namespace scriptinterface {
             .def("GetFormationLeader", &tcPlatformInterface::GetFormationLeader)
             .def("GetFormationEditId", &tcPlatformInterface::GetFormationEditId)
             .def("SetFormationPosition", &tcPlatformInterface::SetFormationPosition)
+			.def("GetFormationPosition", &tcPlatformInterface::GetFormationPosition)
             .def("SetFormationAltitudeOffset", &tcPlatformInterface::SetFormationAltitudeOffset)
+			.def("GetFormationAltitudeOffset", &tcPlatformInterface::GetFormationAltitudeOffset)
             .def("SetFormationMode", &tcPlatformInterface::SetFormationMode)
             .def("GetFormationMode", &tcPlatformInterface::GetFormationMode)
             .def("SetFormationUseNorthBearing", &tcPlatformInterface::SetFormationUseNorthBearing)
+			.def("IsFormationUsingNorthBearing", &tcPlatformInterface::IsFormationUsingNorthBearing)
 
             // platform information
             .def("GetName", &tcPlatformInterface::GetPlatformName)

@@ -119,6 +119,15 @@ namespace scriptinterface {
 		tcTrackList() {}
 	};
 
+	class tcFormationPosition
+	{
+	public:
+		float range_km;
+		float span_km;
+		float bearing_rad;
+		float span_rad;		
+	};
+
 
     /**
     * Info on missiles currently under fire control guidance
@@ -233,10 +242,13 @@ namespace scriptinterface {
         void SetFormationEdit(bool state);
         long GetFormationEditId() const;
         void SetFormationPosition(float range_km, float span_km, float bearing_rad, float span_rad);
+		tcFormationPosition GetFormationPosition();
         void SetFormationAltitudeOffset(float dh_m);
+		float GetFormationAltitudeOffset() const;
         void SetFormationMode(int mode);
         int GetFormationMode() const;
         void SetFormationUseNorthBearing(bool state);
+		bool IsFormationUsingNorthBearing() const;
 
 		// platform info
 		/// get unit name of platform
