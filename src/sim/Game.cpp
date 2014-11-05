@@ -1825,7 +1825,7 @@ bool tcGame::InitGame()
 
 	// popupControl init
 	popupControl = new tcPopupControl(gameWindow, wxPoint(1400, 400), 
-		wxSize(800, 1200));
+		wxSize(1600, 1600));
 	popupControl->SetBaseRenderBin(40);
 	if (!popupControl)
 	{
