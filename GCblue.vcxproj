@@ -668,7 +668,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\BlueII.ico" />
-    <Image Include="res\GCblue.ico" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GCblue.rc" />
@@ -886,7 +885,6 @@
     <ClInclude Include="include\sim\tcWaterCM.h" />
     <ClInclude Include="include\sim\tcWeaponObject.h" />
     <ClInclude Include="include\sim\tcWeaponTester.h" />
-    <ClInclude Include="include\sim\tsSensorState.h" />
     <ClInclude Include="include\database\CsvTranslator.h" />
     <ClInclude Include="include\database\md5.h" />
     <ClInclude Include="include\database\md5class.h" />
@@ -963,10 +961,6 @@
     <ClInclude Include="include\ai\tcCAPMission.h" />
     <ClInclude Include="include\ai\tcMission.h" />
     <ClInclude Include="include\ai\tcMissionManager.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram11.cd" />
-    <None Include="ClassDiagram12.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
