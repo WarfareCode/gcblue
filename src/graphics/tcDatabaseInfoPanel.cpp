@@ -36,6 +36,7 @@
 #include "tcMissileDBObject.h"
 #include "tcTorpedoDBObject.h"
 #include "tcShipDBObject.h"
+#include "tcSubDBObject.h"
 #include "tcAirDBObject.h"
 #include "tcGroundDBObject.h"
 #include "tc3DModel.h"
@@ -123,6 +124,10 @@ void tcDatabaseInfoPanel::DrawDatabaseInfo()
     {
         DrawDatabaseInfo(groundData, texty);
     }
+    else if (tcSubDBObject* subData = dynamic_cast<tcSubDBObject*>(databaseObj))
+    {
+        DrawDatabaseInfo(subData, texty);
+    }
     else if (tcMissileDBObject* missile = dynamic_cast<tcMissileDBObject*>(databaseObj))
     {
         DrawDatabaseInfo(missile, texty);
@@ -188,6 +193,27 @@ void tcDatabaseInfoPanel::DrawDatabaseInfo(database::tcShipDBObject* shipData, f
 
     texty += 10.0f;
     DrawSensorInfo(shipData, texty);
+
+	yCurrent = texty;
+}
+
+
+void tcDatabaseInfoPanel::DrawDatabaseInfo(database::tcSubDBObject* subData, float yStart)
+{
+    float textx = 10.0f;
+//	float maxWidth = float(mnWidth) - textx - 5.0f;
+    float texty = yStart;
+	tcRect textBox;
+	Vec4 color(0.4f, 1.0f, 0.4f, 1.0f);
+
+
+    PrintText(textx, texty, "Max speed: %s", units->GetUserSpeedString(subData->mfMaxSpeed_kts));
+
+    texty += 10.0f;
+    DrawLauncherInfo(subData, texty);
+
+    texty += 10.0f;
+    DrawSensorInfo(subData, texty);
 
 	yCurrent = texty;
 }
@@ -370,7 +396,9 @@ void tcDatabaseInfoPanel::DrawLauncherInfo(database::tcPlatformDBObject* generic
 			s = s.SubString(0, 299) + "...";
 		}
 
-        PrintText(20.0, y, "%s", s.c_str());
+		std::string s2(s.ToStdString());
+
+		PrintText(20.0, y, "%s", s2.c_str());
     }  
 }
 

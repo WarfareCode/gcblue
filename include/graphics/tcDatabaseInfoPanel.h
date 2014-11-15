@@ -42,6 +42,7 @@ namespace database
     class tcMissileDBObject;
     class tcTorpedoDBObject;
     class tcShipDBObject;
+	class tcSubDBObject;
     class tcAirDBObject;
     class tcGroundDBObject;
 }
@@ -90,6 +91,7 @@ private:
 
 	void DrawDatabaseInfo();
     void DrawDatabaseInfo(database::tcShipDBObject* shipData, float yStart);
+    void DrawDatabaseInfo(database::tcSubDBObject* subData, float yStart);
     void DrawDatabaseInfo(database::tcAirDBObject* airData, float yStart);
     void DrawDatabaseInfo(database::tcGroundDBObject* groundData, float yStart);
     void DrawDatabaseInfo(database::tcMissileDBObject* missileData, float yStart);
