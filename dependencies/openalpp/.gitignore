@@ -1,0 +1,12 @@
+bin/*
+lib/*
+lib/*.exp
+VisualStudio/Debug/*
+VisualStudio/Release/*
+VisualStudio/moving_Debug/*
+VisualStudio/multiple_Debug/*
+VisualStudio/simple_Debug/*
+VisualStudio/testfstream_Debug/*
+VisualStudio/testmic_Debug/*
+Debug/**
+Release/**
