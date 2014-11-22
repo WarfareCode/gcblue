@@ -4,3 +4,6 @@
 *.opensdf
 maps.7z
 database/test.txt
+Debug/**
+Release/**
+*.exp
