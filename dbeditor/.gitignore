@@ -2,9 +2,10 @@
 *.suo
 *.user
 *.opensdf
-maps.7z
-database/test.txt
+*.exp
+bin/**
 Debug/**
 Release/**
-lib/**
-*.exp
+Backup/*.db
+*UpgradeReport*
+

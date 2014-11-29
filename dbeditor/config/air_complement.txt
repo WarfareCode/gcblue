@@ -1,0 +1,5 @@
+// column label,column value pairs for table
+AirClass,AirClass
+Quantity,Quantity
+Prefix,Prefix
+ReadyLevel,ReadyLevel

@@ -1,0 +1,13 @@
+<grid orientation="vertical" label_value_file="config/magazine_loadout.txt">
+    <reference table_name="missile"/>
+    <reference table_name="torpedo"/>
+    <reference table_name="ballistic"/>
+    <reference table_name="ballistic_missile"/>
+    <reference table_name="sonobuoy"/>
+    <reference table_name="cm"/>
+    <reference table_name="fueltank"/>
+    
+    <combobox value="References" label="References">
+        <update_reference table="platform_setup" field="MagazineLoadout"/>
+    </combobox>
+</grid>

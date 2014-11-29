@@ -1,0 +1,24 @@
+// label,value table for simulation models
+Default,0
+Surface,1
+Carrier,2
+Air,3
+Fixed Wing,4
+Missile,5
+Helo,6
+Subsurface,7
+Submarine,8
+Torpedo,9
+Fixed Ground,10
+Platform,11
+Jet,12
+Airfield,13
+Ballistic,14
+Sonobuoy,15
+Air CM,16
+Ground Vehicle,17
+Fuel Tank,20
+Guided Bomb,21
+Water CM,22
+Ballistic Missile,23
+Rocket,24

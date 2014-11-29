@@ -1,0 +1,142 @@
+
+<form orientation="vertical">
+    <sizer orientation="horizontal" proportion="1">
+        <text value="Description" label="Description" proportion="3" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
+        <text value="Notes" label="Notes" proportion="3" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
+        <checkbox value="IsHeloOnly" label="Helo Only?" proportion="0"></checkbox>
+        <text value="HangarCapacity" label="Hangar Capacity" proportion="0"></text>
+    </sizer>
+    <sizer orientation="horizontal" proportion="1">
+        <sizer orientation="vertical" proportion="1" label_width="55" control_width="55">
+            <text value="Sp1_launch" label="Sp1_launch" proportion="0"></text>
+            <text value="Sp1_x" label="Sp1_x" proportion="0"></text>
+            <text value="Sp1_y" label="Sp1_y" proportion="0"></text>
+            <text value="Sp1_z" label="Sp1_z" proportion="0"></text>
+            <text value="Sp1_dir_deg" label="Sp1_dir" proportion="0"></text>
+            <text value="Sp1_len" label="Sp1_len" proportion="0"></text>
+        </sizer>
+        <sizer orientation="vertical" proportion="1" label_width="55" control_width="55">
+            <text value="Sp2_launch" label="Sp2_launch" proportion="0"></text>
+            <text value="Sp2_x" label="Sp2_x" proportion="0"></text>
+            <text value="Sp2_y" label="Sp2_y" proportion="0"></text>
+            <text value="Sp2_z" label="Sp2_z" proportion="0"></text>
+            <text value="Sp2_dir_deg" label="Sp2_dir" proportion="0"></text>
+            <text value="Sp2_len" label="Sp2_len" proportion="0"></text>
+        </sizer>   
+        <sizer orientation="vertical" proportion="1" label_width="55" control_width="55">
+            <text value="Sp3_launch" label="Sp3_launch" proportion="0"></text>
+            <text value="Sp3_x" label="Sp3_x" proportion="0"></text>
+            <text value="Sp3_y" label="Sp3_y" proportion="0"></text>
+            <text value="Sp3_z" label="Sp3_z" proportion="0"></text>
+            <text value="Sp3_dir_deg" label="Sp3_dir" proportion="0"></text>
+            <text value="Sp3_len" label="Sp3_len" proportion="0"></text>
+        </sizer>  
+        <sizer orientation="vertical" proportion="1" label_width="55" control_width="55">
+            <text value="Sp4_launch" label="Sp4_launch" proportion="0"></text>
+            <text value="Sp4_x" label="Sp4_x" proportion="0"></text>
+            <text value="Sp4_y" label="Sp4_y" proportion="0"></text>
+            <text value="Sp4_z" label="Sp4_z" proportion="0"></text>
+            <text value="Sp4_dir_deg" label="Sp4_dir" proportion="0"></text>
+            <text value="Sp4_len" label="Sp4_len" proportion="0"></text>
+        </sizer>  
+         <sizer orientation="vertical" proportion="1" label_width="55" control_width="55">
+            <text value="Sp5_launch" label="Sp5_launch" proportion="0"></text>
+            <text value="Sp5_x" label="Sp5_x" proportion="0"></text>
+            <text value="Sp5_y" label="Sp5_y" proportion="0"></text>
+            <text value="Sp5_z" label="Sp5_z" proportion="0"></text>
+            <text value="Sp5_dir_deg" label="Sp5_dir" proportion="0"></text>
+            <text value="Sp5_len" label="Sp5_len" proportion="0"></text>
+        </sizer>  
+        <sizer orientation="vertical" proportion="1" label_width="55" control_width="55">
+            <text value="Sp6_launch" label="Sp6_launch" proportion="0"></text>
+            <text value="Sp6_x" label="Sp6_x" proportion="0"></text>
+            <text value="Sp6_y" label="Sp6_y" proportion="0"></text>
+            <text value="Sp6_z" label="Sp6_z" proportion="0"></text>
+            <text value="Sp6_dir_deg" label="Sp6_dir" proportion="0"></text>
+            <text value="Sp6_len" label="Sp6_len" proportion="0"></text>
+        </sizer>  
+        <sizer orientation="vertical" proportion="1" label_width="55" control_width="55">
+            <text value="Sp7_launch" label="Sp7_launch" proportion="0"></text>
+            <text value="Sp7_x" label="Sp7_x" proportion="0"></text>
+            <text value="Sp7_y" label="Sp7_y" proportion="0"></text>
+            <text value="Sp7_z" label="Sp7_z" proportion="0"></text>
+            <text value="Sp7_dir_deg" label="Sp7_dir" proportion="0"></text>
+            <text value="Sp7_len" label="Sp7_len" proportion="0"></text>
+        </sizer>  
+        <sizer orientation="vertical" proportion="1" label_width="55" control_width="55">
+            <text value="Sp8_launch" label="Sp8_launch" proportion="0"></text>
+            <text value="Sp8_x" label="Sp8_x" proportion="0"></text>
+            <text value="Sp8_y" label="Sp8_y" proportion="0"></text>
+            <text value="Sp8_z" label="Sp8_z" proportion="0"></text>
+            <text value="Sp8_dir_deg" label="Sp8_dir" proportion="0"></text>
+            <text value="Sp8_len" label="Sp8_len" proportion="0"></text>
+        </sizer>
+    </sizer>
+    <sizer orientation="horizontal" proportion="1">
+        <sizer orientation="vertical" proportion="1" label_width="55" control_width="55">
+            <text value="Sp9_launch" label="Sp9_launch" proportion="0"></text>
+            <text value="Sp9_x" label="Sp9_x" proportion="0"></text>
+            <text value="Sp9_y" label="Sp9_y" proportion="0"></text>
+            <text value="Sp9_z" label="Sp9_z" proportion="0"></text>
+            <text value="Sp9_dir_deg" label="Sp9_dir" proportion="0"></text>
+            <text value="Sp9_len" label="Sp9_len" proportion="0"></text>
+        </sizer>
+        <sizer orientation="vertical" proportion="1" label_width="55" control_width="55">
+            <text value="Sp10_launch" label="Sp10_launch" proportion="0"></text>
+            <text value="Sp10_x" label="Sp10_x" proportion="0"></text>
+            <text value="Sp10_y" label="Sp10_y" proportion="0"></text>
+            <text value="Sp10_z" label="Sp10_z" proportion="0"></text>
+            <text value="Sp10_dir_deg" label="Sp10_dir" proportion="0"></text>
+            <text value="Sp10_len" label="Sp10_len" proportion="0"></text>
+        </sizer>
+        <sizer orientation="vertical" proportion="1" label_width="55" control_width="55">
+            <text value="Sp11_launch" label="Sp11_launch" proportion="0"></text>
+            <text value="Sp11_x" label="Sp11_x" proportion="0"></text>
+            <text value="Sp11_y" label="Sp11_y" proportion="0"></text>
+            <text value="Sp11_z" label="Sp11_z" proportion="0"></text>
+            <text value="Sp11_dir_deg" label="Sp11_dir" proportion="0"></text>
+            <text value="Sp11_len" label="Sp11_len" proportion="0"></text>
+        </sizer>
+        <sizer orientation="vertical" proportion="1" label_width="55" control_width="55">
+            <text value="Sp12_launch" label="Sp12_launch" proportion="0"></text>
+            <text value="Sp12_x" label="Sp12_x" proportion="0"></text>
+            <text value="Sp12_y" label="Sp12_y" proportion="0"></text>
+            <text value="Sp12_z" label="Sp12_z" proportion="0"></text>
+            <text value="Sp12_dir_deg" label="Sp12_dir" proportion="0"></text>
+            <text value="Sp12_len" label="Sp12_len" proportion="0"></text>
+        </sizer>
+        <sizer orientation="vertical" proportion="1" label_width="55" control_width="55">
+            <text value="Sp13_launch" label="Sp13_launch" proportion="0"></text>
+            <text value="Sp13_x" label="Sp13_x" proportion="0"></text>
+            <text value="Sp13_y" label="Sp13_y" proportion="0"></text>
+            <text value="Sp13_z" label="Sp13_z" proportion="0"></text>
+            <text value="Sp13_dir_deg" label="Sp13_dir" proportion="0"></text>
+            <text value="Sp13_len" label="Sp13_len" proportion="0"></text>
+        </sizer>
+        <sizer orientation="vertical" proportion="1" label_width="55" control_width="55">
+            <text value="Sp14_launch" label="Sp14_launch" proportion="0"></text>
+            <text value="Sp14_x" label="Sp14_x" proportion="0"></text>
+            <text value="Sp14_y" label="Sp14_y" proportion="0"></text>
+            <text value="Sp14_z" label="Sp14_z" proportion="0"></text>
+            <text value="Sp14_dir_deg" label="Sp14_dir" proportion="0"></text>
+            <text value="Sp14_len" label="Sp14_len" proportion="0"></text>
+        </sizer>
+        <sizer orientation="vertical" proportion="1" label_width="55" control_width="55">
+            <text value="Sp15_launch" label="Sp15_launch" proportion="0"></text>
+            <text value="Sp15_x" label="Sp15_x" proportion="0"></text>
+            <text value="Sp15_y" label="Sp15_y" proportion="0"></text>
+            <text value="Sp15_z" label="Sp15_z" proportion="0"></text>
+            <text value="Sp15_dir_deg" label="Sp15_dir" proportion="0"></text>
+            <text value="Sp15_len" label="Sp15_len" proportion="0"></text>
+        </sizer>
+        <sizer orientation="vertical" proportion="1" label_width="55" control_width="55">
+            <text value="Sp16_launch" label="Sp16_launch" proportion="0"></text>
+            <text value="Sp16_x" label="Sp16_x" proportion="0"></text>
+            <text value="Sp16_y" label="Sp16_y" proportion="0"></text>
+            <text value="Sp16_z" label="Sp16_z" proportion="0"></text>
+            <text value="Sp16_dir_deg" label="Sp16_dir" proportion="0"></text>
+            <text value="Sp16_len" label="Sp16_len" proportion="0"></text>
+        </sizer>        
+    </sizer>    
+</form>
+

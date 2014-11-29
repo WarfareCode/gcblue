@@ -1,0 +1,31 @@
+<form orientation="horizontal">
+    <sizer orientation="vertical" proportion="1">
+        <combobox value="References" label="References" proportion="0" expand_sizer="yes">
+            <update_reference table="launcher_configuration" field="ChildClass"/>
+        </combobox>
+        <text value="NATO_ASCC" label="NATO/ASCC Name" proportion="0" expand_sizer="yes"></text>
+        <text value="Description" label="Description" proportion="2" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
+        <text value="Notes" label="Notes" proportion="2" multiline="yes" expand_control="yes" expand_sizer="yes"></text>        
+        <combobox value="ModelClassId" label="Model Type" proportion="0" file="config/modeltype.txt"></combobox>
+        <combobox value="ClassificationId" label="Classification" proportion="0" file="config/classification.txt"></combobox>
+        <text value="Cost" label="Cost" proportion="0"></text>
+        <text value="Weight_kg" label="Weight_kg" proportion="0"></text>
+        <text value="Volume_m3" label="Volume_m3" proportion="0"></text>
+        <text value="ImageList" label="ImageList" proportion="0"></text>
+        <text value="IconFileName" label="IconFileName" proportion="0"></text>
+        <text value="ModelFileName" label="ModelFileName" proportion="0"></text>
+        <text value="InitialYear" label="InitialYear" proportion="0"></text>
+        <text value="FinalYear" label="FinalYear" proportion="0"></text>
+        <text value="Country" label="Country" proportion="0"></text>
+        <text value="Designation" label="Designation" proportion="0"></text>        
+    </sizer>
+    <sizer orientation="vertical" proportion="1">
+        <text value="TS" label="TS" proportion="0"></text>
+        <combobox value="TS_Model" label="TS Pattern" proportion="0" update_table="signature"></combobox>
+        <combobox value="AcousticModel" label="Acoustic Model" proportion="0" update_table="acoustic_noise"></combobox>        
+        <combobox value="SL_Model" label="SL Pattern" proportion="0" update_table="signature"></combobox>
+        <text value="BatteryLife_s" label="BatteryLife_s" proportion="0"></text>
+        <text value="CommRange_km" label="CommRange_km" proportion="0"></text>
+    </sizer>
+</form>
+

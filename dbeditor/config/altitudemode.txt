@@ -1,0 +1,7 @@
+// label,value table
+MSL,0
+AGL,1
+Intercept,2
+Datum,3
+InterHigh,4
+MSL Loft, 5

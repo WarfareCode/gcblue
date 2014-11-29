@@ -1,0 +1,6 @@
+// column label,column value pairs for platform_setup table
+Setup Name,SetupName
+Initial Year,InitialYear
+Final Year,FinalYear
+AirComplement,AirComplement
+MagazineLoadout,MagazineLoadout

@@ -1,0 +1,30 @@
+<form orientation="horizontal">
+    <sizer orientation="vertical" proportion="1">
+        <combobox value="References" label="References" proportion="0" expand_sizer="yes">
+            <update_reference table="platform_sensor" field="SensorClass"/>
+            <update_reference table="missile" field="SensorClass"/>
+            <update_reference table="ballistic" field="SensorClass"/>
+        </combobox>    
+        <text value="NATO_ASCC" label="NATO/ASCC Name" proportion="0" expand_sizer="yes"></text>
+        <text value="Description" label="Description" proportion="2" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
+        <text value="Notes" label="Notes" proportion="2" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
+        <text value="MaxRange_km" label="MaxRange_km" proportion="0"></text>
+        <text value="RefRange_km" label="Reference Range [km]" proportion="0"></text>
+        <text value="FieldOfView_deg" label="FieldOfView_deg" proportion="0"></text>
+        <text value="MinElevation_deg" label="MinElevation_deg" proportion="0"></text>
+        <text value="MaxElevation_deg " label="MaxElevation_deg" proportion="0"></text>
+        <text value="ScanPeriod_s" label="ScanPeriod_s" proportion="0"></text>
+        <combobox value="DamageEffect" label="DamageEffect" proportion="0" update_table="damage_effect"></combobox>
+        <text value="RangeError" label="RangeError" proportion="0"></text>
+        <text value="AngleError_deg" label="AngleError_deg" proportion="0"></text>
+        <text value="ElevationError_deg" label="ElevationError_deg" proportion="0"></text>
+        <text value="CounterMeasureFactor" label="CM Susceptibility" proportion="0"></text>
+    </sizer>
+    <sizer orientation="vertical" proportion="1">
+        <text value="MinFrequency_Hz" label="MinFrequency_Hz" proportion="0"></text>
+        <text value="MaxFrequency_Hz" label="MaxFrequency_Hz" proportion="0"></text>    
+        <checkbox value="IsSurveillance" label="IsSurveillance" proportion="0"></checkbox>
+        <checkbox value="IsRWR" label="Is RWR?" proportion="0"></checkbox>
+        <text value="IdThreshold_dB" label="IdThreshold_dB" proportion="0" tooltip="SNR margin above detection threshold to identify target, use 99 for no ID capability"></text>
+    </sizer>
+</form>

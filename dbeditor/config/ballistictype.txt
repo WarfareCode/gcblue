@@ -1,0 +1,7 @@
+// label,value pairs
+Gun Round,0
+Gravity Bomb,1
+Auto Cannon,2
+Smart Bomb,3
+CM Round,4
+Rocket,5

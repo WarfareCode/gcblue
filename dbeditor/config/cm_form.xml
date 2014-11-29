@@ -1,0 +1,39 @@
+
+<form orientation="horizontal">
+    <sizer orientation="vertical" proportion="1">
+        <combobox value="References" label="References" proportion="0" expand_sizer="yes">
+            <update_reference table="launcher_configuration" field="ChildClass"/>
+            <update_reference table="missile" field="PayloadClass"/>
+        </combobox>
+        <text value="Description" label="Description" proportion="2" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
+        <text value="Notes" label="Notes" proportion="2" multiline="yes" expand_control="yes" expand_sizer="yes"></text>        
+        <combobox value="ModelClassId" label="Model Type" proportion="0" file="config/modeltype.txt"></combobox>
+        <combobox value="ClassificationId" label="Classification" proportion="0" file="config/classification.txt"></combobox>
+        <text value="Cost" label="Cost" proportion="0"></text>
+        <text value="Weight_kg" label="Weight_kg" proportion="0"></text>
+        <text value="Volume_m3" label="Volume_m3" proportion="0"></text>
+        <text value="IconFileName" label="IconFileName" proportion="0"></text>
+        <text value="ModelFileName" label="ModelFileName" proportion="0"></text>
+    </sizer>
+    <sizer orientation="vertical" proportion="1">
+        <combobox value="SubType" label="SubType" proportion="0" file="config/cmtypes.txt"></combobox>
+        <text value="LifeSpan_s" label="LifeSpan_s" proportion="0"></text>
+        <text value="Effectiveness" label="Effectiveness" proportion="0"></text>
+        <text value="MaxSpeed_mps" label="MaxSpeed_mps" proportion="0"></text>
+        
+        <text value="RCS_dBsm" label="RCS_dBsm" proportion="0"></text>
+        <combobox value="RCS_Model" label="RCS Pattern" proportion="0" update_table="signature"></combobox>
+        <text value="EffectiveHeight_m" label="EffectiveHeight_m" proportion="0"></text>
+        <text value="OpticalCrossSection_dBsm" label="OpticalCrossSection_dBsm" proportion="0"></text>
+        <text value="IRSignature_dB" label="IRSignature_dB" proportion="0"></text>
+        <combobox value="IR_ModelA" label="IR Pattern A" proportion="0" update_table="signature"></combobox>
+        <combobox value="IR_ModelB" label="IR Pattern B" proportion="0" update_table="signature"></combobox>
+        <combobox value="IR_ModelC" label="IR Pattern C" proportion="0" update_table="signature"></combobox>
+        <text value="TS" label="TS" proportion="0"></text>
+        <combobox value="TS_Model" label="TS Pattern" proportion="0" update_table="signature"></combobox>
+        <combobox value="AcousticModel" label="Acoustic Model" proportion="0" update_table="acoustic_noise"></combobox>
+        <combobox value="SL_Model" label="SL Pattern" proportion="0" update_table="signature"></combobox>
+    </sizer>
+
+</form>
+

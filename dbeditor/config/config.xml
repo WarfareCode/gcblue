@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Root>
+    <LastPath LastDatabasePath="D:\gcblue\database" LastDatabaseFile="database.db" LastCSVPath="D:\blue_v26\database"/>
+    <PageState>
+        <Page Table="sub" ItemName="Hayashio"/>
+        <Page Table="ship" ItemName="Murasame DDG"/>
+        <Page Table="ground" ItemName="Airstrip"/>
+        <Page Table="air" ItemName="A-10A"/>
+        <Page Table="simpleair" ItemName="SH-60B"/>
+        <Page Table="radar" ItemName="Test Radar"/>
+        <Page Table="sonar" ItemName="Generic Active"/>
+        <Page Table="esm" ItemName="ESM-1"/>
+        <Page Table="ecm" ItemName="Jammer 100W"/>
+        <Page Table="optical" ItemName="Eyeball 20/20b"/>
+        <Page Table="torpedo" ItemName="RBU Test"/>
+        <Page Table="missile" ItemName="Python 5"/>
+        <Page Table="ballistic_missile" ItemName="UGM-96A"/>
+        <Page Table="ballistic" ItemName="GBU-31B(v)2"/>
+        <Page Table="launcher_configuration" ItemName="Hedgehog"/>
+        <Page Table="stores" ItemName="Iowa Main Ammo Mag"/>
+        <Page Table="magazine_loadout" ItemName=""/>
+        <Page Table="air_complement" ItemName=""/>
+        <Page Table="cm" ItemName=""/>
+        <Page Table="flightport" ItemName=""/>
+        <Page Table="sonobuoy" ItemName=""/>
+    </PageState>
+    <SonarCalculation AutoUpdate="1" PlatformClass="Los Angeles (1988)" PlatformHeading="0" PlatformSpeed="0" PlatformDepth="5" TargetClass="ANZAC FFH" TargetDepth="3" SeaState="1" BottomDepth="4000" EnvironmentTemplate="NA-Summer" LaunchHeading="0" LaunchElevation="0" LaunchSpeed="5" LaunchAltitude="5" TargetHeading="0" TargetSpeed="0" TargetAltitude="50" TargetRange="50"/>
+    <MissileCalculation/>
+</Root>

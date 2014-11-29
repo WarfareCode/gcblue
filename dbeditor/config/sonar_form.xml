@@ -1,0 +1,35 @@
+<form orientation="horizontal">
+    <sizer orientation="vertical" proportion="1">
+        <combobox value="References" label="References" proportion="1" expand_sizer="yes">
+            <update_reference table="platform_sensor" field="SensorClass"/>
+            <update_reference table="torpedo" field="sonarClass"/>
+        </combobox>
+        <text value="NATO_ASCC" label="NATO/ASCC Name" proportion="1" expand_sizer="yes"></text>        
+        <text value="Description" label="Description" proportion="2" multiline="yes" expand_sizer="yes" expand_control="yes"></text>
+        <text value="Notes" label="Notes" proportion="2" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
+        <text value="MaxRange_km" label="MaxRange_km" proportion="1"></text>
+        <text value="RefRange_km" label="RefRange_km" proportion="1"></text>
+        <text value="FieldOfView_deg" label="FieldOfView_deg" proportion="1"></text>
+        <text value="MinElevation_deg" label="MinElevation_deg" proportion="1"></text>
+        <text value="MaxElevation_deg " label="MaxElevation_deg" proportion="1"></text>
+        <text value="ScanPeriod_s" label="ScanPeriod_s" proportion="1"></text>
+        <combobox value="DamageEffect" label="DamageEffect" proportion="1" update_table="damage_effect"></combobox>
+        <text value="RangeError" label="RangeError" proportion="1"></text>
+        <text value="AngleError_deg" label="AngleError_deg" proportion="1"></text>
+        <text value="ElevationError_deg" label="ElevationError_deg" proportion="1"></text>
+        <text value="CounterMeasureFactor" label="CM Susceptibility" proportion="1"></text>
+    </sizer>
+    <sizer orientation="vertical" proportion="1">
+        <text value="MinFrequency_Hz" label="MinFrequency_Hz" proportion="0"></text>
+        <text value="MaxFrequency_Hz" label="MaxFrequency_Hz" proportion="0"></text>
+        <text value="IdThreshold_dB" label="IdThreshold_dB" proportion="0" tooltip="SNR margin above detection threshold to identify target, use 99 for no ID capability"></text>
+        <checkbox value="IsSurveillance" label="IsSurveillance" proportion="0"></checkbox>
+        <text value="SL" label="SL" proportion="0"></text>
+        <text value="DI" label="DI" proportion="0"></text>
+        <checkbox value="isPassive" label="isPassive" proportion="0"></checkbox>
+        <checkbox value="isActive" label="isActive" proportion="0"></checkbox>
+        <checkbox value="isTowed" label="isTowed" proportion="0"></checkbox>
+        <text value="maxScope_m" label="maxScope_m" proportion="0"></text>
+        <checkbox value="isWakeHoming" label="isWakeHoming" proportion="0"></checkbox>
+    </sizer>
+</form>

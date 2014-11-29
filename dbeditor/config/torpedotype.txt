@@ -1,0 +1,5 @@
+// label,value table
+Torpedo,1
+Depth Charge,2
+Bottom Mine,3
+CAPTOR Mine,4

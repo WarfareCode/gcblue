@@ -1,0 +1,7 @@
+<grid orientation="vertical" label_value_file="config/air_complement.txt">
+    <reference table_name="air"/>
+    <reference table_name="simpleair"/>
+    <combobox value="References" label="References">
+        <update_reference table="platform_setup" field="AirComplement"/>
+    </combobox>
+</grid>

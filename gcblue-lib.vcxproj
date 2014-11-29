@@ -19,14 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>BlueII</ProjectName>
-    <ProjectGuid>{76C3883D-96DD-4A32-91C5-2ADA4CA505E7}</ProjectGuid>
+    <ProjectName>gcblue-lib</ProjectName>
+    <ProjectGuid>{13B3F189-73E5-4E91-911C-B9D38A2554B9}</ProjectGuid>
     <RootNamespace>GCblue</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <PlatformToolset>v110</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
@@ -40,7 +40,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <PlatformToolset>v110</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
@@ -75,7 +75,7 @@
     <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>.\bin\</OutDir>
+    <OutDir>.\lib\</OutDir>
     <IntDir>Debug\</IntDir>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
@@ -90,7 +90,7 @@
     <IncludePath>D:\TV3D65;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>.\bin\</OutDir>
+    <OutDir>.\lib\</OutDir>
     <IntDir>Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <LibraryPath>D:\Python27\libs;D:\libogg-1.3.2\win32\VS2010\Win32\Release;D:\libvorbis-1.3.4\win32\VS2010\Win32\Release;D:\boost_1_57_0\stage\lib;D:\wxWidgets-3.0.2\lib\vc_lib;D:\OpenAL 1.1 SDK\libs\Win32;D:\openalpp\lib;D:\TV3D65;$(LibraryPath)</LibraryPath>

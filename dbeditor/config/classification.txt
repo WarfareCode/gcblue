@@ -1,0 +1,20 @@
+// label,value pairs
+Surface,16
+Small Surface,17
+Large Surface,18
+Carrier,22
+Air,32
+Fixed Wing,33
+Helo,34
+Air CM,36
+Missile,64
+Subsurface,128
+Submarine,129
+Torpedo,130
+Sonobuoy,132
+Water CM,136
+Water Mine,138
+Ground,256
+Airfield,257
+Ground Vehicle,258
+Ballistic,512

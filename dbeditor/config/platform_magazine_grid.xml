@@ -1,0 +1,3 @@
+<grid orientation="vertical" table="platform_magazine" label_value_file="config/platform_magazine.txt">
+    <reference table_name="stores"/> 
+</grid>

@@ -1,0 +1,20 @@
+<form orientation="horizontal">
+    <sizer orientation="vertical" proportion="1">
+        <combobox value="References" label="References" proportion="1" expand_sizer="yes">
+            <update_reference table="platform_magazine" field="MagazineClass"/>
+        </combobox>
+        <text value="Description" label="Description" proportion="2" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
+        <text value="Notes" label="Notes" proportion="2" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
+    </sizer>
+    <sizer orientation="vertical" proportion="1" label_width="120" control_width="200">        
+        <text value="DisplayName" label="Display Name" proportion="0"></text>    
+        <text value="Capacity" label="Capacity" proportion="0"></text>
+        <text value="MaxVolume_m3" label="Max Volume [m3]" proportion="0"></text>
+        <text value="MaxWeight_kg" label="Max Weight [kg]" proportion="0"></text>
+        <text value="MoveTime_s" label="Move Time [s]" proportion="0"></text>
+        <text value="Class1" label="Class1" proportion="2" multiline="yes"></text>
+        <text value="Class2" label="Class2" proportion="2" multiline="yes"></text>
+        <text value="Class3" label="Class3" proportion="2" multiline="yes"></text>
+        <text value="Class4" label="Class4" proportion="2" multiline="yes"></text>
+    </sizer>
+</form>

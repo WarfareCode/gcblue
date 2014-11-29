@@ -1,0 +1,6 @@
+// label,value table
+Chaff,Chaff
+Flare,Flare
+WaterFlare,WaterFlare
+Noisemaker,Noisemaker
+Decoy,Decoy

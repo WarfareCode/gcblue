@@ -1,0 +1,61 @@
+<form orientation="horizontal">
+    <sizer orientation="vertical" proportion="1">
+        <combobox value="References" label="References" proportion="0" expand_sizer="yes">
+            <update_reference table="launcher_configuration" field="ChildClass"/>
+            <update_reference table="missile" field="PayloadClass"/>
+            <update_reference table="torpedo" field="PayloadClass"/>
+            <update_reference table="ballistic" field="PayloadClass"/>
+            <update_reference table="ballistic_missile" field="PayloadClass"/>            
+        </combobox>
+        <text value="NATO_ASCC" label="NATO/ASCC Name" proportion="0" expand_sizer="yes"></text>
+        <text value="Description" label="Description" proportion="2" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
+        <text value="Notes" label="Notes" proportion="2" multiline="yes" expand_control="yes" expand_sizer="yes"></text>        
+        <combobox value="ModelClassId" label="Model Type" proportion="0" file="config/modeltype.txt"></combobox>
+        <combobox value="ClassificationId" label="Classification" proportion="0" file="config/classification.txt"></combobox>
+        <text value="Cost" label="Cost" proportion="0"></text>
+        <text value="Weight_kg" label="Weight_kg" proportion="0"></text>
+        <text value="Volume_m3" label="Volume_m3" proportion="0"></text>
+        <text value="ImageList" label="ImageList" proportion="2" multiline="yes"></text>
+        <text value="IconFileName" label="IconFileName" proportion="0"></text>
+        <text value="ModelFileName" label="ModelFileName" proportion="0"></text>
+    </sizer>
+    <sizer orientation="vertical" proportion="1">
+        <text value="InitialYear" label="InitialYear" proportion="0"></text>
+        <text value="FinalYear" label="FinalYear" proportion="0"></text>    
+        <combobox value="DamageModel" label="Damage Model" proportion="0" update_table="weapon_damage"></combobox>
+        <text value="LaunchSpeed_mps" label="LaunchSpeed_mps" proportion="0"></text>
+        <bitfield value="targetFlags" label="Target Flags" proportion="0">
+            <bit label="Sur" value="1"/>
+            <bit label="Air" value="2"/>
+            <bit label="Lnd" value="4"/>
+            <bit label="Mis" value="8"/>
+            <bit label="Sub" value="16"/>
+        </bitfield>
+        <text value="MinLaunchAlt_m" label="MinLaunchAlt_m" proportion="0"></text>
+        <text value="MaxLaunchAlt_m" label="MaxLaunchAlt_m" proportion="0"></text>
+        <text value="MinRange_km" label="MinRange_km" proportion="0"></text>
+        <text value="MaxRange_km" label="MaxRange_km" proportion="0"></text>
+        <text value="ProbNoFaults" label="ProbNoFaults" proportion="0"></text>
+        <text value="DetonationRange_m" label="DetonationRange_m" proportion="0"></text>
+        <text value="maxTurnRate_degps" label="maxTurnRate_degps" proportion="0"></text>
+        <text value="maxDepth_m" label="maxDepth_m" proportion="0"></text>
+        <text value="maxSpeed_kts" label="maxSpeed_kts" proportion="0"></text>
+        <text value="acceleration_ktsps" label="acceleration_ktsps" proportion="0"></text>
+        <text value="preEnableSpeed_kts" label="preEnableSpeed_kts" proportion="0"></text>
+    </sizer>
+    <sizer orientation="vertical" proportion="1">
+        <text value="TS" label="TS" proportion="0"></text>
+        <combobox value="TS_Model" label="TS Pattern" proportion="0" update_table="signature"></combobox>
+        <combobox value="AcousticModel" label="Acoustic Model" proportion="0" update_table="acoustic_noise"></combobox>        
+        <combobox value="SL_Model" label="SL Pattern" proportion="0" update_table="signature"></combobox>
+        <text value="battery_kJ" label="battery_kJ" proportion="0"></text>
+        <text value="batteryRate_kW" label="batteryRate_kW" proportion="0"></text>
+        <combobox value="sonarClass" label="sonarClass" proportion="0" update_table="sonar"></combobox>
+        <checkbox value="wireGuidance" label="wireGuidance" proportion="0"></checkbox>
+        <combobox value="DamageEffect" label="Survivability" proportion="0" update_table="damage_effect"></combobox>
+        <combobox value="WeaponType" label="Weapon Type" proportion="0" file="config/torpedotype.txt"></combobox>
+        <text value="PayloadClass" label="Payload Class" proportion="0"></text>
+		<text value="PayloadQuantity" label="Payload Quantity" proportion="0"></text>
+    </sizer>
+</form>
+

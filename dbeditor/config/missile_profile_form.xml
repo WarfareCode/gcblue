@@ -1,0 +1,52 @@
+
+<form orientation="horizontal">
+    <sizer orientation="vertical" proportion="1" label_width="55" control_width="55">
+        <text value="Rng1_km" label="> Rng [km]" proportion="0"></text>
+        <text value="Alt1_m" label="Alt [m]" proportion="0"></text>
+        <combobox value="AltMode1" label="AltMode" proportion="0" file="config/altitudemode.txt"></combobox>
+        <combobox value="GuidMode1" label="Guidance" proportion="0" file="config/guidancemode.txt"></combobox>
+    </sizer>    
+    <sizer orientation="vertical" proportion="1" label_width="15" control_width="55">
+        <text value="Rng2_km" label="R2" proportion="0"></text>
+        <text value="Alt2_m" label="" proportion="0"></text>
+        <combobox value="AltMode2" label="" proportion="0" file="config/altitudemode.txt"></combobox>
+        <combobox value="GuidMode2" label="" proportion="0" file="config/guidancemode.txt"></combobox>
+    </sizer>
+    <sizer orientation="vertical" proportion="1" label_width="15" control_width="55">
+        <text value="Rng3_km" label="R3" proportion="0"></text>
+        <text value="Alt3_m" label="" proportion="0"></text>
+        <combobox value="AltMode3" label="" proportion="0" file="config/altitudemode.txt"></combobox>
+        <combobox value="GuidMode3" label="" proportion="0" file="config/guidancemode.txt"></combobox>     
+    </sizer>
+    <sizer orientation="vertical" proportion="1" label_width="15" control_width="55">
+        <text value="Rng4_km" label="R4" proportion="0"></text>
+        <text value="Alt4_m" label="" proportion="0"></text>
+        <combobox value="AltMode4" label="" proportion="0" file="config/altitudemode.txt"></combobox>
+        <combobox value="GuidMode4" label="" proportion="0" file="config/guidancemode.txt"></combobox>             
+    </sizer>
+    <sizer orientation="vertical" proportion="1" label_width="15" control_width="55">
+        <text value="Rng5_km" label="R5" proportion="0"></text>
+        <text value="Alt5_m" label="" proportion="0"></text>
+        <combobox value="AltMode5" label="" proportion="0" file="config/altitudemode.txt"></combobox>
+        <combobox value="GuidMode5" label="" proportion="0" file="config/guidancemode.txt"></combobox>            
+    </sizer>
+    <sizer orientation="vertical" proportion="1" label_width="15" control_width="55">
+        <text value="Rng6_km" label="R6" proportion="0"></text>
+        <text value="Alt6_m" label="" proportion="0"></text>
+        <combobox value="AltMode6" label="" proportion="0" file="config/altitudemode.txt"></combobox>
+        <combobox value="GuidMode6" label="" proportion="0" file="config/guidancemode.txt"></combobox>            
+    </sizer>    
+    <sizer orientation="vertical" proportion="1" label_width="15" control_width="55">
+        <text value="Rng7_km" label="R7" proportion="0"></text>
+        <text value="Alt7_m" label="" proportion="0"></text>
+        <combobox value="AltMode7" label="" proportion="0" file="config/altitudemode.txt"></combobox>
+        <combobox value="GuidMode7" label="" proportion="0" file="config/guidancemode.txt"></combobox>            
+    </sizer>    
+    <sizer orientation="vertical" proportion="1" label_width="15" control_width="55">
+        <text value="Rng8_km" label="R8" proportion="0"></text>
+        <text value="Alt8_m" label="" proportion="0"></text>
+        <combobox value="AltMode8" label="" proportion="0" file="config/altitudemode.txt"></combobox>
+        <combobox value="GuidMode8" label="" proportion="0" file="config/guidancemode.txt"></combobox>            
+    </sizer>    
+</form>
+

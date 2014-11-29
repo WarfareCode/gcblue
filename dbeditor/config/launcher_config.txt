@@ -1,0 +1,5 @@
+// column label,column value pairs for table
+Child Class,ChildClass
+Child Capacity,ChildCapacity
+Load Time [s],LoadTime_s
+CycleTime [s],CycleTime_s

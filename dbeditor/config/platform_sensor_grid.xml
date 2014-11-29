@@ -1,0 +1,7 @@
+<grid orientation="vertical" table="platform_sensor" label_value_file="config/platform_sensor.txt">
+    <reference table_name="ecm"/>
+    <reference table_name="esm"/>
+    <reference table_name="optical"/>
+    <reference table_name="radar"/>
+    <reference table_name="sonar"/>    
+</grid>

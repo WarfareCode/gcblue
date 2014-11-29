@@ -1,0 +1,46 @@
+<form orientation="horizontal">
+    <sizer orientation="vertical" proportion="1">
+        <combobox value="References" label="References" proportion="0" expand_sizer="yes">
+            <update_reference table="platform_sensor" field="SensorClass"/>
+            <update_reference table="missile" field="SensorClass"/>
+            <update_reference table="ballistic" field="SensorClass"/>
+        </combobox>
+        <text value="NATO_ASCC" label="NATO/ASCC Name" proportion="0" expand_sizer="yes"></text>        
+        <text value="Description" label="Description" proportion="2" multiline="yes" expand_sizer="yes" expand_control="yes"></text>
+        <text value="Notes" label="Notes" proportion="2" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
+        <text value="MaxRange_km" label="MaxRange_km" proportion="0"></text>
+        <text value="RefRange_km" label="RefRange_km" proportion="0" tooltip="Range at which a 1 m2 target can be detected"></text>
+        <text value="FieldOfView_deg" label="FieldOfView_deg" proportion="0"></text>
+        <text value="MinElevation_deg" label="MinElevation_deg" proportion="0"></text>
+        <text value="MaxElevation_deg " label="MaxElevation_deg" proportion="0"></text>
+        <text value="ScanPeriod_s" label="ScanPeriod_s" proportion="0"></text>
+        <combobox value="DamageEffect" label="DamageEffect" proportion="0" update_table="damage_effect"></combobox>
+        <text value="RangeError" label="RangeError" proportion="0"></text>
+        <text value="AngleError_deg" label="AngleError_deg" proportion="0"></text>
+        <text value="ElevationError_deg" label="ElevationError_deg" proportion="0"></text>
+        <text value="CounterMeasureFactor" label="CM Susceptibility" proportion="0"></text>
+    </sizer>
+    <sizer orientation="vertical" proportion="1">
+        <number value="MinFrequency_Hz" label="Min Freq (MHz)" unit_factor="1e-6" decimal_places="0" proportion="0"></number>
+        <number value="MaxFrequency_Hz" label="Max Freq (MHz)" unit_factor="1e-6" decimal_places="0" proportion="0"></number>
+        <number value="Bandwidth_Hz" label="Bandwidth (MHz)" unit_factor="1e-6" decimal_places="2" proportion="0"></number>
+        <text value="EffectiveSidelobes_dB" label="EffectiveSidelobes_dB" proportion="0" tooltip="Average sidelobe level including effects of any adaptive beamforming"></text>
+        <checkbox value="IsSurveillance" label="IsSurveillance" proportion="0"></checkbox>
+        <text value="ERPpeak_dBW" label="ERP Peak (dBW)" proportion="0" tooltip="10log10(peak transmit power W) + antenna gain"></text>
+        <text value="ERPaverage_dBW" label="ERP Average (dBW)" proportion="0" tooltip="10log10(average transmit power W) + antenna gain"></text>
+        <text value="MaxFireControlTracks" label="MaxFireControlTracks" proportion="0"></text>
+        <checkbox value="IsSemiactive" label="IsSemiactive" proportion="0"></checkbox>
+        <text value="BlindSpeed_mps" label="BlindSpeed_mps" proportion="0"></text>
+        <text value="LookdownWater_dB" label="LookdownWater_dB" proportion="0"></text>
+        <text value="LookdownLand_dB" label="LookdownLand_dB" proportion="0"></text>
+        <text value="AzimuthBeamwidth_deg" label="AzimuthBeamwidth_deg" proportion="0"></text>
+        <text value="ElevationBeamwidth_deg" label="ElevationBeamwidth_deg" proportion="0"></text>
+        <text value="IdThreshold_dB" label="IdThreshold_dB" proportion="0" tooltip="SNR margin above detection threshold to identify target, use 99 for no ID capability"></text>
+        <checkbox value="DetectsSurface" label="DetectsSurface" proportion="0"></checkbox>
+        <checkbox value="DetectsAir" label="DetectsAir" proportion="0"></checkbox>
+        <checkbox value="DetectsMissile" label="DetectsMissile" proportion="0"></checkbox>
+        <checkbox value="DetectsGround" label="DetectsGround" proportion="0"></checkbox>
+        <calc type="radar" subtype="gain" label="radar calc" proportion="0"></calc>
+        <calc type="radar" subtype="losses" label="radar calc" proportion="0"></calc>
+    </sizer>
+</form>

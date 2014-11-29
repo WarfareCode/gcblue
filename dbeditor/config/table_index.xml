@@ -1,0 +1,10 @@
+<root>
+    <table name="platform_launcher" field="DatabaseClass" />
+    <table name="platform_sensor" field="DatabaseClass" />
+    <table name="platform_magazine" field="DatabaseClass" />
+    <table name="platform_names" field="DatabaseClass" />
+    <table name="platform_setup" field="DatabaseClass" />
+    <table name="air_complement" field="DatabaseClass" />
+    <table name="launcher_loadout" field="DatabaseClass" />
+    <table name="magazine_loadout" field="DatabaseClass" />
+</root>

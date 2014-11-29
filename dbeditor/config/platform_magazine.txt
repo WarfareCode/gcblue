@@ -1,0 +1,3 @@
+// column label,column value pairs for platform_magazine table
+Magazine Class,MagazineClass
+Magazine ID,MagazineId

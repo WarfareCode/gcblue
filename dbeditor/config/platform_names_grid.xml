@@ -1,0 +1,4 @@
+<grid orientation="vertical" table="platform_names" label_value_file="config/platform_names.txt">
+	<datefield column="2" />
+	<datefield column="3" />
+</grid>

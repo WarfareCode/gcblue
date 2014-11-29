@@ -1,0 +1,5 @@
+<form orientation="horizontal">
+    <sizer orientation="vertical" proportion="1">
+        <calc type="sonar" proportion="1"></calc>
+    </sizer>
+</form>

@@ -1,0 +1,34 @@
+
+<form orientation="horizontal">
+    <sizer orientation="vertical" proportion="0" label_width="25" control_width="60">
+        <text value="T2" label="T2" proportion="0"></text>
+        <text value="T4" label="T4" proportion="0"></text>        
+        <text value="T6" label="T6" proportion="0"></text>        
+        <text value="T8" label="T8" proportion="0"></text>
+        <text value="T10" label="T10" proportion="0"></text>
+        <text value="T12" label="T12" proportion="0"></text>
+        <text value="T16" label="T16" proportion="0"></text>
+        <text value="T20" label="T20" proportion="0"></text>
+        <text value="T25" label="T25" proportion="0"></text>
+        <text value="T30" label="T30" proportion="0"></text>        
+    </sizer>
+    <sizer orientation="vertical" proportion="0">
+    </sizer>
+    <sizer orientation="vertical" proportion="0" label_width="25" control_width="60">
+        <text value="FE2" label="FE2" proportion="0"></text>
+        <text value="FE4" label="FE4" proportion="0"></text>
+        <text value="FE6" label="FE6" proportion="0"></text>
+        <text value="FE8" label="FE8" proportion="0"></text>
+        <text value="FE10" label="FE10" proportion="0"></text>
+    	<text value="FE12" label="FE12" proportion="0"></text>
+        <text value="FE16" label="FE16" proportion="0"></text>
+        <text value="FE20" label="FE20" proportion="0"></text>
+        <text value="FE25" label="FE25" proportion="0"></text>
+        <text value="FE30" label="FE30" proportion="0"></text>
+    </sizer>    
+    <sizer orientation="vertical" proportion="1" label_width="25" control_width="160">
+        <calc type="aero" proportion="0"></calc>
+    </sizer>       
+</form>
+
+

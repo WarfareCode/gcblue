@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Root>
+        <LastPath LastDatabasePath="" LastDatabaseFile="" LastCSVPath=""/>
+        <PageState>
+                <Page Table="sub" ItemName=""/>
+                <Page Table="ship" ItemName=""/>
+                <Page Table="ground" ItemName=""/>
+                <Page Table="air" ItemName=""/>
+                <Page Table="simpleair" ItemName=""/>
+                <Page Table="radar" ItemName=""/>
+                <Page Table="sonar" ItemName=""/>
+                <Page Table="esm" ItemName=""/>
+                <Page Table="ecm" ItemName=""/>
+                <Page Table="optical" ItemName=""/>
+                <Page Table="torpedo" ItemName=""/>
+                <Page Table="missile" ItemName=""/>
+                <Page Table="ballistic_missile" ItemName=""/>
+                <Page Table="ballistic" ItemName=""/>
+                <Page Table="launcher_configuration" ItemName=""/>
+                <Page Table="stores" ItemName=""/>
+                <Page Table="magazine_loadout" ItemName=""/>
+                <Page Table="air_complement" ItemName=""/>
+                <Page Table="cm" ItemName=""/>
+                <Page Table="flightport" ItemName=""/>
+        </PageState>
+</Root>

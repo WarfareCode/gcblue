@@ -1,0 +1,11 @@
+// column label,column value pairs for platform_launcher table
+Launcher Class,LauncherClass
+Launcher ID,LauncherId
+Description,Description
+Short Name,LocalName
+Firing Arc [deg],FiringArc_deg
+Az [deg],Az
+El [deg],El
+FC Sensor,FireControlSensor
+FC Sensor 2,FireControlSensor2
+Reloadable,IsReloadable
