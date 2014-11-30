@@ -94,6 +94,8 @@ tcGameStream& tcRadar::operator<<(tcGameStream& stream)
 {    
     tcSensorState::operator<<(stream);
 
+	stream >> fireControlTrackCount;
+
     stream >> isSemiactive;
 	stream >> last_range_km;
 
@@ -128,6 +130,8 @@ tcGameStream& tcRadar::operator<<(tcGameStream& stream)
 tcGameStream& tcRadar::operator>>(tcGameStream& stream)
 {
     tcSensorState::operator>>(stream);
+
+	stream << fireControlTrackCount;
 
     stream << isSemiactive;
 	stream << last_range_km; ///< [km] target range from last call to CanDetectTarget

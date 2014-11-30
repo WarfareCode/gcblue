@@ -117,7 +117,7 @@ void tcGameSerializer::LoadFromBinary(const char* fileName)
     if (!valid) return;
 
     int streamVersion = stream.GetVersionId();
-    if ((streamVersion != currentVersion) && (streamVersion < 12))
+    if ((streamVersion != currentVersion))
     {
         wxString msg;
         msg.Printf("Old save file format (version %d) may not be compatible, try to load anyway?", streamVersion);
@@ -516,7 +516,7 @@ void tcGameSerializer::SaveToXml(wxXmlDocument& doc)
 
 
 tcGameSerializer::tcGameSerializer()
-: currentVersion(15)
+: currentVersion(16)
 {
     wxASSERT(tacticalMap != 0);
     wxASSERT(worldMap != 0);
