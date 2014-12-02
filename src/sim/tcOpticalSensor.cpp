@@ -430,7 +430,7 @@ bool tcOpticalSensor::IsTrackAvailable()
 * Calling method must check if target is detectable for this to
 * work properly.
 */
-bool tcOpticalSensor::RequestTrack()
+bool tcOpticalSensor::RequestTrack(long targetId)
 {
     if (IsTrackAvailable())
     {
@@ -443,7 +443,7 @@ bool tcOpticalSensor::RequestTrack()
     }
 }
 
-bool tcOpticalSensor::ReleaseTrack()
+bool tcOpticalSensor::ReleaseTrack(long targetId)
 {
     if (fireControlTrackCount > 0)
     {

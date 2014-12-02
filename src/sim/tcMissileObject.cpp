@@ -333,7 +333,7 @@ void tcMissileObject::LaunchFrom(tcGameObject* obj, unsigned nLauncher)
 		{
 			sensor->SetFireControlSensor(
 				obj->mnID, pLauncher->fireControlSensorIdx);
-			pLauncher->fireControlSensor->RequestTrack();
+			pLauncher->fireControlSensor->RequestTrack(pLauncher->mnTargetID);
 		}
 	}
 

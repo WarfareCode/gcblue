@@ -69,7 +69,16 @@ tcUpdateStream& tcRadar::operator<<(tcUpdateStream& stream)
 {
     tcSensorState::operator<<(stream);
 
+	unsigned char fireControlTrackCount;
     stream >> fireControlTrackCount;
+	fireControlTracks.clear();
+
+	for (unsigned char n=0; n<fireControlTrackCount; n++)
+	{
+		long trackId;
+		stream >> trackId;
+		fireControlTracks.push_back(trackId);
+	}
 
     //stream >> isSemiactive;
 
@@ -83,7 +92,14 @@ tcUpdateStream& tcRadar::operator>>(tcUpdateStream& stream)
 {
     tcSensorState::operator>>(stream);
 
+	wxASSERT(fireControlTracks.size() < 256);
+	unsigned char fireControlTrackCount = (unsigned char)fireControlTracks.size();
     stream << fireControlTrackCount;
+
+	for (unsigned char n=0; n<fireControlTrackCount; n++)
+	{
+		stream << fireControlTracks[n];
+	}
 
     //stream << isSemiactive;
 
@@ -94,7 +110,16 @@ tcGameStream& tcRadar::operator<<(tcGameStream& stream)
 {    
     tcSensorState::operator<<(stream);
 
-	stream >> fireControlTrackCount;
+	unsigned char fireControlTrackCount;
+    stream >> fireControlTrackCount;
+	fireControlTracks.clear();
+
+	for (unsigned char n=0; n<fireControlTrackCount; n++)
+	{
+		long trackId;
+		stream >> trackId;
+		fireControlTracks.push_back(trackId);
+	}
 
     stream >> isSemiactive;
 	stream >> last_range_km;
@@ -131,7 +156,14 @@ tcGameStream& tcRadar::operator>>(tcGameStream& stream)
 {
     tcSensorState::operator>>(stream);
 
-	stream << fireControlTrackCount;
+	wxASSERT(fireControlTracks.size() < 256);
+	unsigned char fireControlTrackCount = (unsigned char)fireControlTracks.size();
+    stream << fireControlTrackCount;
+
+	for (unsigned char n=0; n<fireControlTrackCount; n++)
+	{
+		stream << fireControlTracks[n];
+	}
 
     stream << isSemiactive;
 	stream << last_range_km; ///< [km] target range from last call to CanDetectTarget
@@ -814,7 +846,7 @@ tcRadar* tcRadar::Clone(void)
 
 unsigned tcRadar::GetFireControlTrackCount() const
 {
-	return fireControlTrackCount;
+	return (unsigned)fireControlTracks.size();
 }
 
 unsigned tcRadar::GetMaxFireControlTracks() const
@@ -836,7 +868,7 @@ bool tcRadar::IsRadar() const
 */
 bool tcRadar::IsTrackAvailable()
 {
-    return (fireControlTrackCount < mpDBObj->maxFireControlTracks);
+    return (GetFireControlTrackCount() < mpDBObj->maxFireControlTracks);
 }
 
 /**
@@ -847,31 +879,85 @@ bool tcRadar::IsTrackAvailable()
 * Calling method must check if target is detectable for this to
 * work properly.
 */
-bool tcRadar::RequestTrack()
+bool tcRadar::RequestTrack(long targetId)
 {
-    if (IsTrackAvailable())
-    {
-        fireControlTrackCount++;
-        return true;
+	if (!IsTrackAvailable())
+	{
+		return false;
+	}
+
+	fireControlTracks.push_back(targetId);
+
+	if ((parent != 0) && (!parent->IsClientMode()))
+	{
+        tcSimState* simState = tcSimState::Get();
+
+        if (tcGameObject* newTargetObj = simState->GetObject(targetId))
+        {
+            newTargetObj->AddTargeter(parent->mnID);
+        }
     }
-    else
-    {
-        return false;
-    }
+
+	return true;
 }
 
-bool tcRadar::ReleaseTrack()
+bool tcRadar::ReleaseTrack(long targetId)
 {
-    if (fireControlTrackCount > 0)
-    {
-        fireControlTrackCount--;
-        return true;
-    }
-    else
-    {
-        std::cerr << "tcRadar::ReleaseTrack called with no tracks." << std::endl;
-        return false;
-    }
+	std::vector<long> updatedTracks;
+	for (size_t n=0; n<fireControlTracks.size(); n++)
+	{
+		if (fireControlTracks[n] != targetId)
+		{
+			updatedTracks.push_back(fireControlTracks[n]);
+		}
+	}
+
+	if (updatedTracks.size() == fireControlTracks.size())
+	{
+		fprintf(stderr, "tcRadar::ReleaseTrack targetId not found (%d)", targetId);
+		return false;
+	}
+
+	fireControlTracks = updatedTracks;
+
+	if ((parent != 0) && (parent->IsClientMode())) return true;
+
+	// after releasing track, check if any other radars on parent platform have active fire control track. If not, remove parent from targeter list
+	wxASSERT((parent != 0) && (sensorPlatform != 0));
+
+	bool isTrackingTarget = false;
+	unsigned int nParentSensors = sensorPlatform->GetSensorCount();
+	for (unsigned int n=0; n<nParentSensors; n++)
+	{
+		const tcSensorState* sensor = sensorPlatform->GetSensor(n);
+		isTrackingTarget = isTrackingTarget || sensor->IsTrackingWithRadar(targetId);
+	}
+
+	if (!isTrackingTarget)
+	{
+		tcGameObject* target = simState->GetObject(targetId);
+		if (target != 0)
+		{
+			target->RemoveTargeter(parent->mnID);
+		}
+	}
+
+	return true;
+
+}
+
+/**
+* @return true if this radar has any active fire control tracks on targetId
+*/
+bool tcRadar::IsTrackingWithRadar(long targetId) const
+{
+	size_t nFireControlTracks = fireControlTracks.size();
+	for (size_t n=0; n<nFireControlTracks; n++)
+	{
+		if (fireControlTracks[n] == targetId) return true;
+	}
+
+	return false;
 }
 
 /**
@@ -1328,7 +1414,6 @@ tcRadar::tcRadar()
 tcRadar::tcRadar(tcRadarDBObject* dbObj)
 :   tcSensorState(dbObj),
     mpDBObj(dbObj),
-    fireControlTrackCount(0),
     isSemiactive(mpDBObj->isSemiactive),
 	last_range_km(0),
 	target_x_offset_m(0),

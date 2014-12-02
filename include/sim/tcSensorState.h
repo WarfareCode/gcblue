@@ -98,8 +98,9 @@ public:
     virtual unsigned GetFireControlTrackCount() const;
     virtual unsigned GetMaxFireControlTracks() const;
     virtual bool IsTrackAvailable();
-    virtual bool RequestTrack();
-    virtual bool ReleaseTrack();
+    virtual bool RequestTrack(long targetId);
+    virtual bool ReleaseTrack(long targetId);
+	virtual bool IsTrackingWithRadar(long targetId) const;
 
     virtual bool InitFromDatabase(long key); ///< initializes sensor using database data at key
 	bool IsActive() const;

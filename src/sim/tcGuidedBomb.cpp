@@ -146,7 +146,7 @@ void tcGuidedBomb::LaunchFrom(tcGameObject* obj, unsigned nLauncher)
             wxASSERT(dynamic_cast<tcOpticalSensor*>(pLauncher->fireControlSensor) != 0);
 			sensor->SetFireControlSensor(
 				obj->mnID, pLauncher->fireControlSensorIdx);
-			pLauncher->fireControlSensor->RequestTrack();
+			pLauncher->fireControlSensor->RequestTrack(pLauncher->mnTargetID);
 		}
     }
 

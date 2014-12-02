@@ -72,9 +72,6 @@ class tcRadar : public tcSensorState
 public:
     tcRadarDBObject* mpDBObj;
 
-    // fire-control vars
-    unsigned char fireControlTrackCount;
-
     // semi-active and command mode vars
 
     virtual bool CanDetectTarget(const tcGameObject* target, float& range_km, bool useRandom=true); 
@@ -84,8 +81,9 @@ public:
 	virtual unsigned GetFireControlTrackCount() const;
 	virtual unsigned GetMaxFireControlTracks() const;
     virtual bool IsTrackAvailable();
-    virtual bool RequestTrack();
-    virtual bool ReleaseTrack();
+    virtual bool RequestTrack(long targetId);
+    virtual bool ReleaseTrack(long targetId);
+	virtual bool IsTrackingWithRadar(long targetId) const;
 
     virtual bool IsSemiactive() const {return isSemiactive;}
     virtual void SetFireControlSensor(long id, unsigned char idx);
@@ -128,6 +126,7 @@ protected:
     float jammingDegradation_dB;
     double jamTime_s; ///< time that jammingDegradation_dB was last updated
     bool isJammed;
+	std::vector<long> fireControlTracks;
 
     static float lastTargetRCS_dBsm; ///< target RCS from last call to CanDetectTarget
     static float last_snr_margin_dB; ///< [dB] from last call to CanDetectTarget

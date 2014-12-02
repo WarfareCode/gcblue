@@ -56,8 +56,8 @@ public:
 	virtual unsigned GetFireControlTrackCount() const;
 	virtual unsigned GetMaxFireControlTracks() const;
     virtual bool IsTrackAvailable();
-    virtual bool RequestTrack();
-    virtual bool ReleaseTrack();
+    virtual bool RequestTrack(long targetId);
+    virtual bool ReleaseTrack(long targetId);
     bool IsDesignator() const;
     bool IsSemiactive() const;
 

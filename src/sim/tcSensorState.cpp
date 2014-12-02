@@ -395,16 +395,24 @@ bool tcSensorState::IsTrackAvailable()
     return false;
 }
 
-bool tcSensorState::RequestTrack()
+bool tcSensorState::RequestTrack(long targetId)
 {
     wxASSERT(false);
     return false;
 }
 
-bool tcSensorState::ReleaseTrack()
+bool tcSensorState::ReleaseTrack(long targetId)
 {
     wxASSERT(false);
     return false;
+}
+
+/**
+* tcRadar overrides this, otherwise not a radar so return false
+*/
+bool tcSensorState::IsTrackingWithRadar(long targetId) const
+{
+	return false;
 }
 
 /**
@@ -939,7 +947,7 @@ tcSensorState::~tcSensorState()
     {
         if (tcSensorState *illuminator = GetFireControlSensor())
         {
-            illuminator->ReleaseTrack();
+            illuminator->ReleaseTrack(mcTrack.mnID);
         }
     }
 }

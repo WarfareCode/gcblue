@@ -460,6 +460,7 @@ void Brain::SetTarget(long target_)
 {
     if (target == target_) return;
 
+	/* Moving tracking of targeting to fire control track request/release methods
     if (!platform->IsClientMode())
     {
         tcSimState* simState = tcSimState::Get();
@@ -474,6 +475,7 @@ void Brain::SetTarget(long target_)
             newTargetObj->AddTargeter(platform->mnID);
         }
     }
+	*/
 
     target = target_;
 
