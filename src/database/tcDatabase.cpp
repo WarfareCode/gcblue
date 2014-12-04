@@ -2635,6 +2635,51 @@ wxArrayString tcDatabase::GetFieldsForRow(const wxString& table, const wxString&
 	return result;
 }
 
+/**
+* @return field values for multiple record matching <databaseClass> in <table>
+* @param fields comma separated string of fields to query
+* e.g. GetFieldsForAllRows("sub", "Country,MaxSpeed_kts,Draft_m")
+* SQL is select <fields> from <table> where DatabaseClass=<databaseClass>;
+*/
+tcStringTable tcDatabase::GetFieldsForAllRows(const wxString& table, const wxString& databaseClass, const wxString& fields)
+{
+	tcStringTable result;
+
+	wxString fieldsToQuery(fields);
+	fieldsToQuery.Replace(";", ","); // to guard against accidental commands
+	
+	wxString temp(fieldsToQuery);
+	size_t nCommas = temp.Replace(",", "-");
+	size_t nFields = nCommas + 1;
+
+	try
+	{			
+		wxString command = wxString::Format("select %s from %s where DatabaseClass=\"%s\";", 
+			fieldsToQuery.c_str(), table.c_str(), databaseClass.c_str());
+
+		sqlite3_command sqlCmd(*sqlConnection, command.ToStdString());
+		sqlite3_reader fieldData = sqlCmd.executereader();
+
+		unsigned int rowCount = 0;
+		const unsigned int maxRowsToReturn = 50;
+		while (fieldData.read() && (rowCount++ < maxRowsToReturn))
+		{
+			scriptinterface::tcStringArray row;
+			for (int n=0; n<int(nFields); n++)
+			{
+				row.PushBack(fieldData.getstring(n).c_str());
+			}
+			result.PushBack(row);
+		}
+	}
+	catch (...)
+	{
+		wxASSERT(false);
+	}
+
+	return result;
+}
+
 
 /**
 * @return random database entry matching model type

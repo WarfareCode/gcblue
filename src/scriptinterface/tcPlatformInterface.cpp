@@ -3896,18 +3896,11 @@ namespace scriptinterface {
 		}
 	}
 
-	tcStringArray tcPlatformInterface::QueryDatabase(const std::string& table, const std::string& databaseClass, const std::string& fields)
+	tcStringTable tcPlatformInterface::QueryDatabase(const std::string& table, const std::string& databaseClass, const std::string& fields)
 	{
-		tcStringArray result;
-
 		tcDatabase* database = tcDatabase::Get();
 
-		wxArrayString resultWx = database->GetFieldsForRow(table, databaseClass, fields);
-
-		for (size_t n=0; n<resultWx.size(); n++)
-		{
-			result.AddString(resultWx[n].ToStdString());
-		}
+		tcStringTable result = database->GetFieldsForAllRows(table, databaseClass, fields);
 
 		if (result.Size() > 0)
 		{
@@ -3915,7 +3908,9 @@ namespace scriptinterface {
 		}
 		else
 		{
-			result.AddString("Error");
+			tcStringArray errorArray;
+			errorArray.PushBack("Error");
+			result.AddStringArray(errorArray);
 			return result;
 		}
 	}

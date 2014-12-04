@@ -42,6 +42,7 @@
 #include "tcDamageEffect.h"
 #include "tcPlatformSetupContainers.h"
 #include "tcLoadoutData.h"
+#include "tcStringTable.h"
 
 #include <wx/wx.h>
 #include <wx/string.h>
@@ -172,6 +173,7 @@ namespace database
 		void SetProgressReporting(wxProgressDialog* dlg, int p1, int p2);
 
 		wxArrayString tcDatabase::GetFieldsForRow(const wxString& table, const wxString& databaseClass, const wxString& fields);
+		scriptinterface::tcStringTable GetFieldsForAllRows(const wxString& table, const wxString& databaseClass, const wxString& fields);
 
         tcGameStream& operator>>(tcGameStream& stream);
         tcGameStream& operator<<(tcGameStream& stream);

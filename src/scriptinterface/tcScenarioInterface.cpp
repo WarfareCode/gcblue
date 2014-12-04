@@ -70,6 +70,7 @@
 #include "tcOptions.h"
 #include "tcTorpedoDBObject.h"
 #include "tcMessageCenter.h"
+#include "tcStringTable.h"
 
 using namespace std;
 using namespace boost::python;
@@ -170,6 +171,14 @@ namespace scriptinterface
 			.def("Size", &tcStringArray::Size)
 			.def("GetString", &tcStringArray::GetString)
             .def("PushBack", &tcStringArray::PushBack)
+			;
+
+		object StringTableType = 
+			class_<tcStringTable>("StringTable")
+			.def("Size", &tcStringTable::Size)
+			.def("GetStringArray", &tcStringTable::GetStringArray)
+			.def("GetRow", &tcStringTable::GetStringArray)
+            .def("PushBack", &tcStringTable::PushBack)
 			;
 
         object ParsedUnitNameType = 

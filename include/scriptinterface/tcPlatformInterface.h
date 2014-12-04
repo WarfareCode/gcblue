@@ -34,6 +34,7 @@
 #include "tcSensorMap.h"
 #include "tcSubInterface.h"
 #include "tcScenarioInterface.h"
+#include "tcStringTable.h"
 
 #include <boost/python.hpp>
 
@@ -512,7 +513,7 @@ namespace scriptinterface {
 		float GetRand() {return randf();}
 
 		/// queries field info from database
-		tcStringArray QueryDatabase(const std::string& table, const std::string& databaseClass, const std::string& fields);
+		scriptinterface::tcStringTable QueryDatabase(const std::string& table, const std::string& databaseClass, const std::string& fields);
 
 		// mission editor mode commands
 
