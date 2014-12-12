@@ -50,6 +50,7 @@ namespace scriptinterface
 		void AddStringArray(const tcStringArray& s);
         void PushBack(const tcStringArray& s);
 		tcStringArray GetStringArray(unsigned n) const;
+		std::string GetString(unsigned n) const;
 		unsigned int Size();
 
         void Clear();

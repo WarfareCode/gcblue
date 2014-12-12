@@ -1615,6 +1615,9 @@ void tcPlatformObject::SaveToPython(scriptinterface::tcScenarioLogger& logger)
 	s.Printf("unit.unitName = \"%s\"", mzUnit.c_str());
 	logger.AddScenarioText(s);
 
+	wxASSERT((mcKin.mfLon_rad >= -C_PI) && (mcKin.mfLon_rad < C_PI));
+	wxASSERT((mcKin.mfLat_rad >= -C_PIOVER2) && (mcKin.mfLat_rad <= C_PIOVER2));
+
     if (!formation.IsFollower())
     {
         std::vector<tcRect> randomBoxes = randomizer->GetRandomBoxes(mzUnit.c_str());

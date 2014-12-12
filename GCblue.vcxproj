@@ -547,9 +547,6 @@
     <ClCompile Include="src\ai\tcMissionManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\BlueII.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="GCblue.rc" />
   </ItemGroup>
   <ItemGroup>

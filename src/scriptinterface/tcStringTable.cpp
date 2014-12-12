@@ -62,6 +62,22 @@ namespace scriptinterface
 		}
 	}
 
+	/**
+	* DEPRECATED, temporary method to support previous code
+	*/
+	std::string tcStringTable::GetString(unsigned n) const
+	{
+		static std::string nullString;
+		if ((stringTable.size() > 0) && (stringTable[0].Size() > n))
+		{
+			return stringTable[0].GetString(n);
+		}
+		else
+		{
+			return nullString;
+		}
+	}
+
 	unsigned int tcStringTable::Size()
 	{
 		return (unsigned int)stringTable.size();

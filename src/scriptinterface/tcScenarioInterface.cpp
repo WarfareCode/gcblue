@@ -178,6 +178,7 @@ namespace scriptinterface
 			.def("Size", &tcStringTable::Size)
 			.def("GetStringArray", &tcStringTable::GetStringArray)
 			.def("GetRow", &tcStringTable::GetStringArray)
+			.def("GetString", &tcStringTable::GetString)
             .def("PushBack", &tcStringTable::PushBack)
 			;
 

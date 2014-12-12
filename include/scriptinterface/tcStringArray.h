@@ -50,7 +50,7 @@ namespace scriptinterface
         void PushBack(const std::string& s);
 		std::string GetString(unsigned n) const;
         void SetStringArray(const std::vector<std::string>& x);
-		unsigned int Size();
+		unsigned int Size() const;
 
         void RemoveDuplicates();
         void Sort();

@@ -179,12 +179,11 @@ Section "GCB2 (required)"
   SetOutPath $INSTDIR\bin
 
 
-  File "bin\boost_python-vc110-1_55.dll"
+  File "bin\boost_python-vc110-mt-1_57.dll"
 ;  File "bin\iconv.dll"
 ;  File "bin\libxml2.dll"
   File "bin\oalpp_gcb.dll"
-  File "bin\OpenThreadsWin32.dll"
-  File "bin\sqlite.dll"
+  File "bin\ot13-OpenThreads.dll"
   File "bin\TV3D65.dll"
   File "bin\alut.dll"
   File "bin\oalinst.exe"
@@ -207,7 +206,6 @@ Section "GCB2 (required)"
 ;  SetOutPath $INSTDIR\bin\Microsoft.VC80.CRT
 
 ;  File "bin\x86redist\*.*"
-
 
 
 ; ----- database directory -----
@@ -294,33 +292,6 @@ Section "GCB2 (required)"
   SetOutPath $INSTDIR\manual
   
   File "manual\GCB2_Manual_v125.pdf"
-
-  !ifdef RELEASE_VERSION
-; ----- maps directory -----
-  SetOutPath $INSTDIR\maps
-
-  File "maps\*.dat"
-
-; ----- maps\tiles directory -----
-  SetOutPath $INSTDIR\maps\tiles
-
-  File "maps\tiles\*.dat"
-
-  SetOutPath $INSTDIR\maps\tiles\lowres
-
-  File "maps\tiles\lowres\*.dat"
-
-  SetOutPath $INSTDIR\maps\tiles\lowres10
-
-  File "maps\tiles\lowres10\*.dat"  
-  
-  SetOutPath $INSTDIR\maps\tiles\medres
-
-  File "maps\tiles\medres\*.dat"  
-  
-  
-  !endif
-
 
 
 ; ----- scenarios directories -----
@@ -486,8 +457,37 @@ Section "GCB2 (required)"
   WriteUninstaller "uninstall.exe"
   
 
+SectionEnd
 
+Section "Install Maps"
+  !ifdef RELEASE_VERSION
+; ----- maps directory -----
+  SetOutPath $INSTDIR\maps
 
+  File "maps\*.dat"
+
+; ----- maps\tiles directory -----
+  SetOutPath $INSTDIR\maps\tiles
+  
+  File "maps\tiles\tiles.7z"
+  Nsis7z::Extract "tiles.7z"
+  Delete "$INSTDIR\maps\tiles\tiles.7z"
+  
+;  File "maps\tiles\*.dat"
+
+  SetOutPath $INSTDIR\maps\tiles\lowres
+
+  File "maps\tiles\lowres\*.dat"
+
+  SetOutPath $INSTDIR\maps\tiles\lowres10
+
+  File "maps\tiles\lowres10\*.dat"  
+  
+  SetOutPath $INSTDIR\maps\tiles\medres
+
+  File "maps\tiles\medres\*.dat"  
+  
+  !endif
 SectionEnd
 
 ; Optional section (can be disabled by the user)

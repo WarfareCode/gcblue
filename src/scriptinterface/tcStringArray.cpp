@@ -83,7 +83,7 @@ namespace scriptinterface
         stringArray = x;
     }
 
-	unsigned int tcStringArray::Size() 
+	unsigned int tcStringArray::Size() const
 	{
 		return stringArray.size();
 	}
