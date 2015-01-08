@@ -262,6 +262,7 @@
     <ClCompile Include="src\common\nsNav.cpp" />
     <ClCompile Include="src\common\randfn.cpp" />
     <ClCompile Include="src\common\simmath.cpp" />
+    <ClCompile Include="src\scriptinterface\tcStringTable.cpp" />
     <ClCompile Include="src\stdwx.cpp" />
     <ClCompile Include="src\common\tcFile.cpp" />
     <ClCompile Include="src\common\tcFloatCompressor.cpp" />
@@ -554,6 +555,7 @@
   <ItemGroup>
     <ClInclude Include="D:\sqlite-3.8.7\sqlite3.h" />
     <ClInclude Include="include\common\resource.h" />
+    <ClInclude Include="include\scriptinterface\tcStringTable.h" />
     <ClInclude Include="include\stdwx.h" />
     <ClInclude Include="include\common\AError.h" />
     <ClInclude Include="include\common\gctypes.h" />
