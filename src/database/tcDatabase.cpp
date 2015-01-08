@@ -2661,7 +2661,7 @@ tcStringTable tcDatabase::GetFieldsForAllRows(const wxString& table, const wxStr
 		sqlite3_reader fieldData = sqlCmd.executereader();
 
 		unsigned int rowCount = 0;
-		const unsigned int maxRowsToReturn = 50;
+		const unsigned int maxRowsToReturn = 10000;
 		while (fieldData.read() && (rowCount++ < maxRowsToReturn))
 		{
 			scriptinterface::tcStringArray row;
