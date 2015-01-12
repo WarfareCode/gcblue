@@ -120,7 +120,7 @@ bool tcDamageEffect::ParseEffectString(std::vector<DamagePoint>& effect, const s
     wxString s(effectString.c_str());
 
     unsigned int nIterations = 0;
-    const unsigned int maxIterations = 16;
+    const unsigned int maxIterations = 48;
 
     while ((s.size() > 2) && (++nIterations < maxIterations))
     {
