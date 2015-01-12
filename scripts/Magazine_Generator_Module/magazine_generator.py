@@ -3,137 +3,8 @@ from os.path import dirname, abspath, join, normpath
 from Weapon_Stock_Rates import *
 from Amram_Utilities import *
 from service_period import *
+from wildcard_items_list import *
 
-def MagLoadData():
-    """
-    MagLoadData():
-    Reads in most of the database in csv format to provide the data necessary to generate stock for empty magazines.
-    """
-    #load our files in
-    path = 'scripts/Amram_Script_Data/CSVs/'
-    
-    air_path                = path + 'air.csv'
-    simpleair_path          = path + 'simpleair.csv'
-    launcher_config_path    = path + 'launcher_configuration.csv'
-    platform_path           = path + 'platform_launcher.csv'
-    ballistic_path          = path + 'ballistic.csv'
-    missile_path            = path + 'missile.csv'
-    torpedo_path            = path + 'torpedo.csv'
-    fueltank_path           = path + 'fueltank.csv'
-    cms_path                = path + 'cm.csv'
-    sonobuoy_path           = path + 'sonobuoy.csv'
-    stores_path             = path + 'stores.csv'
-    ship_path               = path + 'ship.csv'
-    ground_path             = path + 'ground.csv'
-    magazine_path           = path + 'platform_magazine.csv'
-    stores_path             = path + 'stores.csv'
-    
-
-    
-    files_dict = {'air':[air_path,simpleair_path],'platform':[platform_path],'launchers':[launcher_config_path],'ballistic':[ballistic_path],'missile':[missile_path],'torpedo':[torpedo_path],
-                  'fueltank':[fueltank_path],'cms':[cms_path],'sonobuoy':[sonobuoy_path],'stores':[stores_path],'ship':[ship_path],'magazines':[magazine_path],'ground':[ground_path]}
-    #read in the files, and compose dictionaries.
-    
-    data_dict = {}
-    for key in files_dict:
-        data_dict[key] = {}
-        path_list = files_dict[key]
-        for path in path_list:
-            file_path = normpath(join(os.getcwd(), path))
-            datafile = open(file_path, 'r')
-            datareader = csv.reader(datafile)
-            for row in datareader:
-                #reading in the file, now we pluck our data to keep what we want, and build out result dictionaries
-                if 'DatabaseClass' not in row[0]:
-                    name = row[0]
-                    try:
-                        test = data_dict[key][name]
-                    except:
-                        data_dict[key][name] = {}
-                    if key == 'platform':
-                        data_dict[key][name][row[2]] = {}
-                        data_dict[key][name][row[2]]['name'] = row[1]
-                        data_dict[key][name][row[2]]['reloadable'] = row[10]
-                    elif key == 'launchers':
-                        #launcher config
-                        data_dict[key][name][row[1]] = row[2]
-                    elif key == 'stores':
-                        data_dict[key][name]['Max Weight'] = row[19]
-                        data_dict[key][name]['Max Volume'] = row[18]
-                        data_dict[key][name]['Max Items'] = row[17]
-                        class1 = row[21].split(';')
-                        class2 = row[22].split(';')
-                        class3 = row[23].split(';')
-                        class4 = row[24].split(';')
-                        classlist = []
-                        for itemlist in [class1, class2, class3, class4]:
-                            for item in itemlist:
-                                if item not in classlist and item != '':
-                                    classlist.append(item)
-                        data_dict[key][name]['classes'] = classlist
-                    elif key == 'magazines':
-                        data_dict[key][name][row[2]] = row[1]
-                    else:
-                        #only add to the data_dict if its something I can't retrieve directly with UI.QueryDatabase().
-                        pass
-    return data_dict
-
-def TrimData(data_dict):
-    """
-    TrimData(data_dict):
-    reforms the raw dictionary into a set of dictionaries(air, item, unit) containing only information relevant to them.
-    Returns the three dictionaries.
-    """
-    #trim by exclusion, simply put, read the relevant data, and form a new dict
-    #read the dict to get the aircraft names.
-    #associate the launcher names
-    air_dict = {}
-    item_dict = {}
-    unit_dict = {}
-    for key in data_dict:
-        if key in ['missile','ballistic','ballistic_missile','torpedo','cms','items', 'fueltank', 'sonobuoy']:
-            for subkey in data_dict[key]:
-                item_dict[subkey] = data_dict[key][subkey]
-    unit_list = sorted(data_dict['ship'].keys() + data_dict['ground'].keys())
-    for unit in unit_list:
-        #associate magazines and setups.
-        if unit in data_dict['ship'].keys():
-            category = 'ship'
-        else:
-            category = 'ground'
-        unit_dict[unit] = {}
-        unit_dict[unit]['setup'] = {}
-        unit_dict[unit]['launchers'] = {}
-        unit_dict[unit]['launcher_count'] = {}
-        if unit in data_dict['platform']:
-            for launcher_num in data_dict['platform'][unit]:
-                launcher = data_dict['platform'][unit][launcher_num]['name']
-                launcher_reloadable = data_dict['platform'][unit][launcher_num]['reloadable']
-                if launcher_reloadable:
-                    if launcher in unit_dict[unit]['launcher_count']:
-                        unit_dict[unit]['launcher_count'][launcher] += 1
-                    else:
-                        unit_dict[unit]['launcher_count'][launcher] = 1
-                unit_dict[unit]['launchers'][launcher_num] = data_dict['launchers'][launcher]
-            
-        unit_dict[unit]['magazines'] = {}
-        limited = []
-        unlimited = []
-        if unit in data_dict['magazines']:
-            for magazine in data_dict['magazines'][unit]:
-                magazine_name = data_dict['magazines'][unit][magazine]
-                unit_dict[unit]['magazines'][magazine] = {}
-                classes = data_dict['stores'][magazine_name]['classes']
-                unit_dict[unit]['magazines'][magazine]['classes'] = classes
-                unit_dict[unit]['magazines'][magazine]['magname'] = magazine_name
-                if classes == [''] or classes == []:
-                    unlimited.append(magazine)
-                else:
-                    limited.append(magazine)
-            unit_dict[unit]['magazines']['limited_mags'] = limited
-            unit_dict[unit]['magazines']['unlimited_mags'] = unlimited
-                
-    return item_dict, unit_dict
 
 def flatten(xs):
     """
@@ -150,7 +21,7 @@ def flatten(xs):
     loop(xs)
     return res
 
-def Get_Aircraft_Weapon_Stocks(UI, aircraft, airwing, item_dict, current_year):
+def Get_Aircraft_Weapon_Stocks(UI, aircraft, airwing, current_year):
     """
     Get_Aircraft_Weapon_Stocks(aircraft, airwing, item_dict, current_year):
     Iterates over loadouts an aircraft possesses, and returns the complete list
@@ -162,17 +33,14 @@ def Get_Aircraft_Weapon_Stocks(UI, aircraft, airwing, item_dict, current_year):
         for item in airwing[aircraft]['launchers'][launcher]:
             if '*' in item:
                 #its a wildcard!
-                items = expand_wildcard(item, item_dict)
+                items = expand_wildcard(item, Wild_Items)
             else:
                 items = [item]
             for item2 in items:
-                if item2 in role_ratios:
-                    role_ratio = role_ratios[item2][designation]
-                else:
-                    role_ratio = 0
+                role_ratio = stock_rate(UI, aircraft, item2)
                 if role_ratio > 0:
                     qty = float(airwing[aircraft]['launchers'][launcher][item])
-                    item_mass = float(UI.QueryDatabase(determine_item_table(UI, item),item,'Weight_kg').GetString(0))
+                    item_mass = float(UI.QueryDatabase(determine_item_table(UI, item2),item2,'Weight_kg').GetString(0))
                     item_qty = role_ratio * qty
                     item_mass = item_mass * item_qty
                     if item2 in aircraft_weapon_list:
@@ -183,52 +51,9 @@ def Get_Aircraft_Weapon_Stocks(UI, aircraft, airwing, item_dict, current_year):
                     aircraft_weapon_list[item2] = 0
     return aircraft_weapon_list
 
-def determine_item_table(UI, item):
-    if UI.QueryDatabase('missile',item,'ModelClassId').GetString(0) != 'Error':
-        #its a missile
-        return 'missile'
-    elif UI.QueryDatabase('ballistic',item,'ModelClassId').GetString(0) != 'Error':
-        #its a ballistic
-        return 'ballistic'
-    elif UI.QueryDatabase('torpedo',item,'ModelClassId').GetString(0) != 'Error':
-        #its a torpedo
-        return 'torpedo'
-    elif UI.QueryDatabase('fueltank',item,'ModelClassId').GetString(0) != 'Error':
-        #its a fueltank
-        return 'fueltank'
-    elif UI.QueryDatabase('sonobuoy',item,'ModelClassId').GetString(0) != 'Error':
-        #its a sonobuoy
-        return 'sonobuoy'
-    elif UI.QueryDatabase('cm',item,'ModelClassId').GetString(0) != 'Error':
-        #its a cm
-        return 'cm'
-    elif UI.QueryDatabase('ballistic_missile',item,'ModelClassId').GetString(0) != 'Error':
-        #its a ballistic missile
-        return 'ballistic_missile'
-    elif UI.QueryDatabase('item',item,'ModelClassId').GetString(0) != 'Error':
-        #its an item
-        return 'item'
-
-def determine_unit_table(UI, unit):
-    if UI.QueryDatabase('air',item,'ModelClassId').GetString(0) != 'Error':
-        #its a complex air
-        return 'air'
-    elif UI.QueryDatabase('ground',item,'ModelClassId').GetString(0) != 'Error':
-        #its a ground
-        return 'ground'
-    elif UI.QueryDatabase('ship',item,'ModelClassId').GetString(0) != 'Error':
-        #its a ship
-        return 'ship'
-    elif UI.QueryDatabase('simpleair',item,'ModelClassId').GetString(0) != 'Error':
-        #its a simple air
-        return 'simpleair'
-    elif UI.QueryDatabase('sub',item,'ModelClassId').GetString(0) != 'Error':
-        #its a sub
-        return 'sub'
-
 def check_limits(UI, stocks):
     """
-    check_limits(item_dict, stocks):
+    check_limits(UI, stocks):
     totals and returns the total quantity of items, and the total mass of those items.
     """
     mass = 0
@@ -302,72 +127,110 @@ def Get_Weapon_Service_Mod(item, year, date1, date2):
         mod = 0
     return mod
 
-def Get_Own_Stock(UI, unit, unit_dict, data_dict, current_year, country):
+def Get_Own_Stock(UI, unit, current_year, country):
     """
-    Get_Own_Stock(unit, unit_dict, data_dict, current_year):
+    Get_Own_Stock(unit, current_year):
     determines an appropriate loadout, and the stock needed to reload it, returns the results.
     """
     table = determine_unit_table(UI, unit)
     #configure launcher loadout too based on this data.
+    load_item = ''
     own_stock_list = {}
     loadout_entry = {}
-    for launcher_num in unit_dict[unit]['launchers']:
-        #iterate over the ships launchers
-        launcher_name = data_dict['platform'][unit][launcher_num]['name']
-
+    own_launchers = UI.QueryDatabase('platform_launcher', unit, 'LauncherId, LauncherClass, IsReloadable')
+    for launcher_num in xrange(own_launchers.Size()):
+        LauncherId = own_launchers.GetRow(launcher_num).GetString(0)
+        LauncherClass = own_launchers.GetRow(launcher_num).GetString(1)
+        Reloadable = int(own_launchers.GetRow(launcher_num).GetString(2))
+        Launcher_Config = UI.QueryDatabase('launcher_configuration',LauncherClass,'ChildClass, ChildCapacity')
         launcher_items = {}
-        #get the launcher items and modify their qty by service date.
-        for item in unit_dict[unit]['launchers'][launcher_num]:
-            if country in servicekit:
-                if item in servicekit[country]:
-                    date1 = float(servicekit[country][item]['Entry'])
-                    date2 = float(servicekit[country][item]['Exit'])
-                    service_mod = Get_Weapon_Service_Mod(item, current_year, date1, date2)
-                else:
-                    service_mod = 0
+        wild_names = []
+        for item_x in xrange(Launcher_Config.Size()):
+            item = Launcher_Config.GetRow(item_x).GetString(0)
+            #item may be a wildcard, check for that now!
+            if '*' in item:
+                #wildcard
+                wild_names.append(item)
+                wild_list = expand_wildcard(item, Wild_Items)
             else:
-                table = determine_item_table(UI, item)
-                date1 = float(UI.QueryDatabase(table,item,'InitialYear').GetString(0))
-                date2 = float(UI.QueryDatabase(table,item,'FinalYear').GetString(0))
-                if table in ['fueltank', 'sonobuoy']:
-                    service_mod = 1
+                wild_list = [item]
+            for item in wild_list:
+                if country in servicekit:
+                    if item in servicekit[country]:
+                        date1 = float(servicekit[country][item]['Entry'])
+                        date2 = float(servicekit[country][item]['Exit'])
+                        service_mod = Get_Weapon_Service_Mod(item, current_year, date1, date2)
+                    else:
+                        date1 = 2999
+                        date2 = 1900
+                        service_mod = 0
                 else:
-                    service_mod = Get_Weapon_Service_Mod(item, current_year, date1, date2)        
-        
-            if not date1 > current_year and not date2 < current_year:
-                qty = float(unit_dict[unit]['launchers'][launcher_num][item]) * service_mod
-                launcher_items[item] = qty
-        #keep the item with the highest stock value, load that.
+                    table = determine_item_table(UI, item)
+                    date1 = float(UI.QueryDatabase(table,item,'InitialYear').GetRow(0).GetString(0))
+                    date2 = float(UI.QueryDatabase(table,item,'FinalYear').GetRow(0).GetString(0))
+                    if table in ['fueltank']:
+                        service_mod = 1
+                    else:
+                        service_mod = Get_Weapon_Service_Mod(item, current_year, date1, date2)        
+            
+                if not date1 > current_year and not date2 < current_year:
+                    qty = float(Launcher_Config.GetRow(item_x).GetString(1)) * service_mod
+                    launcher_items[item] = qty
+
+        #keep the item with the highest stock value, load that for now
+        #need to make something better for choosing stock to load.
         high_val = 0
+        has_load_item = False
         for item in launcher_items:
             if launcher_items[item] > high_val:
                 high_val = launcher_items[item]
                 load_item = item
+                has_load_item = True
 
         #build reload stock list
-        load_item_qty = float(unit_dict[unit]['launchers'][launcher_num][item])
-        if launcher_name in unit_dict[unit]['launcher_count']:
-            stock_lvl = {'torpedo':4,'ballistic':5,'missile':3}
-            stock = stock_lvl.get(determine_item_table(UI, item),5)
-            qty = load_item_qty * stock
-            if load_item in own_stock_list:
-                own_stock_list[load_item] += qty
-            else:
-                own_stock_list[load_item] = qty
-        #build loadout list
-        loadout_entry[launcher_num] = [load_item, load_item_qty]
+        is_wild = False
+        for wild_name in wild_names:
+            if wild_name in load_item:
+                #then we were a wildcard in the launcher config, not the full name, so lookup the wildcard name
+                is_wild = True
+                for item_x in xrange(Launcher_Config.Size()):
+                    item = Launcher_Config.GetRow(item_x).GetString(0)
+                    if item == wild_name:
+                        load_item_qty = Launcher_Config.GetRow(item_x).GetString(1)
+                        break
+                break
+        if not is_wild:
+            for item_x in xrange(Launcher_Config.Size()):
+                item = Launcher_Config.GetRow(item_x).GetString(0)
+                if item == load_item:
+                    load_item_qty = Launcher_Config.GetRow(item_x).GetString(1)
+                    break
+                    
+        if has_load_item:
+            #build loadout list
+            loadout_entry[launcher_num] = [load_item, load_item_qty]
+            #Add stock if reloadable
+            if Reloadable:
+                stock_lvl = {'torpedo':4,'ballistic':5,'missile':3}
+                stock = stock_lvl.get(determine_item_table(UI, load_item),5)
+                qty = float(load_item_qty) * stock
+                if load_item in own_stock_list:
+                    own_stock_list[load_item] += qty
+                else:
+                    own_stock_list[load_item] = qty
+
     return own_stock_list, loadout_entry
 
-def airwing_stock(UI, airwing, item_dict, current_year, data_dict, country):
+def airwing_stock(UI, airwing, current_year, country):
     """
-    airwing_stock(airwing, item_dict, current_year, data_dict, country):
+    airwing_stock(airwing, item_dict, current_year, country):
     iterates over all the present aircraft, and compiles a list of all the items needed and their quantities.
     Returns the resulting dictionary.
     """
     airwing_stock = {}
     for aircraft in airwing:
         airwing_qty = airwing[aircraft]['count']
-        aircraft_weapon_list = Get_Aircraft_Weapon_Stocks(UI, aircraft, airwing, item_dict, current_year)
+        aircraft_weapon_list = Get_Aircraft_Weapon_Stocks(UI, aircraft, airwing, current_year)
         for item in aircraft_weapon_list:
             if item in airwing_stock:
                 airwing_stock[item] += float(aircraft_weapon_list[item]) * airwing_qty
@@ -385,14 +248,14 @@ def airwing_stock(UI, airwing, item_dict, current_year, data_dict, country):
             table = determine_item_table(UI, item)
             date1 = float(UI.QueryDatabase(table,item,'InitialYear').GetString(0))
             date2 = float(UI.QueryDatabase(table,item,'FinalYear').GetString(0))
-            if table in ['fueltank', 'sonobuoy']:
+            if table in ['fueltank']:
                 service_mod = 1
             else:
                 service_mod = Get_Weapon_Service_Mod(item, current_year, date1, date2)
         airwing_stock[item] *= service_mod
     return airwing_stock
     
-def generate_airwing(UI, data_dict, item_dict):
+def generate_airwing(UI):
     """
     generate_airwing(UI):
     itemises the present child aircraft for use in finding needed stocks.
@@ -408,69 +271,78 @@ def generate_airwing(UI, data_dict, item_dict):
             airwing[name] = {}
             airwing[name]['count'] = 1
             if UIn.HasThrottle():
-                airwing[name]['date1'] = UI.QueryDatabase('air',name, 'InitialYear').GetString(0)
-                airwing[name]['date2'] = UI.QueryDatabase('air',name, 'FinalYear').GetString(0)
-                airwing[name]['fuelcap'] = UI.QueryDatabase('air',name, 'FuelCapacity_kg').GetString(0)
-                airwing[name]['mass'] = UI.QueryDatabase('air',name, 'Weight_kg').GetString(0)
-                airwing[name]['MTOW'] = UI.QueryDatabase('air',name, 'MaxTakeoffWeight_kg').GetString(0)
-                airwing[name]['designation'] = UI.QueryDatabase('air',name, 'Designation').GetString(0)
+                airwing[name]['date1'] = UI.QueryDatabase('air',name, 'InitialYear').GetRow(0).GetString(0)
+                airwing[name]['date2'] = UI.QueryDatabase('air',name, 'FinalYear').GetRow(0).GetString(0)
+                airwing[name]['fuelcap'] = UI.QueryDatabase('air',name, 'FuelCapacity_kg').GetRow(0).GetString(0)
+                airwing[name]['mass'] = UI.QueryDatabase('air',name, 'Weight_kg').GetRow(0).GetString(0)
+                airwing[name]['MTOW'] = UI.QueryDatabase('air',name, 'MaxTakeoffWeight_kg').GetRow(0).GetString(0)
+                airwing[name]['designation'] = UI.QueryDatabase('air',name, 'Designation').GetRow(0).GetString(0)
             else:
-                airwing[name]['date1'] = UI.QueryDatabase('simpleair',name, 'InitialYear').GetString(0)
-                airwing[name]['date2'] = UI.QueryDatabase('simpleair',name, 'FinalYear').GetString(0)
-                airwing[name]['fuelcap'] = UI.QueryDatabase('simpleair',name, 'FuelCapacity_kg').GetString(0)
-                airwing[name]['mass'] = UI.QueryDatabase('simpleair',name, 'Weight_kg').GetString(0)
-                airwing[name]['MTOW'] = UI.QueryDatabase('simpleair',name, 'MaxTakeoffWeight_kg').GetString(0)
-                airwing[name]['designation'] = UI.QueryDatabase('simpleair',name, 'Designation').GetString(0)
+                airwing[name]['date1'] = UI.QueryDatabase('simpleair',name, 'InitialYear').GetRow(0).GetString(0)
+                airwing[name]['date2'] = UI.QueryDatabase('simpleair',name, 'FinalYear').GetRow(0).GetString(0)
+                airwing[name]['fuelcap'] = UI.QueryDatabase('simpleair',name, 'FuelCapacity_kg').GetRow(0).GetString(0)
+                airwing[name]['mass'] = UI.QueryDatabase('simpleair',name, 'Weight_kg').GetRow(0).GetString(0)
+                airwing[name]['MTOW'] = UI.QueryDatabase('simpleair',name, 'MaxTakeoffWeight_kg').GetRow(0).GetString(0)
+                airwing[name]['designation'] = UI.QueryDatabase('simpleair',name, 'Designation').GetRow(0).GetString(0)
             airwing[name]['payload'] = float(airwing[name]['MTOW']) - float(airwing[name]['mass']) - float(airwing[name]['fuelcap'])
 
             #replace dependence on data_dict with QueryDatabase when able to perform multi-line lookup
-            if name in data_dict['platform']:
-                airwing[name]['launchers'] = {}
-                for launcher_num in data_dict['platform'][name]:
-                    #iterate through relevant launcher names and append
-                    launcher = data_dict['platform'][name][launcher_num]['name']
-                    airwing[name]['launchers'][launcher_num] = {}
-                    for item in data_dict['launchers'][launcher]:
+            airwing[name]['launchers'] = {}
+            
+            own_launchers = UI.QueryDatabase('platform_launcher', name, 'LauncherId, LauncherClass, IsReloadable')
+            for launcher_num in xrange(own_launchers.Size()):
+                airwing[name]['launchers'][launcher_num] = {}
+                LauncherId = own_launchers.GetRow(launcher_num).GetString(0)
+                if LauncherId != 'Error':
+                    LauncherClass = own_launchers.GetRow(launcher_num).GetString(1)
+                    try:
+                        Reloadable = int(own_launchers.GetRow(launcher_num).GetString(2))
+                    except:
+                        Reloadable = 0
+                    Launcher_Config = UI.QueryDatabase('launcher_configuration',LauncherClass,'ChildClass, ChildCapacity')
+                    wild_names = []
+                    for item_x in xrange(Launcher_Config.Size()):
+                        item = Launcher_Config.GetRow(item_x).GetString(0)
                         #iterate through launcher names and append items
-                        qty = data_dict['launchers'][launcher][item]
+                        qty = Launcher_Config.GetRow(item_x).GetString(1)
                         if '*' in item:
                             #wild card item, expand wildcard
-                            wild_list = expand_wildcard(item, item_dict)
+                            wild_list = expand_wildcard(item, Wild_Items)
                             for wild_item in wild_list:
                                 airwing[name]['launchers'][launcher_num][wild_item] = qty
                         else:
                             airwing[name]['launchers'][launcher_num][item] = qty
-                    #functional to here, loads items just fine per launcher, assigning wrongly?
     return airwing
     
 def GetMagClasses(UI, magname):
-    class1 = UI.QueryDatabase('stores',magname,'Class1').GetString(0).split(';')
-    class2 = UI.QueryDatabase('stores',magname,'Class2').GetString(0).split(';')
-    class3 = UI.QueryDatabase('stores',magname,'Class3').GetString(0).split(';')
-    class4 = UI.QueryDatabase('stores',magname,'Class4').GetString(0).split(';')
+    class1 = UI.QueryDatabase('stores',magname,'Class1').GetRow(0).GetString(0).split(';')
+    class2 = UI.QueryDatabase('stores',magname,'Class2').GetRow(0).GetString(0).split(';')
+    class3 = UI.QueryDatabase('stores',magname,'Class3').GetRow(0).GetString(0).split(';')
+    class4 = UI.QueryDatabase('stores',magname,'Class4').GetRow(0).GetString(0).split(';')
     classlist = []
     for itemlist in [class1, class2, class3, class4]:
         for item in itemlist:
             if item not in classlist and item != '':
                 classlist.append(item)
     return classlist
-    
-def MagGenerator(UI, mag_date):
+
+def MagGenerator(UI):
     """
-    MagGenerator(UI, mag_date):
+    MagGenerator(UI):
     Takes a date, and in return will load the launchers, and stock the magazines with date appropriate gear.
     
     This is not group capable, nothing prevents calling it from a group capable handler.
-    Expects date in an unformatted YYYY/MM/DD string format.
     """
     BB = UI.GetBlackboardInterface()
+    SM = UI.GetScenarioInterface()
+    mag_date = SM.GetScenarioDateAsString()
+    current_year = DateString_DecimalYear(mag_date)
     
     launcher_count = UI.GetLauncherCount()
     
     unit = UI.GetPlatformClass()
-    data_dict = MagLoadData()
-    item_dict, unit_dict = TrimData(data_dict)
-    current_year = DateString_DecimalYear(mag_date)
+    name = UI.GetPlatformName()
+    UI.DisplayMessage('Configuring %s for year %0.3f' % (name, current_year))
     set_mag_items = float(100000000000000000000)
     set_mag_tonnage = float(100000000000000000000)
     if BB.KeyExists('MagTonnage'):
@@ -483,33 +355,44 @@ def MagGenerator(UI, mag_date):
     elif not UI.IsSurface():
         #how did we even get here?
         return
-    
-    
-
     plat_setup = {}
         
-    if UI.QueryDatabase('platform_magazine',unit,'MagazineClass').GetString(0) != 'Error':
-        airwing = generate_airwing(UI, data_dict, item_dict)
+    if UI.QueryDatabase('platform_magazine',unit,'MagazineClass').GetRow(0).GetString(0) != 'Error':
+        airwing = generate_airwing(UI)
         #get our country:
         if UI.IsSurface():
-            country = UI.QueryDatabase('ship', unit, 'Country')
-            country = country.GetString(0)
+            table = 'ship'
         elif UI.IsGroundVehicle() or UI.IsFixed():
-            country = UI.QueryDatabase('ground', unit, 'Country')
-            country = country.GetString(0)
-        airwing_stock_list = airwing_stock(UI, airwing, item_dict, current_year, data_dict, country)
+            table = 'ground'
+        country = UI.QueryDatabase(table, unit, 'Country').GetRow(0).GetString(0)
+        mag_info = UI.QueryDatabase('platform_magazine', unit, 'MagazineId, MagazineClass')
+        magazines = {}
+        magazines['limited'] = {}
+        magazines['unlimited'] = {}
+        for mag in xrange(mag_info.Size()):
+            magname = mag_info.GetRow(mag).GetString(1)
+            mag_id = mag_info.GetRow(mag).GetString(0)
+            classes = GetMagClasses(UI, magname)
+            if classes == []:
+                magazines['unlimited'][mag_id] = magname
+            else:
+                magazines['limited'][mag_id] = magname
+            
+        airwing_stock_list = airwing_stock(UI, airwing, current_year, country)
         if launcher_count > 0:
-            own_stock_list, loadout_entry = Get_Own_Stock(UI, unit, unit_dict, data_dict, current_year, country)
+            own_stock_list, loadout_entry = Get_Own_Stock(UI, unit, current_year, country)
+
         #split stock lists into magazine assignments.
         mag_assignments = {}
         assigned_items = []
+        
         #limited magazine stock
-        for mag in unit_dict[unit]['magazines']['limited_mags']:
-            magname = unit_dict[unit]['magazines'][mag]['magname']
+        for mag in magazines['limited']:
+            magname = magazines['limited'][mag]
             classes = GetMagClasses(UI, magname)
             mag_assignments[mag] = {}
-            mag_assignments[mag]['Max Items'] = UI.QueryDatabase('stores',magname,'Capacity').GetString(0)
-            mag_assignments[mag]['Max Weight'] = UI.QueryDatabase('stores',magname,'MaxWeight_kg').GetString(0)
+            mag_assignments[mag]['Max Items'] = UI.QueryDatabase('stores',magname,'Capacity').GetRow(0).GetString(0)
+            mag_assignments[mag]['Max Weight'] = UI.QueryDatabase('stores',magname,'MaxWeight_kg').GetRow(0).GetString(0)
             mag_assignments[mag]['items'] = {}
             for item in airwing_stock_list:
                 if item in classes:
@@ -523,17 +406,17 @@ def MagGenerator(UI, mag_date):
                         mag_assignments[mag]['items'][item] = own_stock_list[item]
                         assigned_items.append(item)
         #unlimited magazine stock
-        for mag in unit_dict[unit]['magazines']['unlimited_mags']:
-            magname = unit_dict[unit]['magazines'][mag]['magname']
+        for mag in magazines['unlimited']:
+            magname = magazines['unlimited'][mag]
             mag_assignments[mag] = {}
             if BB.KeyExists('MagTonnage'):
                 mag_assignments[mag]['Max Weight'] = set_mag_tonnage
             else:
-                mag_assignments[mag]['Max Weight'] = UI.QueryDatabase('stores',magname,'Capacity').GetString(0)
+                mag_assignments[mag]['Max Weight'] = UI.QueryDatabase('stores',magname,'MaxWeight_kg').GetRow(0).GetString(0)
             if BB.KeyExists('MaxItems'):
                 mag_assignments[mag]['Max Items'] = set_mag_items
             else:
-                mag_assignments[mag]['Max Items'] = UI.QueryDatabase('stores',magname,'MaxWeight_kg').GetString(0)
+                mag_assignments[mag]['Max Items'] = UI.QueryDatabase('stores',magname,'Capacity').GetRow(0).GetString(0)
             mag_assignments[mag]['items'] = {}
             for item in airwing_stock_list:
                 if item not in assigned_items:
@@ -556,9 +439,9 @@ def MagGenerator(UI, mag_date):
             if mag_item_limit == 0:
                 #unrestricted, set it to something absurdly huge
                 mag_item_limit = float(1e20)
-            if mag_weight_limit > set_mag_tonnage and mag in unit_dict[unit]['magazines']['unlimited_mags']:
+            if mag_weight_limit > set_mag_tonnage and mag in magazines['unlimited']:
                 mag_weight_limit = set_mag_tonnage
-            if mag_item_limit > set_mag_items and mag in unit_dict[unit]['magazines']['unlimited_mags']:
+            if mag_item_limit > set_mag_items and mag in magazines['unlimited']:
                 mag_item_limit = set_mag_items
             if mag_items > mag_item_limit:
                 over_qty = True
@@ -573,7 +456,6 @@ def MagGenerator(UI, mag_date):
                 limit_closest = 'items'
             else:
                 limit_closest = 'mass'
-
             if not over_qty and not over_mass:
                 if limit_closest == 'items':
                     #reduce by item qty
@@ -611,22 +493,24 @@ def MagGenerator(UI, mag_date):
                 else:
                     stock_mod = (mag_weight_limit * 0.95) / mag_weight
             mag_stock_mod[mag] = stock_mod
-   
+
         mag_loads = []
         #begin creating the magazine entry lines
         for mag_num in mag_assignments:
             stock_mod = mag_stock_mod[mag_num]
-            
             for item in mag_assignments[mag_num]['items']:
-                if determine_item_table(UI, item) in ['sonobuoy', 'fueltank']:
+                item_table = determine_item_table(UI, item)
+                if item_table in ['fueltank']:
                     item_qty = int(mag_assignments[mag_num]['items'][item])
                 else:
                     item_qty = int(mag_assignments[mag_num]['items'][item] * stock_mod)
                 if item_qty < 1:
                     item_qty = 0
+                if 'Nuclear' in UI.QueryDatabase(item_table,item,'DamageModel').GetRow(0).GetString(0) and not BB.KeyExists('MagGenAllowNukes'):
+                    item_qty = 0
                 if launcher_count > 0:
                     if item in own_stock_list and item_qty < own_stock_list[item]:
-                        item_qty = int(own_stock_list[item])
+                        item_qty += int(own_stock_list[item])
                 if item_qty > 0:
                     mag_load = (mag_num, item, item_qty)
                     mag_loads.append(mag_load)
@@ -639,7 +523,7 @@ def MagGenerator(UI, mag_date):
             UI.AddItemToMagazine(item, qty)
         
     elif launcher_count > 0:
-        own_stock_list, loadout_entry = Get_Own_Stock(unit, unit_dict, data_dict, item_dict, current_year)
+        own_stock_list, loadout_entry = Get_Own_Stock(unit, unit_dict, current_year)
     else:
         #no magazine to store items, no launchers to configure either, wtf are we doing?  Terminate now.
         return
@@ -659,4 +543,201 @@ def MagGenerator(UI, mag_date):
             item = line[1]
             UI.LoadLauncher(Lnum, item)
     
-    UI.DisplayMessage('%0.1f tons of munitions provided to %d %s (%s)' % (check_limits(UI, mag_loads)[1]/1000, UI.GetPlatformId(), UI.GetPlatformName(), unit))
+    UI.DisplayMessage('%0.1f tons of munitions provided to <%d> %s (%s)' % (check_limits(UI, mag_loads)[1]/1000, UI.GetPlatformId(), UI.GetPlatformName(), unit))
+
+def stock_rate(UI, aircraft, item):
+    qty = 0
+    sortie = 0
+    item_table = determine_item_table(UI, item)
+
+    if UI.QueryDatabase('air', aircraft, 'InitialYear').GetRow(0).GetString(0) != 'Error':
+        unit_role = UI.QueryDatabase('air', aircraft,'Designation').GetRow(0).GetString(0)
+    else:
+        unit_role = UI.QueryDatabase('simpleair', aircraft,'Designation').GetRow(0).GetString(0)
+
+    try:
+        sortie = int(sorties[unit_role])
+    except KeyError:
+        return 0
+    
+    if item_table == 'cm':
+        qty = cm.get(unit_role,2)
+    elif item_table == 'fueltank':
+        qty = tank.get(unit_role,1)
+    elif item_table == 'sonobuoy':
+        qty = buoy.get(unit_role,0)
+    elif item_table == 'ballistic':
+        if 'Nuclear' in UI.QueryDatabase(item_table,item,'DamageModel').GetRow(0).GetString(0):
+            qty = nuke_bomb.get(unit_role,0)
+        elif UI.QueryDatabase(item_table,item,'BallisticType').GetRow(0).GetString(0) == '5':  #rockets
+            qty = rockets.get(unit_role,0)
+        elif (UI.QueryDatabase(item_table,item,'BallisticType').GetRow(0).GetString(0) == '0' or
+            UI.QueryDatabase(item_table,item,'BallisticType').GetRow(0).GetString(0) == '2'):  #gun round, autocannon round
+            qty = gun.get(unit_role,1)
+        elif UI.QueryDatabase(item_table,item,'BallisticType').GetRow(0).GetString(0) == '1':  #unguided bomb
+            if UI.QueryDatabase('torpedo',UI.QueryDatabase('ballistic',item,'Payload').GetRow(0).GetString(0),'weight_kg').GetRow(0).GetString(0) != 'Error':
+                if UI.QueryDatabase('torpedo',item,'ClassificationId').GetRow(0).GetString(0) == '138':  #mine
+                    qty = mine_bomb.get(unit_role,0)
+                elif UI.QueryDatabase('torpedo',item,'WeaponType').GetRow(0).GetString(0) == '2':
+                    qty = DC.get(unit_role,0)
+            mass = float(UI.QueryDatabase(item_table, item,'Weight_kg').GetRow(0).GetString(0))
+            if mass < 125:
+                qty = ib_125.get(unit_role,0)
+            elif mass < 250:
+                qty = ib_250.get(unit_role,0)
+            elif mass < 500:
+                qty = ib_500.get(unit_role,0)
+            elif mass < 750:
+                qty = ib_750.get(unit_role,0)
+            elif mass < 1000:
+                qty = ib_1000.get(unit_role,0)
+            elif mass < 2000:
+                qty = ib_2000.get(unit_role,0)
+            elif mass < 3000:
+                qty = ib_3000.get(unit_role,0)
+        elif UI.QueryDatabase(item_table,item,'BallisticType').GetRow(0).GetString(0) == '3':  #guided bomb
+            mass = float(UI.QueryDatabase(item_table, item,'Weight_kg').GetRow(0).GetString(0))
+            if mass < 125:
+                qty = gb_125.get(unit_role,0)
+            elif mass < 250:
+                qty = gb_250.get(unit_role,0)
+            elif mass < 500:
+                qty = gb_500.get(unit_role,0)
+            elif mass < 750:
+                qty = gb_750.get(unit_role,0)
+            elif mass < 1000:
+                qty = gb_1000.get(unit_role,0)
+            elif mass < 2000:
+                qty = gb_2000.get(unit_role,0)
+    elif item_table == 'torpedo':
+        if UI.QueryDatabase(item_table,item,'WeaponType').GetRow(0).GetString(0) == '1':
+            qty = torpedo.get(unit_role,0)
+        elif UI.QueryDatabase(item_table,item,'WeaponType').GetRow(0).GetString(0) == '2':
+            qty = DC.get(unit_role,0)
+        else:
+            qty = mine.get(unit_role,0)
+    elif item_table == 'missile':
+        if 'Nuclear' in UI.QueryDatabase(item_table,item,'DamageModel').GetRow(0).GetString(0):
+            qty = nuke_mis.get(unit_role,0)
+        else:
+            targets = bin(int(UI.QueryDatabase(item_table,item,'targetFlags').GetRow(0).GetString(0)))[2:]
+            surface = int(targets[-1])
+            if len(targets) > 1:
+                air = int(targets[-2])
+            else:
+                air = 0
+            if len(targets) > 2:
+                land = int(targets[-3])
+            else:
+                land = 0
+            if len(targets) > 3:
+                missile = int(targets[-4])
+            else:
+                missile = 0
+            if len(targets) > 4:
+                sub = int(targets[-5])
+            else:
+                sub = 0
+            
+            mass = float(UI.QueryDatabase(item_table, item,'Weight_kg').GetRow(0).GetString(0))
+            
+            if air:
+                range_km = float(UI.QueryDatabase(item_table, item,'MaxRange_km').GetRow(0).GetString(0))
+                year = float(UI.QueryDatabase(item_table, item,'InitialYear').GetRow(0).GetString(0))
+                year -= 1950
+                if UI.QueryDatabase('optical', UI.QueryDatabase(item_table, item,'SensorClass').GetRow(0).GetString(0),'Cost').GetRow(0).GetString(0) != 'Error':  #its ir
+                    short_ir = year / 5 * 0.08 * 16
+                    medium_ir = year / 5 * 0.08 * 24
+                    long_ir = year / 5 * 0.08 * 32
+                    
+                    if range_km < short_ir:
+                        qty = ir_sraam.get(unit_role,0)
+                    elif range_km < medium_ir:
+                        qty = ir_mraam.get(unit_role,0)
+                    elif range_km < long_ir:
+                        qty = ir_lraam.get(unit_role,0)
+                    else:
+                        qty = ir_vlraam.get(unit_role,0)
+                elif UI.QueryDatabase('esm', UI.QueryDatabase(item_table, item,'SensorClass').GetRow(0).GetString(0),'Cost').GetRow(0).GetString(0) != 'Error':  #its esm
+                    qty = ir_vlraam.get(unit_role,0)  #just using the longest of the actives for now.
+                else:  #its radar
+                    short_radar = year / 5.0 * 0.08 * 50.0
+                    medium_radar = year / 5.0 * 0.08 * 100.0
+                    long_radar = year / 5.0 * 0.08 * 200.0
+                    very_long_radar = year / 5.0 * 0.08 * 200.0
+                    semiactive = int(UI.QueryDatabase('radar', UI.QueryDatabase(item_table, item,'SensorClass').GetRow(0).GetString(0),'IsSemiactive').GetRow(0).GetString(0))
+                    if range < short_radar:
+                        if semiactive:
+                            qty = sr_sraam.get(unit_role,0)
+                        else:
+                            qty = ar_sraam.get(unit_role,0)
+                    elif range < medium_radar:
+                        if semiactive:
+                            qty = sr_mraam.get(unit_role,0)
+                        else:
+                            qty = ar_mraam.get(unit_role,0)
+                    elif range < long_radar:
+                        if semiactive:
+                            qty = sr_lraam.get(unit_role,0)
+                        else:
+                            qty = ar_lraam.get(unit_role,0)
+                    else:
+                        if semiactive:
+                            qty = sr_vlraam.get(unit_role,0)
+                        else:
+                            qty = ar_vlraam.get(unit_role,0)
+            elif UI.QueryDatabase('esm', UI.QueryDatabase(item_table, item,'SensorClass').GetRow(0).GetString(0),'Cost').GetRow(0).GetString(0) != 'Error':  #its esm
+                if mass < 50:
+                    qty = usarm.get(unit_role,0)
+                elif mass < 150:
+                    qty = vsarm.get(unit_role,0)
+                elif mass < 400:
+                    qty = sarm.get(unit_role,0)
+                elif mass < 1000:
+                    qty = arm.get(unit_role,0)
+                elif mass > 1000:
+                    qty = larm.get(unit_role,0)
+                elif mass > 2500:
+                    qty = vlarm.get(unit_role,0)
+            elif surface and land:
+                if mass < 50:
+                    qty = usagsm.get(unit_role,0)
+                elif mass < 150:
+                    qty = vsagsm.get(unit_role,0)
+                elif mass < 400:
+                    qty = sagsm.get(unit_role,0)
+                elif mass < 1000:
+                    qty = agsm.get(unit_role,0)
+                elif mass > 1000:
+                    qty = lagsm.get(unit_role,0)
+                elif mass > 2500:
+                    qty = vlagsm.get(unit_role,0)
+            elif surface:
+                if mass < 50:
+                    qty = usasm.get(unit_role,0)
+                elif mass < 150:
+                    qty = vsasm.get(unit_role,0)
+                elif mass < 400:
+                    qty = sasm.get(unit_role,0)
+                elif mass < 1000:
+                    qty = asm.get(unit_role,0)
+                elif mass > 1000:
+                    qty = lasm.get(unit_role,0)
+                elif mass > 2500:
+                    qty = vlasm.get(unit_role,0)
+            elif land:
+                if mass < 50:
+                    qty = usagm.get(unit_role,0)
+                elif mass < 150:
+                    qty = vsagm.get(unit_role,0)
+                elif mass < 400:
+                    qty = sagm.get(unit_role,0)
+                elif mass < 1000:
+                    qty = agm.get(unit_role,0)
+                elif mass > 1000:
+                    qty = lagm.get(unit_role,0)
+                elif mass > 2500:
+                    qty = vlagm.get(unit_role,0)
+                
+    #return float(sortie) * float(qty)
+    return float(qty)

@@ -1,4 +1,4 @@
-# Created on 01/18/12 09:37:27
+# Created on 11/07/14 03:28:30
 from math import *
 from random import *
 from UnitCommands import *
@@ -18,10 +18,10 @@ def CreateScenario(SM):
     SM.SetAlliancePlayable(3, 0)
     SM.SetAllianceRelationship(1, 3, 'Neutral')
     SM.SetAllianceRelationship(2, 3, 'Neutral')
-    SM.SetUserAlliance(1)
+    SM.SetUserAlliance(2)
 
     SM.SetDateTime(1988,8,4,12,0,0)
-    SM.SetStartTheater(15.562501, 68.470833) # (lon, lat) in degrees, negative is West or South
+    SM.SetStartTheater(15.029165, 68.470833) # (lon, lat) in degrees, negative is West or South
     SM.SetScenarioLoaded(1)
 
     SM.SetSeaState(2)
@@ -62,7 +62,7 @@ def CreateScenario(SM):
     BB = UI.GetBlackboardInterface()
     
     SM.AddUnitToFlightDeck('Airfield Harstad', 'P-3C II Orion', 'ASW Harstad-1', 2)
-    SM.SetFlightDeckUnitLoadout('Airfield Harstad', 'ASW Harstad-1', '17 DICASS (85) Sonobuoy;17 LOFAR (85) Sonobuoy;50 DIFAR (85) Sonobuoy;2 Mk-46 Mod5;2 AGM-65D;6 AGM-65D;2 Mk-46 Mod5;2 Mk-46 Mod5;8 Mk-46 Mod5;30 Chaff-1;30 Flare-1')
+    SM.SetFlightDeckUnitLoadout('Airfield Harstad', 'ASW Harstad-1', '17 DICASS (85) Sonobuoy;17 LOFAR (85) Sonobuoy;50 DIFAR (85) Sonobuoy;2 Mk-46 Mod5;2 AGM-65D;2 AGM-65D;2 Mk-46 Mod5;2 Mk-46 Mod5;8 Mk-46 Mod5;30 Chaff-1;30 Flare-1;')
     
     SM.AddUnitToFlightDeck('Airfield Harstad', 'P-3C II Orion', 'ASW Harstad-2', 2)
     SM.SetFlightDeckUnitLoadout('Airfield Harstad', 'ASW Harstad-2', '17 DICASS (85) Sonobuoy;17 LOFAR (85) Sonobuoy;50 DIFAR (85) Sonobuoy;2 Mk-46 Mod5;2 AGM-65D;2 AGM-65D;2 Mk-46 Mod5;2 Mk-46 Mod5;8 Mk-46 Mod5;30 Chaff-1;30 Flare-1;')
@@ -99,6 +99,7 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("HNoMS Skolpen", 'Type-612 Torpedo', 6)
     SM.AddToUnitMagazine("HNoMS Skolpen", 'NT37C', 6)
     UI.SetSensorState(3, 0)
+    UI.AddTask('AvoidCav', 3.000000, 3)
     UI.AddTask('SubBattery', 4.000000, 3)
     UI.AddTask('SubEvade', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
@@ -123,6 +124,7 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("HNoMS Utsira", 'Type-612 Torpedo', 6)
     SM.AddToUnitMagazine("HNoMS Utsira", 'NT37C', 6)
     UI.SetSensorState(3, 0)
+    UI.AddTask('AvoidCav', 3.000000, 3)
     UI.AddTask('SubBattery', 4.000000, 3)
     UI.AddTask('SubEvade', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
@@ -150,6 +152,7 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("B-437 Magnitogorsk", '53-65M', 6)
     UI.SetSensorState(0, 0)
     UI.SetSensorState(4, 0)
+    UI.AddTask('AvoidCav', 3.000000, 3)
     UI.AddTask('EngageAll', 2.000000, 0)
     UI.AddTask('Nav', 1.000000, 0)
     UI.AddNavWaypointAdvanced(0.262058, 1.190724, 0.000000, 0.000000)
@@ -158,13 +161,28 @@ def CreateScenario(SM):
     UI.AddTask('SubBattery', 4.000000, 3)
     UI.AddTask('SubEvade', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
+    BB.Write('129_EngageLimit', '1')
+    BB.Write('16_EngageLimit', '4')
+    BB.Write('17_EngageLimit', '6')
+    BB.Write('18_EngageLimit', '12')
+    BB.Write('22_EngageLimit', '24')
+    BB.Write('256_EngageLimit', '2')
+    BB.Write('257_EngageLimit', '24')
+    BB.Write('258_EngageLimit', '2')
+    BB.Write('32_EngageLimit', '1')
+    BB.Write('33_EngageLimit', '1')
+    BB.Write('34_EngageLimit', '1')
+    BB.Write('64_EngageLimit', '1')
+    BB.Write('ID_EngageLimit', '{"12": "0"}')
+    BB.Write('MissionTarget', '["Target", 12]')
+    BB.Write('Selected', '{"RotaryWing": 0, "Speed-": 10, "Alt+": 0, "Speed+": 10, "RadarMast+": 0, "RadarMast-": 1, "34_EngageLimit": "1", "257_EngageLimit": "24", "17_EngageLimit": "6", "UnitCount": 7, "HasECM": 0, "HasTarget": 0, "TargetDatum": 0, "Alliance0_EngageLimit": -1, "FixedLand": 0, "Launchers": 1, "Periscope-": 1, "FixedWing": 0, "MagWeaponList": {"9M32M Strela 3": 8, "30mm OF-84 HE-FRAG AK-630M": 12272, "TEST-68": 0, "TEST-71ME": 0, "RPK-6 Vodopod": 0, "SAET-60M": 0, "130mm F-44 HE": 500, "SET-65M": 144, "100mm OF-58 FRAG": 1400, "9M330 Kinzhal": 0, "TEST-71MKE": 0, "3M45 Granit": 0, "30mm OP-84 FRAG Tracer AK-630M": 0, "Yu-6": 0, "130mm ZS-44 AA": 0, "9M32 Strela 2": 48, "RPK-3 Metel": 0, "SET-65": 0, "TEST-71": 0, "53-56V": 0, "5V55RM": 0, "3M10 Granat(n)": 0, "3M10 Granat": 0, "AT-2M": 0, "76.2mm OS-62 FRAG": 0, "9M33M": 0, "53-56": 0, "100mm ZS-58 AA": 0, "130mm ZS-44P AA": 0, "3M54E Klub Alfa": 0, "76.2mm ZS-63 AA": 0, "100mm ZS-58P AA": 0, "53-65KE": 0, "3M80M Moskit-M": 0, "USET-80": 0, "Shkval": 0, "53-65M": 196}, "Air": 0, "64_EngageLimit": "1", "HasAIWeap": 0, "18_EngageLimit": "12", "256_EngageLimit": "2", "Depth+": 250.0, "MobileLand": 0, "CanStrafe": 0, "Depth-": 0, "HasSonarP": 1, "HasThrottle": 0, "PeriDeep": 0, "Sub": 2, "HasSonarA": 1, "HasFlightPort": 1, "HasMagazine": 1, "DieselSub": 1, "HasGBU": 0, "HasAINav": 0, "FormMember": 4, "Alliance1_EngageLimit": -1, "HasBombs": 0, "Snorkel-": 1, "TargetTrack": 1, "Snorkel+": 0, "16_EngageLimit": "4", "Alliance2_EngageLimit": -1, "258_EngageLimit": "2", "FormLeader": 1, "129_EngageLimit": "1", "HasESM": 1, "Periscope+": 0, "22_EngageLimit": "24", "FormModeSprint": 4, "32_EngageLimit": "1", "Tasks": {"MissileWarning": 2, "Nav": 3, "EngageAll": 5}, "HasOptical": 1, "33_EngageLimit": "1", "HasRadar": 1, "Ship": 5, "TargetSet": 1, "FormModePace": 0, "WeaponList": {"9M330 Kinzhal": [64, 64], "9M32M Strela 3": [1, 1], "5V55RM": [64, 64], "3M45 Granit": [16, 16], "9M32 Strela 2": [24, 24], "SET-65M": [8, 8], "130mm F-44 HE": [100, 100], "30mm OF-84 HE-FRAG AK-630M": [590, 590], "76.2mm OS-62 FRAG": [608, 608], "9M33M": [80, 80], "100mm OF-58 FRAG": [92, 92], "53-65M": [26, 26], "RPK-3 Metel": [12, 12]}}')
     
     unit = SM.GetDefaultUnit()
     unit.className = 'Pr 877M Paltus'
     unit.unitName = "B-439"
     unit.SetPosition(14.446730, 68.047276, -150.0)
     unit.heading = 74.08
-    unit.speed = 14.4
+    unit.speed = 5.9
     unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, '9M32M Strela 3', 1)
@@ -180,6 +198,7 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("B-439", '9M32M Strela 3', 8)
     UI.SetSensorState(0, 0)
     UI.SetSensorState(4, 0)
+    UI.AddTask('AvoidCav', 3.000000, 3)
     UI.AddTask('EngageAll', 2.000000, 0)
     UI.AddTask('Nav', 1.000000, 0)
     UI.AddNavWaypointAdvanced(0.257382, 1.188411, 0.000000, 0.000000)
@@ -190,6 +209,21 @@ def CreateScenario(SM):
     UI.AddTask('SubBattery', 4.000000, 3)
     UI.AddTask('SubEvade', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
+    BB.Write('129_EngageLimit', '1')
+    BB.Write('16_EngageLimit', '4')
+    BB.Write('17_EngageLimit', '6')
+    BB.Write('18_EngageLimit', '12')
+    BB.Write('22_EngageLimit', '24')
+    BB.Write('256_EngageLimit', '2')
+    BB.Write('257_EngageLimit', '24')
+    BB.Write('258_EngageLimit', '2')
+    BB.Write('32_EngageLimit', '1')
+    BB.Write('33_EngageLimit', '1')
+    BB.Write('34_EngageLimit', '1')
+    BB.Write('64_EngageLimit', '1')
+    BB.Write('ID_EngageLimit', '{"12": "0"}')
+    BB.Write('MissionTarget', '["Target", 12]')
+    BB.Write('Selected', '{"RotaryWing": 0, "Speed-": 10, "Alt+": 0, "Speed+": 10, "RadarMast+": 0, "RadarMast-": 1, "34_EngageLimit": "1", "257_EngageLimit": "24", "17_EngageLimit": "6", "UnitCount": 7, "HasECM": 0, "HasTarget": 0, "TargetDatum": 0, "Alliance0_EngageLimit": -1, "FixedLand": 0, "Launchers": 1, "Periscope-": 1, "FixedWing": 0, "MagWeaponList": {"9M32M Strela 3": 8, "30mm OF-84 HE-FRAG AK-630M": 12272, "TEST-68": 0, "TEST-71ME": 0, "RPK-6 Vodopod": 0, "SAET-60M": 0, "130mm F-44 HE": 500, "SET-65M": 144, "100mm OF-58 FRAG": 1400, "9M330 Kinzhal": 0, "TEST-71MKE": 0, "3M45 Granit": 0, "30mm OP-84 FRAG Tracer AK-630M": 0, "Yu-6": 0, "130mm ZS-44 AA": 0, "9M32 Strela 2": 48, "RPK-3 Metel": 0, "SET-65": 0, "TEST-71": 0, "53-56V": 0, "5V55RM": 0, "3M10 Granat(n)": 0, "3M10 Granat": 0, "AT-2M": 0, "76.2mm OS-62 FRAG": 0, "9M33M": 0, "53-56": 0, "100mm ZS-58 AA": 0, "130mm ZS-44P AA": 0, "3M54E Klub Alfa": 0, "76.2mm ZS-63 AA": 0, "100mm ZS-58P AA": 0, "53-65KE": 0, "3M80M Moskit-M": 0, "USET-80": 0, "Shkval": 0, "53-65M": 196}, "Air": 0, "64_EngageLimit": "1", "HasAIWeap": 0, "18_EngageLimit": "12", "256_EngageLimit": "2", "Depth+": 250.0, "MobileLand": 0, "CanStrafe": 0, "Depth-": 0, "HasSonarP": 1, "HasThrottle": 0, "PeriDeep": 0, "Sub": 2, "HasSonarA": 1, "HasFlightPort": 1, "HasMagazine": 1, "DieselSub": 1, "HasGBU": 0, "HasAINav": 0, "FormMember": 4, "Alliance1_EngageLimit": -1, "HasBombs": 0, "Snorkel-": 1, "TargetTrack": 1, "Snorkel+": 0, "16_EngageLimit": "4", "Alliance2_EngageLimit": -1, "258_EngageLimit": "2", "FormLeader": 1, "129_EngageLimit": "1", "HasESM": 1, "Periscope+": 0, "22_EngageLimit": "24", "FormModeSprint": 4, "32_EngageLimit": "1", "Tasks": {"MissileWarning": 2, "Nav": 3, "EngageAll": 5}, "HasOptical": 1, "33_EngageLimit": "1", "HasRadar": 1, "Ship": 5, "TargetSet": 1, "FormModePace": 0, "WeaponList": {"9M330 Kinzhal": [64, 64], "9M32M Strela 3": [1, 1], "5V55RM": [64, 64], "3M45 Granit": [16, 16], "9M32 Strela 2": [24, 24], "SET-65M": [8, 8], "130mm F-44 HE": [100, 100], "30mm OF-84 HE-FRAG AK-630M": [590, 590], "76.2mm OS-62 FRAG": [608, 608], "9M33M": [80, 80], "100mm OF-58 FRAG": [92, 92], "53-65M": [26, 26], "RPK-3 Metel": [12, 12]}}')
     
     unit = SM.GetDefaultUnit()
     unit.className = 'Pr 1135 Burevestnik'
@@ -218,17 +252,32 @@ def CreateScenario(SM):
     UI.AddNavWaypointAdvanced(0.279261, 1.193445, 0.000000, 0.000000)
     UI.AddTask('PointDefense', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
+    BB.Write('129_EngageLimit', '1')
+    BB.Write('16_EngageLimit', '4')
+    BB.Write('17_EngageLimit', '6')
+    BB.Write('18_EngageLimit', '12')
+    BB.Write('22_EngageLimit', '24')
+    BB.Write('256_EngageLimit', '2')
+    BB.Write('257_EngageLimit', '24')
+    BB.Write('258_EngageLimit', '2')
+    BB.Write('32_EngageLimit', '1')
+    BB.Write('33_EngageLimit', '1')
+    BB.Write('34_EngageLimit', '1')
+    BB.Write('64_EngageLimit', '1')
+    BB.Write('ID_EngageLimit', '{"12": "0"}')
+    BB.Write('MissionTarget', '["Target", 12]')
+    BB.Write('Selected', '{"RotaryWing": 0, "Speed-": 10, "Alt+": 0, "Speed+": 10, "RadarMast+": 0, "RadarMast-": 0, "34_EngageLimit": "1", "257_EngageLimit": "24", "17_EngageLimit": "6", "UnitCount": 4, "HasECM": 0, "HasTarget": 0, "TargetDatum": 0, "Alliance0_EngageLimit": -1, "FixedLand": 0, "Launchers": 1, "Periscope-": 0, "FixedWing": 0, "MagWeaponList": {"30mm OF-84 HE-FRAG AK-630M": 8496, "TEST-68": 0, "RPK-6 Vodopod": 0, "SAET-60M": 0, "130mm F-44 HE": 500, "SET-65M": 0, "3M45 Granit": 0, "30mm OP-84 FRAG Tracer AK-630M": 0, "Yu-6": 0, "130mm ZS-44 AA": 0, "RPK-3 Metel": 0, "SET-65": 0, "TEST-71": 0, "53-56V": 0, "5V55RM": 0, "AT-2M": 0, "76.2mm OS-62 FRAG": 0, "9M33M": 0, "53-56": 0, "130mm ZS-44P AA": 0, "76.2mm ZS-63 AA": 0, "9M32 Strela 2": 48, "USET-80": 0, "Shkval": 0, "53-65M": 76}, "Air": 0, "64_EngageLimit": "1", "HasAIWeap": 0, "18_EngageLimit": "12", "256_EngageLimit": "2", "Depth+": 0, "MobileLand": 0, "CanStrafe": 0, "Depth-": 0, "HasSonarP": 1, "HasThrottle": 0, "PeriDeep": 0, "Sub": 0, "HasSonarA": 1, "HasFlightPort": 1, "HasMagazine": 1, "DieselSub": 0, "HasGBU": 0, "HasAINav": 0, "FormMember": 3, "Alliance1_EngageLimit": -1, "HasBombs": 0, "Snorkel-": 0, "TargetTrack": 1, "Snorkel+": 0, "16_EngageLimit": "4", "Alliance2_EngageLimit": -1, "258_EngageLimit": "2", "FormLeader": 1, "129_EngageLimit": "1", "HasESM": 1, "Periscope+": 0, "22_EngageLimit": "24", "FormModeSprint": 0, "32_EngageLimit": "1", "Tasks": {"MissileWarning": 2, "Nav": 1, "EngageAll": 2}, "HasOptical": 1, "33_EngageLimit": "1", "HasRadar": 1, "Ship": 4, "TargetSet": 0, "FormModePace": 3, "WeaponList": {"130mm F-44 HE": [100, 100], "5V55RM": [64, 64], "3M45 Granit": [16, 16], "9M32 Strela 2": [24, 24], "30mm OF-84 HE-FRAG AK-630M": [354, 354], "76.2mm OS-62 FRAG": [608, 608], "9M33M": [80, 80], "53-65M": [14, 14], "RPK-3 Metel": [4, 4]}}')
     
     unit = SM.GetDefaultUnit()
     unit.className = 'Pr 1171 Tapir'
     unit.unitName = "Nikolay Vilkov"
     UI = SM.GetUnitInterface('Letuchiy')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
-    lon_deg = 57.296*leader_track.Lon + -0.0609
-    lat_deg = 57.296*leader_track.Lat + -0.0018
+    lon_deg = 57.296*leader_track.Lon + -0.0607
+    lat_deg = 57.296*leader_track.Lat + -0.0012
     unit.SetPosition(lon_deg, lat_deg, 0.0)
     unit.heading = 45.72
-    unit.speed = 10
+    unit.speed = 10.0
     unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, '76.2mm OS-62 FRAG', 152)
@@ -238,9 +287,24 @@ def CreateScenario(SM):
     UI.AddTask('MissileWarning', 3.000000, 3)
     UI.AddTask('PointDefense', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
+    BB.Write('129_EngageLimit', '1')
+    BB.Write('16_EngageLimit', '4')
+    BB.Write('17_EngageLimit', '6')
+    BB.Write('18_EngageLimit', '12')
+    BB.Write('22_EngageLimit', '24')
+    BB.Write('256_EngageLimit', '2')
+    BB.Write('257_EngageLimit', '24')
+    BB.Write('258_EngageLimit', '2')
+    BB.Write('32_EngageLimit', '1')
+    BB.Write('33_EngageLimit', '1')
+    BB.Write('34_EngageLimit', '1')
+    BB.Write('64_EngageLimit', '1')
+    BB.Write('ID_EngageLimit', '{"12": "0"}')
+    BB.Write('MissionTarget', '["Target", 12]')
+    BB.Write('Selected', '{"RotaryWing": 0, "Speed-": 10, "Alt+": 0, "Speed+": 10, "RadarMast+": 0, "RadarMast-": 0, "34_EngageLimit": "1", "257_EngageLimit": "24", "17_EngageLimit": "6", "UnitCount": 4, "HasECM": 0, "HasTarget": 0, "TargetDatum": 0, "Alliance0_EngageLimit": -1, "FixedLand": 0, "Launchers": 1, "Periscope-": 0, "FixedWing": 0, "MagWeaponList": {"30mm OF-84 HE-FRAG AK-630M": 8496, "TEST-68": 0, "RPK-6 Vodopod": 0, "SAET-60M": 0, "130mm F-44 HE": 500, "SET-65M": 0, "3M45 Granit": 0, "30mm OP-84 FRAG Tracer AK-630M": 0, "Yu-6": 0, "130mm ZS-44 AA": 0, "RPK-3 Metel": 0, "SET-65": 0, "TEST-71": 0, "53-56V": 0, "5V55RM": 0, "AT-2M": 0, "76.2mm OS-62 FRAG": 0, "9M33M": 0, "53-56": 0, "130mm ZS-44P AA": 0, "76.2mm ZS-63 AA": 0, "9M32 Strela 2": 48, "USET-80": 0, "Shkval": 0, "53-65M": 76}, "Air": 0, "64_EngageLimit": "1", "HasAIWeap": 0, "18_EngageLimit": "12", "256_EngageLimit": "2", "Depth+": 0, "MobileLand": 0, "CanStrafe": 0, "Depth-": 0, "HasSonarP": 1, "HasThrottle": 0, "PeriDeep": 0, "Sub": 0, "HasSonarA": 1, "HasFlightPort": 1, "HasMagazine": 1, "DieselSub": 0, "HasGBU": 0, "HasAINav": 0, "FormMember": 3, "Alliance1_EngageLimit": -1, "HasBombs": 0, "Snorkel-": 0, "TargetTrack": 1, "Snorkel+": 0, "16_EngageLimit": "4", "Alliance2_EngageLimit": -1, "258_EngageLimit": "2", "FormLeader": 1, "129_EngageLimit": "1", "HasESM": 1, "Periscope+": 0, "22_EngageLimit": "24", "FormModeSprint": 0, "32_EngageLimit": "1", "Tasks": {"MissileWarning": 2, "Nav": 1, "EngageAll": 2}, "HasOptical": 1, "33_EngageLimit": "1", "HasRadar": 1, "Ship": 4, "TargetSet": 0, "FormModePace": 3, "WeaponList": {"130mm F-44 HE": [100, 100], "5V55RM": [64, 64], "3M45 Granit": [16, 16], "9M32 Strela 2": [24, 24], "30mm OF-84 HE-FRAG AK-630M": [354, 354], "76.2mm OS-62 FRAG": [608, 608], "9M33M": [80, 80], "53-65M": [14, 14], "RPK-3 Metel": [4, 4]}}')
     leader_id = UI.LookupFriendlyId('Letuchiy')
     UI.SetFormationLeader(leader_id)
-    UI.SetFormationMode(2)
+    UI.SetFormationMode(1)
     UI.SetFormationPosition(2.551, 0.358, -2.459, 0.339)
     UI.SetFormationAltitudeOffset(0.0)
     UI.SetFormationUseNorthBearing(0)
@@ -250,11 +314,11 @@ def CreateScenario(SM):
     unit.unitName = "BDK-13"
     UI = SM.GetUnitInterface('Letuchiy')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
-    lon_deg = 57.296*leader_track.Lon + -0.0215
-    lat_deg = 57.296*leader_track.Lat + -0.0274
+    lon_deg = 57.296*leader_track.Lon + -0.0213
+    lat_deg = 57.296*leader_track.Lat + -0.0268
     unit.SetPosition(lon_deg, lat_deg, 0.0)
     unit.heading = 45.66
-    unit.speed = 10
+    unit.speed = 10.0
     unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, '76.2mm OS-62 FRAG', 152)
@@ -264,9 +328,24 @@ def CreateScenario(SM):
     UI.AddTask('MissileWarning', 3.000000, 3)
     UI.AddTask('PointDefense', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
+    BB.Write('129_EngageLimit', '1')
+    BB.Write('16_EngageLimit', '4')
+    BB.Write('17_EngageLimit', '6')
+    BB.Write('18_EngageLimit', '12')
+    BB.Write('22_EngageLimit', '24')
+    BB.Write('256_EngageLimit', '2')
+    BB.Write('257_EngageLimit', '24')
+    BB.Write('258_EngageLimit', '2')
+    BB.Write('32_EngageLimit', '1')
+    BB.Write('33_EngageLimit', '1')
+    BB.Write('34_EngageLimit', '1')
+    BB.Write('64_EngageLimit', '1')
+    BB.Write('ID_EngageLimit', '{"12": "0"}')
+    BB.Write('MissionTarget', '["Target", 12]')
+    BB.Write('Selected', '{"RotaryWing": 0, "Speed-": 10, "Alt+": 0, "Speed+": 10, "RadarMast+": 0, "RadarMast-": 0, "34_EngageLimit": "1", "257_EngageLimit": "24", "17_EngageLimit": "6", "UnitCount": 4, "HasECM": 0, "HasTarget": 0, "TargetDatum": 0, "Alliance0_EngageLimit": -1, "FixedLand": 0, "Launchers": 1, "Periscope-": 0, "FixedWing": 0, "MagWeaponList": {"30mm OF-84 HE-FRAG AK-630M": 8496, "TEST-68": 0, "RPK-6 Vodopod": 0, "SAET-60M": 0, "130mm F-44 HE": 500, "SET-65M": 0, "3M45 Granit": 0, "30mm OP-84 FRAG Tracer AK-630M": 0, "Yu-6": 0, "130mm ZS-44 AA": 0, "RPK-3 Metel": 0, "SET-65": 0, "TEST-71": 0, "53-56V": 0, "5V55RM": 0, "AT-2M": 0, "76.2mm OS-62 FRAG": 0, "9M33M": 0, "53-56": 0, "130mm ZS-44P AA": 0, "76.2mm ZS-63 AA": 0, "9M32 Strela 2": 48, "USET-80": 0, "Shkval": 0, "53-65M": 76}, "Air": 0, "64_EngageLimit": "1", "HasAIWeap": 0, "18_EngageLimit": "12", "256_EngageLimit": "2", "Depth+": 0, "MobileLand": 0, "CanStrafe": 0, "Depth-": 0, "HasSonarP": 1, "HasThrottle": 0, "PeriDeep": 0, "Sub": 0, "HasSonarA": 1, "HasFlightPort": 1, "HasMagazine": 1, "DieselSub": 0, "HasGBU": 0, "HasAINav": 0, "FormMember": 3, "Alliance1_EngageLimit": -1, "HasBombs": 0, "Snorkel-": 0, "TargetTrack": 1, "Snorkel+": 0, "16_EngageLimit": "4", "Alliance2_EngageLimit": -1, "258_EngageLimit": "2", "FormLeader": 1, "129_EngageLimit": "1", "HasESM": 1, "Periscope+": 0, "22_EngageLimit": "24", "FormModeSprint": 0, "32_EngageLimit": "1", "Tasks": {"MissileWarning": 2, "Nav": 1, "EngageAll": 2}, "HasOptical": 1, "33_EngageLimit": "1", "HasRadar": 1, "Ship": 4, "TargetSet": 0, "FormModePace": 3, "WeaponList": {"130mm F-44 HE": [100, 100], "5V55RM": [64, 64], "3M45 Granit": [16, 16], "9M32 Strela 2": [24, 24], "30mm OF-84 HE-FRAG AK-630M": [354, 354], "76.2mm OS-62 FRAG": [608, 608], "9M33M": [80, 80], "53-65M": [14, 14], "RPK-3 Metel": [4, 4]}}')
     leader_id = UI.LookupFriendlyId('Letuchiy')
     UI.SetFormationLeader(leader_id)
-    UI.SetFormationMode(2)
+    UI.SetFormationMode(1)
     UI.SetFormationPosition(3.175, 0.500, 2.624, 0.200)
     UI.SetFormationAltitudeOffset(0.0)
     UI.SetFormationUseNorthBearing(0)
@@ -276,11 +355,11 @@ def CreateScenario(SM):
     unit.unitName = "Udaloy"
     UI = SM.GetUnitInterface('Letuchiy')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
-    lon_deg = 57.296*leader_track.Lon + -0.0782
-    lat_deg = 57.296*leader_track.Lat + -0.0321
+    lon_deg = 57.296*leader_track.Lon + -0.0780
+    lat_deg = 57.296*leader_track.Lat + -0.0315
     unit.SetPosition(lon_deg, lat_deg, 0.0)
     unit.heading = 46.24
-    unit.speed = 10
+    unit.speed = 10.0
     unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, '9M330 Kinzhal', 64)
@@ -307,6 +386,21 @@ def CreateScenario(SM):
     UI.AddTask('PointDefense', 3.000000, 3)
     UI.AddTask('RefuelAllAircraft', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
+    BB.Write('129_EngageLimit', '1')
+    BB.Write('16_EngageLimit', '4')
+    BB.Write('17_EngageLimit', '6')
+    BB.Write('18_EngageLimit', '12')
+    BB.Write('22_EngageLimit', '24')
+    BB.Write('256_EngageLimit', '2')
+    BB.Write('257_EngageLimit', '24')
+    BB.Write('258_EngageLimit', '2')
+    BB.Write('32_EngageLimit', '1')
+    BB.Write('33_EngageLimit', '1')
+    BB.Write('34_EngageLimit', '1')
+    BB.Write('64_EngageLimit', '1')
+    BB.Write('ID_EngageLimit', '{"12": "0"}')
+    BB.Write('MissionTarget', '["Target", 12]')
+    BB.Write('Selected', '{"RotaryWing": 0, "Speed-": 10, "Alt+": 0, "Speed+": 10, "RadarMast+": 0, "RadarMast-": 1, "34_EngageLimit": "1", "257_EngageLimit": "24", "17_EngageLimit": "6", "UnitCount": 7, "HasECM": 0, "HasTarget": 0, "TargetDatum": 0, "Alliance0_EngageLimit": -1, "FixedLand": 0, "Launchers": 1, "Periscope-": 1, "FixedWing": 0, "MagWeaponList": {"9M32M Strela 3": 8, "30mm OF-84 HE-FRAG AK-630M": 12272, "TEST-68": 0, "TEST-71ME": 0, "RPK-6 Vodopod": 0, "SAET-60M": 0, "130mm F-44 HE": 500, "SET-65M": 144, "100mm OF-58 FRAG": 1400, "9M330 Kinzhal": 0, "TEST-71MKE": 0, "3M45 Granit": 0, "30mm OP-84 FRAG Tracer AK-630M": 0, "Yu-6": 0, "130mm ZS-44 AA": 0, "9M32 Strela 2": 48, "RPK-3 Metel": 0, "SET-65": 0, "TEST-71": 0, "53-56V": 0, "5V55RM": 0, "3M10 Granat(n)": 0, "3M10 Granat": 0, "AT-2M": 0, "76.2mm OS-62 FRAG": 0, "9M33M": 0, "53-56": 0, "100mm ZS-58 AA": 0, "130mm ZS-44P AA": 0, "3M54E Klub Alfa": 0, "76.2mm ZS-63 AA": 0, "100mm ZS-58P AA": 0, "53-65KE": 0, "3M80M Moskit-M": 0, "USET-80": 0, "Shkval": 0, "53-65M": 196}, "Air": 0, "64_EngageLimit": "1", "HasAIWeap": 0, "18_EngageLimit": "12", "256_EngageLimit": "2", "Depth+": 250.0, "MobileLand": 0, "CanStrafe": 0, "Depth-": 0, "HasSonarP": 1, "HasThrottle": 0, "PeriDeep": 0, "Sub": 2, "HasSonarA": 1, "HasFlightPort": 1, "HasMagazine": 1, "DieselSub": 1, "HasGBU": 0, "HasAINav": 0, "FormMember": 4, "Alliance1_EngageLimit": -1, "HasBombs": 0, "Snorkel-": 1, "TargetTrack": 1, "Snorkel+": 0, "16_EngageLimit": "4", "Alliance2_EngageLimit": -1, "258_EngageLimit": "2", "FormLeader": 1, "129_EngageLimit": "1", "HasESM": 1, "Periscope+": 0, "22_EngageLimit": "24", "FormModeSprint": 4, "32_EngageLimit": "1", "Tasks": {"MissileWarning": 2, "Nav": 3, "EngageAll": 5}, "HasOptical": 1, "33_EngageLimit": "1", "HasRadar": 1, "Ship": 5, "TargetSet": 1, "FormModePace": 0, "WeaponList": {"9M330 Kinzhal": [64, 64], "9M32M Strela 3": [1, 1], "5V55RM": [64, 64], "3M45 Granit": [16, 16], "9M32 Strela 2": [24, 24], "SET-65M": [8, 8], "130mm F-44 HE": [100, 100], "30mm OF-84 HE-FRAG AK-630M": [590, 590], "76.2mm OS-62 FRAG": [608, 608], "9M33M": [80, 80], "100mm OF-58 FRAG": [92, 92], "53-65M": [26, 26], "RPK-3 Metel": [12, 12]}}')
     leader_id = UI.LookupFriendlyId('Letuchiy')
     UI.SetFormationLeader(leader_id)
     UI.SetFormationMode(2)
@@ -342,11 +436,11 @@ def CreateScenario(SM):
     unit.unitName = "Moskva"
     UI = SM.GetUnitInterface('Letuchiy')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
-    lon_deg = 57.296*leader_track.Lon + -0.0371
-    lat_deg = 57.296*leader_track.Lat + -0.0151
+    lon_deg = 57.296*leader_track.Lon + -0.0369
+    lat_deg = 57.296*leader_track.Lat + -0.0145
     unit.SetPosition(lon_deg, lat_deg, 0.0)
     unit.heading = 46.12
-    unit.speed = 10
+    unit.speed = 10.0
     unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, '5V55RM', 64)
@@ -371,23 +465,40 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("Moskva", '30mm OF-84 HE-FRAG AK-630M', 1416)
     SM.AddToUnitMagazine("Moskva", '130mm F-44 HE', 500)
     SM.AddToUnitMagazine("Moskva", '53-65M', 30)
-    UI.SetSensorState(1, 1)
-    UI.SetSensorState(5, 1)
     UI.SetSensorState(6, 1)
     UI.AddTask('EngageAll', 2.000000, 0)
     UI.AddTask('MissileWarning', 0.000000, 0)
     UI.AddTask('PointDefense', 3.000000, 3)
     UI.AddTask('RefuelAllAircraft', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
+    BB.Write('129_EngageLimit', '1')
+    BB.Write('16_EngageLimit', '4')
+    BB.Write('17_EngageLimit', '6')
+    BB.Write('18_EngageLimit', '12')
+    BB.Write('22_EngageLimit', '24')
+    BB.Write('256_EngageLimit', '2')
+    BB.Write('257_EngageLimit', '24')
+    BB.Write('258_EngageLimit', '2')
+    BB.Write('32_EngageLimit', '1')
+    BB.Write('33_EngageLimit', '1')
+    BB.Write('34_EngageLimit', '1')
+    BB.Write('64_EngageLimit', '1')
+    BB.Write('ID_EngageLimit', '{"12": "0"}')
+    BB.Write('InvMulti', '1')
+    BB.Write('MissionTarget', '["Target", 12]')
+    BB.Write('Selected', '{"RotaryWing": 0, "Speed-": 10, "Alt+": 0, "Speed+": 10, "RadarMast+": 0, "RadarMast-": 0, "34_EngageLimit": "1", "257_EngageLimit": "24", "17_EngageLimit": "6", "UnitCount": 4, "HasECM": 0, "HasTarget": 0, "TargetDatum": 0, "Alliance0_EngageLimit": -1, "FixedLand": 0, "Launchers": 1, "Periscope-": 0, "FixedWing": 0, "MagWeaponList": {"30mm OF-84 HE-FRAG AK-630M": 8496, "TEST-68": 0, "RPK-6 Vodopod": 0, "SAET-60M": 0, "130mm F-44 HE": 500, "SET-65M": 0, "3M45 Granit": 0, "30mm OP-84 FRAG Tracer AK-630M": 0, "Yu-6": 0, "130mm ZS-44 AA": 0, "RPK-3 Metel": 0, "SET-65": 0, "TEST-71": 0, "53-56V": 0, "5V55RM": 0, "AT-2M": 0, "76.2mm OS-62 FRAG": 0, "9M33M": 0, "53-56": 0, "130mm ZS-44P AA": 0, "76.2mm ZS-63 AA": 0, "9M32 Strela 2": 48, "USET-80": 0, "Shkval": 0, "53-65M": 76}, "Air": 0, "64_EngageLimit": "1", "HasAIWeap": 0, "18_EngageLimit": "12", "256_EngageLimit": "2", "Depth+": 0, "MobileLand": 0, "CanStrafe": 0, "Depth-": 0, "HasSonarP": 1, "HasThrottle": 0, "PeriDeep": 0, "Sub": 0, "HasSonarA": 1, "HasFlightPort": 1, "HasMagazine": 1, "DieselSub": 0, "HasGBU": 0, "HasAINav": 0, "FormMember": 3, "Alliance1_EngageLimit": -1, "HasBombs": 0, "Snorkel-": 0, "TargetTrack": 1, "Snorkel+": 0, "16_EngageLimit": "4", "Alliance2_EngageLimit": -1, "258_EngageLimit": "2", "FormLeader": 1, "129_EngageLimit": "1", "HasESM": 1, "Periscope+": 0, "22_EngageLimit": "24", "FormModeSprint": 0, "32_EngageLimit": "1", "Tasks": {"MissileWarning": 2, "Nav": 1, "EngageAll": 2}, "HasOptical": 1, "33_EngageLimit": "1", "HasRadar": 1, "Ship": 4, "TargetSet": 0, "FormModePace": 3, "WeaponList": {"130mm F-44 HE": [100, 100], "5V55RM": [64, 64], "3M45 Granit": [16, 16], "9M32 Strela 2": [24, 24], "30mm OF-84 HE-FRAG AK-630M": [354, 354], "76.2mm OS-62 FRAG": [608, 608], "9M33M": [80, 80], "53-65M": [14, 14], "RPK-3 Metel": [4, 4]}}')
+    BB.Write('loadouts_dict', '{"Torpedoes": {"Ka-27A": {"T 1997": {"DICASS (90) Sonobuoy": 5, "AT-1": 2, "LOFAR (90) Sonobuoy": 5, "DIFAR (90) Sonobuoy": 14}, "T CHN 1982": {"DIFAR (75) Sonobuoy": 14, "DICASS (75) Sonobuoy": 5, "Yu-7": 2, "LOFAR (75) Sonobuoy": 5}, "T CHN 1987": {"DICASS (80) Sonobuoy": 5, "LOFAR (80) Sonobuoy": 5, "DIFAR (80) Sonobuoy": 14, "Yu-7": 2}, "T 1992": {"DICASS (85) Sonobuoy": 5, "LOFAR (85) Sonobuoy": 5, "DIFAR (85) Sonobuoy": 14, "AT-1": 2}, "T CHN 1977": {"DIFAR (70) Sonobuoy": 14, "DICASS (70) Sonobuoy": 5, "Yu-7": 2, "LOFAR (70) Sonobuoy": 5}, "T CHN 1997": {"DICASS (90) Sonobuoy": 5, "LOFAR (90) Sonobuoy": 5, "Yu-7": 2, "DIFAR (90) Sonobuoy": 14}, "T CHN 1972": {"DIFAR (65) Sonobuoy": 14, "DICASS (65) Sonobuoy": 5, "LOFAR (65) Sonobuoy": 5, "Yu-7": 2}, "T CHN 1992": {"DICASS (85) Sonobuoy": 5, "LOFAR (85) Sonobuoy": 5, "DIFAR (85) Sonobuoy": 14, "Yu-7": 2}, "T 2002": {"DICASS (95) Sonobuoy": 5, "LOFAR (95) Sonobuoy": 5, "AT-1": 2, "DIFAR (95) Sonobuoy": 14}, "T 2012": {"DICASS (105) Sonobuoy": 5, "AT-1": 2, "LOFAR (105) Sonobuoy": 5, "DIFAR (105) Sonobuoy": 14}, "T 2007": {"DICASS (100) Sonobuoy": 5, "LOFAR (100) Sonobuoy": 5, "AT-1": 2, "DIFAR (100) Sonobuoy": 14}, "T CHN 2007": {"DICASS (100) Sonobuoy": 5, "LOFAR (100) Sonobuoy": 5, "Yu-7": 2, "DIFAR (100) Sonobuoy": 14}, "T CHN 2012": {"DICASS (105) Sonobuoy": 5, "AT-1": 2, "LOFAR (105) Sonobuoy": 5, "DIFAR (105) Sonobuoy": 14}, "T CHN 2002": {"DICASS (95) Sonobuoy": 5, "LOFAR (95) Sonobuoy": 5, "Yu-7": 2, "DIFAR (95) Sonobuoy": 14}, "T 1982": {"DIFAR (75) Sonobuoy": 14, "DICASS (75) Sonobuoy": 5, "AT-1": 2, "LOFAR (75) Sonobuoy": 5}, "T 1987": {"DICASS (80) Sonobuoy": 5, "LOFAR (80) Sonobuoy": 5, "DIFAR (80) Sonobuoy": 14, "AT-1": 2}}}}')
     leader_id = UI.LookupFriendlyId('Letuchiy')
     UI.SetFormationLeader(leader_id)
-    UI.SetFormationMode(2)
+    UI.SetFormationMode(1)
     UI.SetFormationPosition(2.286, 0.632, 3.082, 0.278)
     UI.SetFormationAltitudeOffset(0.0)
     UI.SetFormationUseNorthBearing(0)
     
     SM.AddUnitToFlightDeck('Moskva', 'Ka-27A', 'Atlant Ka-27 1', 1)
     SM.SetFlightDeckUnitLoadout('Moskva', 'Atlant Ka-27 1', '5 DICASS (80) Sonobuoy;5 LOFAR (80) Sonobuoy;14 DIFAR (80) Sonobuoy;2 AT-1;')
+    FP = UI.GetFlightPortInfo()
+    base_track = UI.GetTrackById(UI.GetPlatformId())
     
     ##############################
     ### Alliance 3 units
@@ -435,6 +546,7 @@ def CreateScenario(SM):
     goal_temp.SetTargetList('Nikolay Vilkov, BDK-13')
     goal_temp.SetTimeObjective(0.000000)
     goal_temp.SetLogicAny(1)
+    goal_temp.SetQuantity(1)
     goal_temp.AddPointDeg(16.09006, 68.40239)
     goal_temp.AddPointDeg(16.00545, 68.33701)
     goal_temp.AddPointDeg(15.89431, 68.35856)

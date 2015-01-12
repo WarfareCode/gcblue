@@ -260,7 +260,7 @@ def EngageAllAir(TI):
 # shoot hostiles and unknowns within range, but do not intercept.
 # Turn if necessary to position launchers
 # type: 'all' everything, 'air' just engage aircraft
-def EngageAllWrapper(TI, type):
+def EngageAllWrapper(TI, mtype):
     UI = TI.GetPlatformInterface()
     BB = TI.GetBlackboardInterface()
 
@@ -288,7 +288,7 @@ def EngageAllWrapper(TI, type):
             ReleaseConnControl(BB) # maintain control if FC radar guidance is active, otherwise release
             
         TI.SetMemoryValue(14, float(UI.GetFormationLeader())) # save formation leader to resume formation after attack
-        if (type == 'air'):
+        if (mtype == 'air'):
             best_target, best_launcher = GetImmediateAirTarget(UI)
         else:
             best_target, best_launcher = GetImmediateTarget(UI)
@@ -354,22 +354,23 @@ def EngageAllWrapper(TI, type):
             UI.SetHeading(goal_heading)
             alt_m = UI.GetAltitude()
             if (alt_m < launcher_info.MinLaunchAlt_m):
-                UI.SetAltitude(launcher_info.MinLaunchAlt_m + 1.0)
+                SetAlt(UI,launcher_info.MinLaunchAlt_m + 1.0)
                 return
             elif (alt_m > launcher_info.MaxLaunchAlt_m):
-                UI.SetAltitude(launcher_info.MaxLaunchAlt_m - 1.0)
+                SetAlt(UI,launcher_info.MaxLaunchAlt_m - 1.0)
                 return
             if (UI.IsAir() and target_track.IsAir() and (target_track.Alt > 0)):
+                UI.SetThrottle(1.0)
                 range_km = UI.GetRangeToTarget()
                 if (alt_m < target_track.Alt):
-                    UI.SetAltitude(target_track.Alt)
+                    SetAlt(UI,target_track.Alt)
                 elif (alt_m > (target_track.Alt + 200*range_km)):
-                    UI.SetAltitude(target_track.Alt)
+                    SetAlt(UI,target_track.Alt)
   
         engagement_angle = target_bearing - UI.GetHeading() - launcher_angle
         engagement_angle = ((engagement_angle + 180) % 360) - 180 # force to -180 to 180
         
-        if (engagement_angle <= 0.5 * sector_width):
+        if (engagement_angle <= 0.5 * sector_width) and launcher_info.Status == 0:
             #UI.DisplayMessage('Engaging target with launcher %d' % launcher)
             EngageTargetWithLauncher(UI, launcher)
             TI.SetMemoryValue(2, 0)
@@ -740,7 +741,21 @@ def MaxRangeForNonAir(UI):
             maxRange_km = max(maxRange_km, launcher_info.MaxRange_km)
     
     return (maxRange_km, targetFlags)
-            
+
+# return max range and classification mask based on loaded weapon capability
+def MaxRangeForAir(UI):
+    maxRange_km = 0
+    targetFlags = 0
+    
+    nLaunchers = UI.GetLauncherCount()
+    for n in range(0, nLaunchers):
+        launcher_info = UI.GetLauncherInfo(n)
+        if ((launcher_info.TargetFlags & 0x09) != 0):
+            targetFlags = targetFlags | launcher_info.TargetFlags
+            maxRange_km = max(maxRange_km, launcher_info.MaxRange_km)
+    
+    return (maxRange_km, targetFlags)
+    
 # returns id of closest target that is in-range, engageable, not already
 # overwhelmingly engaged, and not a stale track
 # returns -1 if none
@@ -772,7 +787,7 @@ def GetImmediateTarget(UI):
     # PTYPE_FIXED 0x0100
     # int anClassMask, float afMaxRange_km, UINT8 anAffiliation
     
-    track_list = UI.GetTrackList(classMask, maxRange_km, 100)
+    track_list = UI.GetTrackList(classMask, min(maxRange_km*2, maxRange_km+200), 100)
 
     current_time = UI.GetTime()
     nTracks = track_list.Size()
@@ -796,56 +811,56 @@ def GetImmediateTarget(UI):
     
     for n in range(0, nTracks):
         track_info = track_list.GetTrack(n)
-        track_id = track_info.ID
-        staleness = current_time - track_info.Time
-        is_destroyed = track_info.IsDestroyed()
-        bearing_only = track_info.IsBearingOnly() or (track_info.TrackErrorKm() > 20)
-        engaged_count = track_info.GetEngagedCount()
-        
-        max_engaged_count = GetEngageLimit(track_info)
-        max_staleness = GetStaleLimit(track_info)
-        is_air_target = track_info.IsAir() or track_info.IsMissile()
-        
-        # check for crossing missile case
-        missile_reject = 0
-        if (track_info.IsMissile()):
-            track_heading_valid = (track_info.Flags & 0x04) != 0
-            if (track_heading_valid):
-                cos_dhdg_rad = cos(track_info.BearingToRad(UI.GetLongitude(), UI.GetLatitude()) - track_info.Heading_rad)
-                missile_reject = (cos_dhdg_rad < 0.866) # > about 30 deg
-            else:
-                missile_reject = 1
+        if ValidateTargetAllowable(UI, track_info):
+            track_id = track_info.ID
+            staleness = current_time - track_info.Time
+            is_destroyed = track_info.IsDestroyed()
+            bearing_only = track_info.IsBearingOnly() or (track_info.TrackErrorKm() > 20)
+            engaged_count = track_info.GetEngagedCount()
             
-        #UI.DisplayMessage('AI815 Track %d, %.0f/%d/%d' % (track_id, staleness, bearing_only, engaged_count))
-
-        if ((engaged_count < max_engaged_count) and (staleness < max_staleness) and (not bearing_only) and (not is_destroyed)):
-            UI.SetTarget(track_id)
-            launcher_info = UI.GetBestLauncher()
-            launcher_idx = launcher_info.Launcher
-            #UI.DisplayMessage('Best launcher %d' % launcher_idx)
-            if (launcher_idx != -1):
-                target_range = UI.GetRangeToTarget()
-                launch_range = launcher_info.Range_km  # reference max range, use for launch decision
-
-                is_better = (target_range <= launch_range) and (engaged_count < best_engaged_count)
-                is_better = is_better or ((engaged_count == best_engaged_count) and (target_range < 0.9*best_range))
-                is_better = is_better and (not missile_reject) # don't engage crossing missiles
+            max_engaged_count = GetEngageLimit(track_info)
+            max_staleness = GetStaleLimit(track_info)
+            is_air_target = track_info.IsAir() or track_info.IsMissile()
+            
+            # check for crossing missile case
+            missile_reject = 0
+            if (track_info.IsMissile()):
+                track_heading_valid = (track_info.Flags & 0x04) != 0
+                if (track_heading_valid):
+                    cos_dhdg_rad = cos(track_info.BearingToRad(UI.GetLongitude(), UI.GetLatitude()) - track_info.Heading_rad)
+                    missile_reject = (cos_dhdg_rad < 0.866) # > about 30 deg
+                else:
+                    missile_reject = 1
                 
-                if (is_better):
-                    best_range = target_range
-                    best_target = track_id
-                    best_launcher = launcher_idx
-                    best_engaged_count = engaged_count
+            #UI.DisplayMessage('AI815 Track %d, %.0f/%d/%d' % (track_id, staleness, bearing_only, engaged_count))
+
+            if ((engaged_count < max_engaged_count) and (staleness < max_staleness) and (not bearing_only) and (not is_destroyed)):
+                UI.SetTarget(track_id)
+                launcher_info = UI.GetBestLauncher()
+                launcher_idx = launcher_info.Launcher
+                #UI.DisplayMessage('Best launcher %d' % launcher_idx)
+                if (launcher_idx != -1):
+                    target_range = UI.GetRangeToTarget()
+                    launch_range = launcher_info.Range_km  # reference max range, use for launch decision
+
+                    is_better = (target_range <= launch_range) and (engaged_count < best_engaged_count)
+                    is_better = is_better or ((engaged_count == best_engaged_count) and (target_range < 0.9*best_range))
+                    is_better = is_better and (not missile_reject) # don't engage crossing missiles
                     
-                # Clear best if there is another unengaged air target close to the launch zone
-                near_launch_range = (target_range > launch_range) and (target_range < 1.75*launch_range)
-                if (near_launch_range and is_air_target and (launcher_idx == best_launcher) and \
-                    (best_engaged_count > 0) and (engaged_count == 0) and (not missile_reject)):
-                    best_range = 1e6
-                    best_target = -1
-                    best_launcher = -1
-                    best_engaged_count = 99
-                
+                    if (is_better):
+                        best_range = target_range
+                        best_target = track_id
+                        best_launcher = launcher_idx
+                        best_engaged_count = engaged_count
+                        
+                    # Clear best if there is another unengaged air target close to the launch zone
+                    near_launch_range = (target_range > launch_range) and (target_range < 1.75*launch_range)
+                    if (near_launch_range and is_air_target and (launcher_idx == best_launcher) and \
+                        (best_engaged_count > 0) and (engaged_count == 0) and (not missile_reject)):
+                        best_range = 1e6
+                        best_target = -1
+                        best_launcher = -1
+                        best_engaged_count = 99
     UI.SetTarget(best_target)
     
     return (best_target, best_launcher)
@@ -870,7 +885,8 @@ def GetImmediateAirTarget(UI):
     # PTYPE_SUBSURFACE 0x0080
     # PTYPE_FIXED 0x0100
     # int anClassMask, float afMaxRange_km, UINT8 anAffiliation
-    track_list = UI.GetTrackList(0x0060, 150, 100)
+    max_range_km, target_flags = MaxRangeForAir(UI)
+    track_list = UI.GetTrackList(0x0060, min(max_range_km * 2, max_range_km + 200), 100)
 
     current_time = UI.GetTime()
     nTracks = track_list.Size()
@@ -882,56 +898,57 @@ def GetImmediateAirTarget(UI):
     
     for n in range(0, nTracks):
         track_info = track_list.GetTrack(n)
-        track_id = track_info.ID
-        staleness = current_time - track_info.Time
-        is_destroyed = track_info.IsDestroyed()
-        bearing_only = track_info.IsBearingOnly()
-        engaged_count = track_info.GetEngagedCount()
-        is_air_target = track_info.IsAir() or track_info.IsMissile()
-        if (is_air_target or track_info.IsSub()):
-            max_engaged_count = 2
-        else:
-            max_engaged_count = 5
-        #UI.DisplayMessage('Track %d, %.0f/%d/%d' % (track_id, staleness, bearing_only, engaged_count))
+        if ValidateTargetAllowable(UI, track_info):
+            track_id = track_info.ID
+            staleness = current_time - track_info.Time
+            is_destroyed = track_info.IsDestroyed()
+            bearing_only = track_info.IsBearingOnly()
+            engaged_count = track_info.GetEngagedCount()
+            is_air_target = track_info.IsAir() or track_info.IsMissile()
+            if (is_air_target or track_info.IsSub()):
+                max_engaged_count = 2
+            else:
+                max_engaged_count = 5
+            #UI.DisplayMessage('Track %d, %.0f/%d/%d' % (track_id, staleness, bearing_only, engaged_count))
 
-        if ((engaged_count < max_engaged_count) and (staleness < 15.0) and (not bearing_only) and (not is_destroyed)):
-            UI.SetTarget(track_id)
-            launcher_info = UI.GetBestLauncher()
-            launcher_idx = launcher_info.Launcher
-            #UI.DisplayMessage('Best launcher %d' % launcher_idx)
-            if (launcher_idx != -1):
-                # check for crossing missile case
-                missile_reject = 0
-                if (track_info.IsMissile()):
-                    track_heading_valid = (track_info.Flags & 0x04) != 0
-                    if (track_heading_valid):
-                        cos_dhdg_rad = cos(track_info.BearingToRad(UI.GetLongitude(), UI.GetLatitude()) - track_info.Heading_rad)
-                        missile_reject = (cos_dhdg_rad < 0.866) # > about 30 deg
-                    else:
-                        missile_reject = 1
-            
-                target_range = UI.GetRangeToTarget()
-                launch_range = launcher_info.Range_km  # reference max range, use for launch decision
-                #UI.DisplayMessage('L%d TR: %.1f km, LR: %.1f km, MR: %d' % (launcher_idx, target_range, launch_range, missile_reject))
-                is_better = (target_range <= launch_range) and (engaged_count < best_engaged_count)
-                is_better = is_better or ((engaged_count == best_engaged_count) and (target_range < best_range))
-                is_better = is_better and (not missile_reject)
+            if ((engaged_count < max_engaged_count) and (staleness < 15.0) and (not bearing_only) and (not is_destroyed)):
+                UI.SetTarget(track_id)
+                launcher_info = UI.GetBestLauncher()
+                launcher_idx = launcher_info.Launcher
+                #UI.DisplayMessage('Best launcher %d' % launcher_idx)
+                if (launcher_idx != -1):
+                    # check for crossing missile case
+                    missile_reject = 0
+                    if (track_info.IsMissile()):
+                        track_heading_valid = (track_info.Flags & 0x04) != 0
+                        if (track_heading_valid):
+                            cos_dhdg_rad = cos(track_info.BearingToRad(UI.GetLongitude(), UI.GetLatitude()) - track_info.Heading_rad)
+                            missile_reject = (cos_dhdg_rad < 0.866) # > about 30 deg
+                        else:
+                            missile_reject = 1
                 
-                if (is_better):
-                    best_range = target_range
-                    best_target = track_id
-                    best_launcher = launcher_idx
-                    best_engaged_count = engaged_count
+                    target_range = UI.GetRangeToTarget()
+                    launch_range = launcher_info.Range_km  # reference max range, use for launch decision
+                    #UI.DisplayMessage('L%d TR: %.1f km, LR: %.1f km, MR: %d' % (launcher_idx, target_range, launch_range, missile_reject))
+                    is_better = (target_range <= launch_range) and (engaged_count < best_engaged_count)
+                    is_better = is_better or ((engaged_count == best_engaged_count) and (target_range < best_range))
+                    is_better = is_better and (not missile_reject)
                     
-                # Clear best if there is another unengaged air target close to the launch zone
-                near_launch_range = (target_range > launch_range) and (target_range < 1.75*launch_range)
-                if (near_launch_range and is_air_target and (launcher_idx == best_launcher) and \
-                    (best_engaged_count > 0) and (engaged_count == 0) and (not missile_reject)):
-                    best_range = 1e6
-                    best_target = -1
-                    best_launcher = -1
-                    best_engaged_count = 99
-                
+                    if (is_better):
+                        best_range = target_range
+                        best_target = track_id
+                        best_launcher = launcher_idx
+                        best_engaged_count = engaged_count
+                        
+                    # Clear best if there is another unengaged air target close to the launch zone
+                    near_launch_range = (target_range > launch_range) and (target_range < 1.75*launch_range)
+                    if (near_launch_range and is_air_target and (launcher_idx == best_launcher) and \
+                        (best_engaged_count > 0) and (engaged_count == 0) and (not missile_reject)):
+                        best_range = 1e6
+                        best_target = -1
+                        best_launcher = -1
+                        best_engaged_count = 99
+
     UI.SetTarget(best_target)
     
     return (best_target, best_launcher)
@@ -1097,20 +1114,22 @@ def GetSuitableTargetAll(UI, class_mask):
     # PTYPE_SUBSURFACE 0x0080
     # PTYPE_FIXED 0x0100
     # int anClassMask, float afMaxRange_km, UINT8 anAffiliation
-    track_list = UI.GetTrackList(class_mask, 150, 100)
+    search_range, target_flags = MaxRangeForAir(UI)
+    track_list = UI.GetTrackList(class_mask, min(search_range*2, search_range + 200), ROE)
     nTracks = track_list.Size()
     best_score = 0
     best_target = -1
     info_string = ''
     for n in range(0, nTracks):
         track_info = track_list.GetTrack(n)
-        track_id = track_info.ID
-        engaged_count = track_info.GetEngagedCount()
-        UI.SetTarget(track_id)
-        score = ScoreTarget(UI, track_info)
-        if (score > best_score):
-            best_score = score
-            best_target = track_id
+        if ValidateTargetAllowable(UI, track_info):
+            track_id = track_info.ID
+            engaged_count = track_info.GetEngagedCount()
+            UI.SetTarget(track_id)
+            score = ScoreTarget(UI, track_info)
+            if (score > best_score):
+                best_score = score
+                best_target = track_id
             
         #info_string = '%s %d (%.1f %d)' % (info_string, track_id, score, engaged_count)
                 
@@ -1119,11 +1138,13 @@ def GetSuitableTargetAll(UI, class_mask):
 
 # Just air tracks
 def GetSuitableTarget(UI):
-    air_track = UI.GetClosestAirTrack(150,100,1)
+    search_km, flags = MaxRangeForAir(UI)
+    air_track = UI.GetClosestAirTrack(min(search_km*2,search_km+200),100,1)
     UI.SetTarget(air_track.ID) # can be -1
     air_rating = ConsiderTarget(UI)
     
-    surface_track = UI.GetClosestSurfaceTrack(200,100,4)  # surface first considers surface tracks
+    search_km, flags = MaxRangeForNonAir(UI)
+    surface_track = UI.GetClosestSurfaceTrack(min(search_km*2,search_km+200),100,4)  # surface first considers surface tracks
     UI.SetTarget(surface_track.ID)  
     surface_rating = ConsiderTarget(UI)
 

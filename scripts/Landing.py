@@ -4,6 +4,7 @@ from GCBcommon import *
 import math
 
 from Amram_Utilities import *
+from Amram_AI_Scripts import CruiseEnforcement, CopyParentRules
 
 #  added aerial refueling scripts to this, 
 # so now has both landing and aerial refueling with tanker aircraft
@@ -28,15 +29,22 @@ def CancelTasksForLanding(UI):
                     'BombRun', 
                     'Strafing', 
                     'AirIntercept',
-                    'Air_Patrol']
-
-    nKill = len(kill_list)
-    for n in range(0, nKill):
-        if (UI.TaskExists(kill_list[n])):
-            UI.DeleteTask(kill_list[n])
+                    'Air_Patrol',
+                    'Intercept',
+                    'Refuel',
+                    'EngageAll',
+                    'EngageAllAir',
+                    'BombRun',
+                    'GBUBombRun',
+                    'CruiseClimb',
+                    ]
+    for task in kill_list:
+        if (UI.TaskExists(task)):
+            DeleteTask(UI, task)
             
 # for non-helo aircraft
 def Land(TI):
+    #refactor landing to be simpler, more effective.
     UI = TI.GetPlatformInterface()
     BB = TI.GetBlackboardInterface()
 
@@ -44,14 +52,8 @@ def Land(TI):
         UI.AddTask('LandHelo', 4.0, 0)
         TI.EndTask()
         return
-    
-    #if (not GetConnControl(BB)):
-    #    return
 
-    iteration = TI.GetMemoryValue(1) # will return 0 first time
-    if (iteration == 0):  # do initialization
-        TI.SetMemoryText('Description', 'Land at designated airbase')
-        TI.SetMemoryValue(2, 0) # 0 - init, 1 - distant, 2 - init approach, 3 - final approach
+    if not BB.KeyExists('LandState'):
         dest_name = BB.ReadMessage('LandTarget')
         dest_id = UI.LookupFriendlyId(dest_name)
         if (dest_id == -1):
@@ -63,89 +65,108 @@ def Land(TI):
                 UI.DisplayPopupMessage('Need alternate landing field')
                 TI.EndTask()
                 return
-        TI.SetMemoryValue(3, dest_id)
         CancelTasksForLanding(UI)
         UI.SetLandingState(0)
-        UI.SetPitchLimit(85)
-        cruise_alt_m = GetCruiseAltitude(UI)
-        TI.SetMemoryValue(15, cruise_alt_m)
+        UI.DisplayMessage('%s Landing at %s' % (UI.GetPlatformName(), UI.LookupFriendlyName(dest_id)))
+        BB.Write('LandTarget',str(dest_id))
+        BB.Write('LandState','Init')
 
-    iteration = iteration + 1
-    TI.SetMemoryValue(1, iteration)
-    
-    
 
-    land_state = TI.GetMemoryValue(2)
-    dest_id = long(TI.GetMemoryValue(3))
-    track_info = UI.GetTrackById(dest_id)
-    cruise_alt_m = TI.GetMemoryValue(15)
-    
-    alt_m = track_info.Alt
-    if (track_info.ID == -1):
-        dest_name = BB.ReadMessage('LandTarget')
-        UI.DisplayMessage('Bad track ID for landing (%d, %s)' % (dest_id, dest_name))
-        TI.EndTask()
-        return # invalid id
-
+    def Do_Approach(UI, track, alt_offset, update_min, update_max):
+        marker_range = UI.GetRangeToDatum(track.Lon, track.Lat) * 1000.0
+        marker_range = UI.GetRangeToDatum(track.Lon, track.Lat) * 1000.0
+        marker_alt = max(UI.GetMapTerrainElevation(track.Lon, track.Lat),0) + alt_offset
+        delta_alt = marker_alt - UI.GetAlt()
+        slope = math.degrees(atan(delta_alt/marker_range))
+        UI.SetClimbDeg(slope)
+        UI.SetHeading(UI.GetHeadingToDatum(track.Lon, track.Lat))
+        update = min(max((marker_range / (UI.GetSpeed() * 0.514444)) / 10,update_min),update_max)
+        return update, marker_range, delta_alt
+        
+    #commence landing routine.
+    dest_id = int(BB.ReadMessage('LandTarget'))
     landing_data = UI.GetLandingData(dest_id)
     if (landing_data.ID == -1):
         UI.DisplayMessage('Invalid landing destination')
         TI.EndTask()
         return # invalid id
-
-    track_info.Lat = landing_data.Lat
-    track_info.Lon = landing_data.Lon
-    track_info.Alt = landing_data.Alt
     
-    # adjust track location based on approach state
-    if (land_state <= 1):
-        if (land_state == 0):
-            base_name = UI.LookupFriendlyName(track_info.ID)
-            UI.DisplayMessage('Landing %s' % base_name)
-        UI.SetPitchLimit(15)
-        UI.SetThrottle(0.7)
-        TI.SetMemoryValue(2, 1)
-        track_info.Offset(6, landing_data.Heading_rad + 3.1416)  # final approach
-        track_info.Offset(6, landing_data.Heading_rad + 1.5708)  # base leg
-        range_km = UI.GetRangeToDatum(track_info.Lon, track_info.Lat)
-        if (range_km > 50):
-            goal_alt_m = cruise_alt_m
-        else:
-            goal_alt_m = 80*range_km + 1000 + alt_m
-        SetAlt(UI, goal_alt_m)
-        if (UI.GetAltitude() > (goal_alt_m - 300)):
-            cruiseSpeed_kts = UI.GetCruiseSpeedForAltitude(goal_alt_m)
-            UI.SetSpeed(cruiseSpeed_kts)
-        elif (UI.HasThrottle()):
-            UI.SetThrottle(1.0)
-        else:
-            UI.SetSpeed(UI.GetMaxSpeed())
-        
-    elif (land_state == 2):       
-        track_info.Offset(6, landing_data.Heading_rad + 3.1416)
-        SetAlt(UI, 300 + alt_m)
-        UI.SetPitchLimit(6)
-        UI.SetThrottle(0.7)
-        SetFractionalSpeed(UI,0.5)
-    elif (land_state >= 3):
-        SetAlt(UI, 18 + alt_m)
-        UI.SetPitchLimit(5)
-        SetFractionalSpeed(UI,0.4)
-        UI.SetThrottle(0.5)
-        if(UI.GetLandingState()==0):
-            UI.SetLandingState(1)   # gear down        
+    track = UI.GetTrackById(dest_id)
+    track.Lat = landing_data.Lat
+    track.Lon = landing_data.Lon
+    track.Alt = landing_data.Alt
 
-    #UI.DisplayMessage('Landing state is %d, alt_m: %f' % (land_state, alt_m)) 
+
+    land_state = BB.ReadMessage('LandState')
     
-    TTI = UI.SetHeadingToInterceptTrack(track_info)
-
-    if (TTI <= 5):
-        TI.SetMemoryValue(2, land_state+1)  # move to next landing state
-        TI.SetUpdateInterval(3) 
-    elif (TTI <= 20):
-        TI.SetUpdateInterval(3)
-    else:
-        TI.SetUpdateInterval(10)
+    if land_state == 'Init':
+        #cruise to initial marker
+        track.Offset(6, landing_data.Heading_rad + 3.1416)  # final approach
+        track.Offset(6, landing_data.Heading_rad + 1.5708)  # base leg
+        if UI.GetRangeToDatum(track.Lon, track.Lat) < 40:
+            BB.Write('LandState','Initial Descent')
+            UI.SetActionText('Landing: Descend')
+        else:
+            UI.SetHeading(UI.GetHeadingToDatum(track.Lon, track.Lat))
+            if UI.GetAlt() != GetCruiseAltitude(UI):
+                SetAlt(UI, GetCruiseAltitude(UI))
+                CruiseEnforcement(TI)
+            UI.SetSpeed(UI.GetCruiseSpeedForAltitude(UI.GetAlt()))
+            UI.SetActionText('Landing: Cruise')
+        range_km = UI.GetRangeToDatum(track.Lon, track.Lat)
+        update = min((range_km * 1000 / (UI.GetSpeed() * 0.514444)) / 10,20)
+        TI.SetUpdateInterval(update)
+    elif land_state == 'Initial Descent':
+        #descend to reach 2100m @ outer marker.
+        #determine pitch angle from current altitude.
+        track.Offset(6, landing_data.Heading_rad + 3.1416)
+        track.Offset(6, landing_data.Heading_rad + 1.5708)
+        update, marker_range, delta_alt = Do_Approach(UI, track, 2000.0, 2, 10)
+        TI.SetUpdateInterval(update)
+        UI.SetSpeed(UI.GetCruiseSpeedForAltitude(UI.GetAlt()))
+        if marker_range < 200 and abs(delta_alt) < 50:
+            BB.Write('LandState', 'Initial Approach')
+            UI.SetActionText('Landing: Approach')
+            TI.SetUpdateInterval(0.1)
+            return
+    elif land_state == 'Initial Approach':
+        #descend from 2100m outer to 1050m middle
+        track.Offset(6, landing_data.Heading_rad + 3.1416)
+        update, marker_range, delta_alt = Do_Approach(UI, track, 950.0, 2, 10)
+        cruise = UI.GetCruiseSpeedForAltitude(UI.GetAlt())
+        if UI.HasThrottle() and UI.GetSpeed() > cruise:
+            UI.SetThrottle(0)
+            update = 1
+        else:
+            UI.SetSpeed(cruise)
+        TI.SetUpdateInterval(update)
+        if marker_range < 200 and abs(delta_alt) < 40:
+            BB.Write('LandState', 'Final Approach')
+            UI.SetActionText('Landing: Final')
+            TI.SetUpdateInterval(0.1)
+            return
+    elif land_state == 'Final Approach':
+        #descend from 1050 middle to 50m inner
+        track.Offset(1, landing_data.Heading_rad + 3.1416)
+        update, marker_range, delta_alt = Do_Approach(UI, track, 90.0, 1, 5)
+        cruise = UI.GetCruiseSpeedForAltitude(UI.GetAlt()) * (1-(0.3*UI.GetRangeToTrack(track)/5))
+        if UI.HasThrottle() and UI.GetSpeed() > cruise:
+            UI.SetThrottle(0)
+            update = 1
+        else:
+            UI.SetSpeed(cruise)
+        TI.SetUpdateInterval(update)
+        if marker_range < 200 and abs(delta_alt) < 20:
+            BB.Write('LandState', 'Land')
+            UI.SetActionText('Landing: Threshold')
+            TI.SetUpdateInterval(0.1)
+            return
+    elif land_state == 'Land':
+        #prep for touchdown
+        UI.SetLandingState(1)
+        cruise = UI.GetCruiseSpeedForAltitude(UI.GetAlt()) * 0.7
+        update, marker_range, delta_alt = Do_Approach(UI, track, 5.0, 0.2, 1)
+        TI.SetUpdateInterval(update)
 
 # modified this to adjust altitude based on altitude of landing
 # site
@@ -293,6 +314,9 @@ def RTB(TI):
         TI.EndTask()
         return
 
+    CopyParentRules(UI)
+        
+        
     if UI.TaskExists('Land') or UI.TaskExists('LandHelo'):
         return
     else:

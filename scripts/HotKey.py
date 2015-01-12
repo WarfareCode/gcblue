@@ -101,6 +101,8 @@ def ProcessHotKey(UnitInfo, key):
             if throttle < 1.0 and alt > UnitInfo.GetAlt():
                 UnitInfo.SetThrottle(1.0)
             OptionHandler(UnitInfo,'ClimbInitThrottle|Set|%s;ClimbInitAlt|Set|%s;cruiseclimb|Task|Start~0.2~-1' % (throttle, alt))
+    elif (key == '0'):
+        OptionHandler(UnitInfo,'SetSpeed|Function|Cruise')
     else:
         msg = 'unrecognized key: %s' % key
         UnitInfo.DisplayMessage(msg)
@@ -125,6 +127,10 @@ def ProcessHotKeyGroup(GI, key):
         RelGroupSpeed(GI, 1.0)
     elif (key == '5'):
         RelGroupSpeedMax(GI)
+    elif (key == '0'):
+        OptionHandler(UnitInfo,'SetSpeed|Function|Cruise')
+    elif (key == 'w'):
+        GI.GetUserInput('CreateWaypointScript','Datum')        
 
 
 

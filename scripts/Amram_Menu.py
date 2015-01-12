@@ -1032,46 +1032,46 @@ def Get_Relevant_Stock(UI, loadouts_dict):
         done = False
         #just primary categories for now.
         if not done:
-            if ('Nuclear' in UI.QueryDatabase('missile',stock,'DamageModel').GetString(0) or
-               'Nuclear' in UI.QueryDatabase('ballistic',stock,'DamageModel').GetString(0) or
-               'Nuclear' in UI.QueryDatabase('torpedo',stock,'DamageModel').GetString(0)):  #nuke
+            if ('Nuclear' in UI.QueryDatabase('missile',stock,'DamageModel').GetRow(0).GetString(0) or
+               'Nuclear' in UI.QueryDatabase('ballistic',stock,'DamageModel').GetRow(0).GetString(0) or
+               'Nuclear' in UI.QueryDatabase('torpedo',stock,'DamageModel').GetRow(0).GetString(0)):  #nuke
                 classified['Parent']['NUC'][stock] = None
                 done = True
         if not done:
-            if UI.QueryDatabase('missile',stock,'ClassificationId').GetString(0) == '64':  #missile
+            if UI.QueryDatabase('missile',stock,'ClassificationId').GetRow(0).GetString(0) == '64':  #missile
                 classified['Parent']['MIS'][stock] = None
                 done = True
         if not done:
-            if UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '1':  #unguided bomb
+            if UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '1':  #unguided bomb
                 classified['Parent']['UBU'][stock] = None
                 done = True
-            elif UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '3':  #guided bomb
+            elif UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '3':  #guided bomb
                 classified['Parent']['GBU'][stock] = None
                 done = True
         if not done:
-            if UI.QueryDatabase('torpedo',stock,'ClassificationId').GetString(0) == '130':  #torpedo
+            if UI.QueryDatabase('torpedo',stock,'ClassificationId').GetRow(0).GetString(0) == '130':  #torpedo
                 classified['Parent']['TRP'][stock] = None
                 done = True
-            elif UI.QueryDatabase('torpedo',stock,'ClassificationId').GetString(0) == '138':  #mine
+            elif UI.QueryDatabase('torpedo',stock,'ClassificationId').GetRow(0).GetString(0) == '138':  #mine
                 classified['Parent']['MIN'][stock] = None
                 done = True
         if not done:
-            if (UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '0' or
-            UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '2'):  #gun round, autocannon round
+            if (UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '0' or
+            UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '2'):  #gun round, autocannon round
                 classified['Parent']['GUN'][stock] = None
                 done = True
         if not done:
-            if (UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '4' or
-                UI.QueryDatabase('cm',stock,'ClassificationId').GetString(0) == '36' or
-                UI.QueryDatabase('cm',stock,'ClassificationId').GetString(0) == '136'):  #gun cm, air cm, water cm
+            if (UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '4' or
+                UI.QueryDatabase('cm',stock,'ClassificationId').GetRow(0).GetString(0) == '36' or
+                UI.QueryDatabase('cm',stock,'ClassificationId').GetRow(0).GetString(0) == '136'):  #gun cm, air cm, water cm
                 classified['Parent']['CM'][stock] = None
                 done = True
         if not done:
-            if UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '5':  #rockets
+            if UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '5':  #rockets
                 classified['Parent']['ROC'][stock] = None
                 done = True
         if not done:
-            if UI.QueryDatabase('sonobuoy',stock,'ClassificationId').GetString(0) == '132':  #sonobuoy
+            if UI.QueryDatabase('sonobuoy',stock,'ClassificationId').GetRow(0).GetString(0) == '132':  #sonobuoy
                 classified['Parent']['BUI'][stock] = None
                 done = True
         if not done:
@@ -1081,46 +1081,46 @@ def Get_Relevant_Stock(UI, loadouts_dict):
             done = False
             #just primary categories for now.
             if not done:
-                if ('Nuclear' in UI.QueryDatabase('missile',stock,'DamageModel').GetString(0) or
-                   'Nuclear' in UI.QueryDatabase('ballistic',stock,'DamageModel').GetString(0) or
-                   'Nuclear' in UI.QueryDatabase('torpedo',stock,'DamageModel').GetString(0)):  #nuke
+                if ('Nuclear' in UI.QueryDatabase('missile',stock,'DamageModel').GetRow(0).GetString(0) or
+                   'Nuclear' in UI.QueryDatabase('ballistic',stock,'DamageModel').GetRow(0).GetString(0) or
+                   'Nuclear' in UI.QueryDatabase('torpedo',stock,'DamageModel').GetRow(0).GetString(0)):  #nuke
                     classified['Child']['NUC'][stock] = None
                     done = True
             if not done:
-                if UI.QueryDatabase('missile',stock,'ClassificationId').GetString(0) == '64':  #missile
+                if UI.QueryDatabase('missile',stock,'ClassificationId').GetRow(0).GetString(0) == '64':  #missile
                     classified['Child']['MIS'][stock] = None
                     done = True
             if not done:
-                if UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '1':  #unguided bomb
+                if UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '1':  #unguided bomb
                     classified['Child']['UBU'][stock] = None
                     done = True
-                elif UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '3':  #guided bomb
+                elif UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '3':  #guided bomb
                     classified['Child']['GBU'][stock] = None
                     done = True
             if not done:
-                if UI.QueryDatabase('torpedo',stock,'ClassificationId').GetString(0) == '130':  #torpedo
+                if UI.QueryDatabase('torpedo',stock,'ClassificationId').GetRow(0).GetString(0) == '130':  #torpedo
                     classified['Parent']['TRP'][stock] = None
                     done = True
-                elif UI.QueryDatabase('torpedo',stock,'ClassificationId').GetString(0) == '138':  #mine
+                elif UI.QueryDatabase('torpedo',stock,'ClassificationId').GetRow(0).GetString(0) == '138':  #mine
                     classified['Parent']['MIN'][stock] = None
                     done = True
             if not done:
-                if (UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '0' or
-                UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '2'):  #gun round, autocannon round
+                if (UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '0' or
+                UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '2'):  #gun round, autocannon round
                     classified['Child']['GUN'][stock] = None
                     done = True
             if not done:
-                if (UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '4' or
-                    UI.QueryDatabase('cm',stock,'ClassificationId').GetString(0) == '36' or
-                    UI.QueryDatabase('cm',stock,'ClassificationId').GetString(0) == '136'):  #gun cm, air cm, water cm
+                if (UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '4' or
+                    UI.QueryDatabase('cm',stock,'ClassificationId').GetRow(0).GetString(0) == '36' or
+                    UI.QueryDatabase('cm',stock,'ClassificationId').GetRow(0).GetString(0) == '136'):  #gun cm, air cm, water cm
                     classified['Child']['CM'][stock] = None
                     done = True
             if not done:
-                if UI.QueryDatabase('ballistic',stock,'BallisticType').GetString(0) == '5':  #rockets
+                if UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '5':  #rockets
                     classified['Child']['ROC'][stock] = None
                     done = True
             if not done:
-                if UI.QueryDatabase('sonobuoy',stock,'ClassificationId').GetString(0) == '132':  #sonobuoy
+                if UI.QueryDatabase('sonobuoy',stock,'ClassificationId').GetRow(0).GetString(0) == '132':  #sonobuoy
                     classified['Child']['BUI'][stock] = None
                     done = True
             if not done:

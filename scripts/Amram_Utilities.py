@@ -1,10 +1,12 @@
 #relocating my utility scripts.  i'm beginning to have a few of them, and would like to try and avoid having to constantly refer back and forth between my files, and overgrow my core files.
-import sys, os, math, re
+import sys, os, math, re, datetime
 from os.path import dirname, abspath, join, normpath
 sys.path.append(abspath(join(dirname(__file__), '..', 'bin', 'lib')))
 from UnitCommands import *
 import json, csv 
 
+
+#once I can step fully away from 1.25, I can proceed with eliminating most of the input handlers, the option handler ~can~ do it, if it can take string params.
 
 def DeleteTask(interface, taskname):
     """
@@ -225,6 +227,11 @@ def SetOption(UI, params):
     elif method == 'Erase':
         if BB.KeyExists(variable):
             BB.Erase(variable)
+    elif method == 'DictSet':
+        temp_dict = Read_Message_Dict(BB, variable)
+        key_val = [float(x) for x in value.split('~')]
+        temp_dict[key_val[0]] = key_val[1]
+        Write_Message_List(BB, temp_dict, variable)
     elif method == 'Set':
         if type(value) == type([]):
             Write_Message_List(BB, value, variable)
@@ -324,8 +331,8 @@ def SetOption(UI, params):
         #speed
         elif variable == 'SetSpeed':
             if value == 'Cruise':
-                BB.WriteGlobal('Cruise_Speed_Only')
-                AddTask('CruiseEnforcement', 5,-1)
+                BB.WriteGlobal('Cruise_Speed_Only','1')
+                AddTask(UI,'CruiseEnforcement', 5,-1)
             else:
                 UI.SetSpeed(float(value))
         elif variable == 'SetSpeed+':
@@ -538,10 +545,10 @@ def RemoveWaypointScript(interface, idx):
     if group:
         for unit in xrange(interface.GetUnitCount()):
             UI = interface.GetPlatformInterface(unit)
-            DeleteWaypoint(UI, idx)
+            UI.DeleteNavWaypoint(idx)
     else:
         UI = interface
-        DeleteWaypoint(UI, idx)
+        UI.DeleteNavWaypoint(idx)
 
 def OptionSetTargeting(interface, *args):
     """
@@ -644,165 +651,170 @@ def LoadoutHandler(UI, param):
     else:
         UI.EquipLoadout(loadout)
         
-def read_loadout_file(tgt_names, filter, filter_list):
-    """
-    read_loadout_file(tgt_names, filter, filter_list):
-    Reads in platform_setup.csv and launcher_loadout.csv, and returns a formatted dictionary of the contents
-    
-    This provides the information necessary to do additive loadouts, or to display the contents of a laodout
-    """
-    #debug = open('log/loadout.txt', 'w')
-    aircraft_dict = {}
-    for each_name in tgt_names:
-        aircraft_dict[each_name] = {}
-    #load platform setups.
-    filepath = 'scripts/Amram_Script_Data/CSVs/' + 'platform_setup.csv'
-    file = normpath(join(os.getcwd(), filepath))
-    datafile = open(file, 'r')
-    datareader = csv.reader(datafile)
-    setup_names = {}
-    for row in datareader:
-        aircraft_name = row[0]
-        simple_name = row[1]
-        setup = row[6]
-        reject_list = ['xit', 'nter', 'ervice', 'ntil',] # ['Exit', 'Enter', 'Service', 'Until',] dropped initial letter to avoid upper vs lower case discrimination.
-        Proceed = True
-        for reject in reject_list:
-            if reject in aircraft_name:
-                Proceed = False
-            if setup in ['-L', None]:
-                Proceed = False
-                
-        if Proceed and aircraft_name in tgt_names:
-            aircraft_dict[aircraft_name][setup] = simple_name
-            setup_names[setup] = None
-    
-    #get the loadout names
-    tgt_names = []
-    for entry in setup_names:
-        if entry not in tgt_names:
-            tgt_names.append(entry)
-    
-    #load launcher loadouts.
-    filepath = 'scripts/Amram_Script_Data/CSVs/' + 'launcher_loadout.csv'
-    file = normpath(join(os.getcwd(), filepath))
-    datafile = open(file, 'r')
-    datareader = csv.reader(datafile)
-    load_dict = {}
-    filepath = 'scripts/Amram_Script_Data/CSVs/' + 'launcher_loadout.csv'
-#    filepath = 'c:/GCB2_1.25_Nov_16/scripts/Amram_Script_Data/Aircraft/launcher_loadout.csv'
-    file = normpath(join(os.getcwd(), filepath))
-    datafile = open(file, 'r')
-    datareader = csv.reader(datafile)
-    load_dict = {}
-    for row in datareader:
-        if row[0] in tgt_names and row[2] != '' and not row[2].isspace():
-            #print row
-            fail = 0
-            if row[3] == '' or row[3].isspace():
-                qty = 0
-            else:
-                qty = int(row[3])
-            wpn = row[2]
-            ld = row[0]
-            if wpn != '' and not wpn.isspace():
-                try:
-                    load_dict[ld][wpn] += qty
-                except:
-                    try:
-                        load_dict[ld][wpn] = qty
-                        test = load_dict[ld]
-                    except:
-                        load_dict[ld] = {wpn:qty}
-    #we have our platform setups, and our launcher loadouts.
-    
-    
-    
-    #time to mate them, and combine like entries for launcher loadouts.
-    #also sort them for easing usage in the menu and for other purposes
+def determine_item_table(UI, item):
+    if UI.QueryDatabase('missile',item,'ModelClassId').GetRow(0).GetString(0) != 'Error':
+        #its a missile
+        return 'missile'
+    elif UI.QueryDatabase('ballistic',item,'ModelClassId').GetRow(0).GetString(0) != 'Error':
+        #its a ballistic
+        return 'ballistic'
+    elif UI.QueryDatabase('torpedo',item,'ModelClassId').GetRow(0).GetString(0) != 'Error':
+        #its a torpedo
+        return 'torpedo'
+    elif UI.QueryDatabase('fueltank',item,'ModelClassId').GetRow(0).GetString(0) != 'Error':
+        #its a fueltank
+        return 'fueltank'
+    elif UI.QueryDatabase('sonobuoy',item,'ModelClassId').GetRow(0).GetString(0) != 'Error':
+        #its a sonobuoy
+        return 'sonobuoy'
+    elif UI.QueryDatabase('cm',item,'ModelClassId').GetRow(0).GetString(0) != 'Error':
+        #its a cm
+        return 'cm'
+    elif UI.QueryDatabase('ballistic_missile',item,'ModelClassId').GetRow(0).GetString(0) != 'Error':
+        #its a ballistic missile
+        return 'ballistic_missile'
+    elif UI.QueryDatabase('item',item,'ModelClassId').GetRow(0).GetString(0) != 'Error':
+        #its an item
+        return 'item'
 
-    loadouts_dict = {}
-    done_loadout = []
-    menu_list = [ [1, 'AW', 'Air to Air', 2], [2, 'GM', 'Air to Ground Missile', 2], [3, 'SM', 'Air to Surface Missile', 2], [4, 'IB', 'Unguided Bombs', 2], [5, 'GB', 'Guided Bombs', 2], [6, 'UR', 'Unguided Rockets', 2], [7, 'T', 'Torpedoes', 1], [8, ['N', 'X'], 'Nuclear', 1], [9, 'SD', 'Suppression of Air Defences', 2], [10, 'CS', 'Close Support', 2]]
-    for aircraft in aircraft_dict:
-#        debug.write('%s\n' % aircraft)
-        for item in menu_list:
-            for platform_setup in aircraft_dict[aircraft]:
-                if platform_setup != '' and not platform_setup.isspace() and platform_setup not in done_loadout:
-                    simple_loadout_name = aircraft_dict[aircraft][platform_setup]
-                    proceed = True
-                    if filter:
-#                        debug.write('%s pass filter: %s\n' % (simple_loadout_name, simple_loadout_name in filter_list))
-                        if simple_loadout_name not in filter_list:
-                            proceed = False
-                    if simple_loadout_name[:item[3]] in item[1] and proceed:
-#                        debug.write('%s proceed\n' % simple_loadout_name)
-                        loadout = load_dict[platform_setup]
-                        armament = item[2]
-                        try:
-                            loadouts_dict[armament][aircraft][simple_loadout_name] = loadout
-                        except KeyError:
-                            try:
-                                loadouts_dict[armament][aircraft] = {simple_loadout_name:loadout}
-                            except KeyError:
-                                loadouts_dict[armament] = {aircraft:{simple_loadout_name:loadout}}
-                        done_loadout.append(platform_setup)
-        for platform_setup in aircraft_dict[aircraft]:
-            if platform_setup != '' and not platform_setup.isspace() and platform_setup not in done_loadout:
-                simple_loadout_name = aircraft_dict[aircraft][platform_setup]
-                proceed = True
-                if filter:
-                    if simple_loadout_name not in filter_list:
-                        proceed = False
-                if proceed:
-                    loadout = load_dict[platform_setup]
+def determine_unit_table(UI, unit):
+    if UI.QueryDatabase('air',unit,'ModelClassId').GetRow(0).GetString(0) != 'Error':
+        #its a complex air
+        return 'air'
+    elif UI.QueryDatabase('ground',unit,'ModelClassId').GetRow(0).GetString(0) != 'Error':
+        #its a ground
+        return 'ground'
+    elif UI.QueryDatabase('ship',unit,'ModelClassId').GetRow(0).GetString(0) != 'Error':
+        #its a ship
+        return 'ship'
+    elif UI.QueryDatabase('simpleair',unit,'ModelClassId').GetRow(0).GetString(0) != 'Error':
+        #its a simple air
+        return 'simpleair'
+    elif UI.QueryDatabase('sub',unit,'ModelClassId').GetRow(0).GetString(0) != 'Error':
+        #its a sub
+        return 'sub'
+
+def queryDB(UI, table, name, fields):
+    """
+    queryDB(UI, table, name, fields, additive = False)
+    a wrapper for UI.QueryDatabase()
+    it will return a string if only one item is found, or a dict if multiple are found.
+    the first field will be used as the dictionary key.
+    The values will be strings, unless there were more than two fields.
+    """
+    array = UI.QueryDatabase(table, name, fields)
+    if array.Size() > 1 and ',' not in fields:
+        return array.GetRow(0).GetString(0)
+    else:
+        info = {}
+        for x in xrange(array.Size()):
+            row = array.GetRow(x)
+            field_count = row.Size()
+            if field_count == 1:
+                info[row.GetString(0)] = ''
+            elif field_count == 2:
+                key = row.GetString(0)
+                if key in info:
                     try:
-                        loadouts_dict['Unknown'][aircraft][simple_loadout_name] = loadout
-                    except KeyError:
-                        try:
-                            loadouts_dict['Unknown'][aircraft] = {simple_loadout_name:loadout}
-                        except KeyError:
-                            loadouts_dict['Unknown'] = {aircraft:{simple_loadout_name:loadout}}
+                        info[key] += float(row.GetString(1))
+                    except:
+                        info[key] = row.GetString(1)
+                else:
+                    try:
+                        info[key] = float(row.GetString(1))
+                    except:
+                        info[key] = row.GetString(1)
+            elif field_count > 2:
+                field_info = []
+                for y in xrange(row.Size()):
+                    field_info.append(row.GetString(y))
+                title = field_info.pop(0)
+                info[title] = field_info
+        return info
+
+def get_compatible_items(UI):
+    """
+    get_compatible_items(UI)
+    returns a list of all valid items for the platform belonging to the given UI, 
+    this is not date filtered but contains the info needed to filter it further.
+    """
+    launchers = queryDB(UI, 'platform_launcher', UI.GetPlatformClass(), 'LauncherId, LauncherClass, IsReloadable')
     
-    ###debut output only
-#    debug.write('\n\n')
-#    for aircraft in loadouts_dict:
-#        debug.write('%s\n' % aircraft)
-#        for armament in loadouts_dict[aircraft]:
-#            debug.write('  %s\n' % armament)
-#            for loadout in loadouts_dict[aircraft][armament]:
-#                debug.write('    %s\n' % loadout)
-#                for weapon in loadouts_dict[aircraft][armament][loadout]:
-#                    debug.write('      %s   %s\n' % (weapon, loadouts_dict[aircraft][armament][loadout][weapon]))
-    #dict{
-        #armament{
-                    #aircraft{
-                    #           #setup{
-                    #           #        #item{qty}
-                    #           #        #item{qty}
-                    #           #        #item{qty}
-                    #           #        #item{qty}
-                    #           #setup{
-                    #                    #item{qty}
-                    #                    #item{qty}
-                    #                    #item{qty}
-                    #                    #item{qty}
-                    #aircraft{
-                                #setup{
-                                #        #item{qty}
-                                #        #item{qty}
-                                #        #item{qty}
-                                #        #item{qty}
-                                #setup{
-                                         #item{qty}
-                                         #item{qty}
-                                         #item{qty}
-                                         #item{qty}
-     
+    #reform it into just what info I sought from it.
+    
+    #iterate over the launchers, and get a list of all items, expand wildcards as encountered
+    compatible_items = {}
+    for launcher in launchers:
+        launcher_class = launchers[launcher][0]
+        items = queryDB(UI, 'launcher_configuration', launcher_class, 'ChildClass, ChildCapacity')
+        for x in items:
+            item = items[x][0]
+            qty = float(items[x][1])
+            if '*' in item:
+                #wildcard
+                wild_names.append(item)
+                wild_list = expand_wildcard(item, Wild_Items)
+            else:
+                wild_list = [item]
+            for item in wild_list:
+                if qty > 0:
+                    if item not in compatible_items:
+                        compatible_items[item] += qty
+                    else:
+                        compatible_items[item] = qty
+    return compatible_items
+    
+def get_loadouts(UI, tgt_names, filter, filter_list):
+    """
+    get_loadouts(tgt_names, filter, filter_list)
+    a QueryDatabase version of my loadouts listing, eliminates the need for external csv.
+    filter is a boolean toggle for date restricting the loadouts.
+    """
+    loadouts_dict = {}
+    #armament names.
+    menu_list = [ 
+        [1, 'AW', 'AAW', 2], 
+        [2, 'GM', 'AGM', 2], 
+        [3, 'SM', 'ASM', 2], 
+        [4, 'IB', 'Bombs', 2], 
+        [5, 'GB', 'Guided Bombs', 2], 
+        [6, 'UR', 'Rockets', 2], 
+        [7, 'T', 'Torpedoes', 1], 
+        [8, ['N', 'X'], 'Nuclear', 1], 
+        [9, 'SD', 'Anti Radar', 2], 
+        [10, 'CS', 'Close Support', 2]]
+    for item in menu_list:
+        identifier = item[1]
+        category = item[2]
+        offset = item[3]
+        for unit in tgt_names:
+            loadouts = queryDB(UI, 'platform_setup', unit, 'SetupName, LauncherLoadout')
+            for setup_name in loadouts:
+                if (filter and setup_name in filter_list.keys()) or not filter:
+                    if setup_name[:offset] in identifier:
+                        if loadouts[setup_name] != 'Error':
+                            #this loadout belongs to this category.
+                            loadout_items = queryDB(UI, 'launcher_loadout', loadouts[setup_name], 'Item, Quantity')
+                            if loadout_items.keys() != ['Error']:
+                                try:
+                                    loadouts_dict[category][unit][setup_name] += loadout_items
+                                except KeyError:
+                                    try:
+                                        loadouts_dict[category][unit][setup_name] = loadout_items
+                                    except KeyError:
+                                        try:
+                                            loadouts_dict[category][unit] = {setup_name:loadout_items}
+                                        except KeyError:
+                                            loadouts_dict[category] = {unit:{setup_name:loadout_items}}
+
     return loadouts_dict
-#
-#
-#    
+    #dict{
+        #category{
+                    #unit{
+                            #setup{
+                                    #item{qty}
+                                    #item{qty}
+    
 def DateString_DecimalYear(string):
     """
     DateString_DecimalYear(string):
@@ -817,7 +829,13 @@ def DateString_DecimalYear(string):
     date = datetime.datetime(int(date_time[0]),int(date_time[1]),int(date_time[2]))
     dec_date = (float(date.strftime("%j"))-1) / 366 + float(date.strftime("%Y"))
     return dec_date
- 
+
+def modification_date(filename):
+    t = os.path.getctime(filename)
+    t = datetime.datetime.fromtimestamp(t)
+    t = t.strftime("%y/%m/%d %H:%M:%S")
+    return t
+        
 def has_target_flag(flag, val):
     while flag > 0:
         if flag ==  val:
@@ -864,4 +882,186 @@ def expand_wildcard(wildstring, items):
         for item in stringlist:
             if re.match(searchstring, item):
                 wildcard_items.append(item)
-        return wildcard_items    
+        return wildcard_items
+        
+def CombatLimitsInputHandler(interface, input, param):
+    input = ''.join([x for x in input if ord(x) < 128])
+    if param < 12:
+        params = {0:16,1:17,2:18,3:22,4:32,5:33,6:34,7:64,8:129,9:256,10:258,11:257}
+        OptionHandler(interface, '%s_EngageLimit|Set|%s' % (params[param],input))
+    elif param is 12:
+        #group function
+        GI = interface
+        for n in xrange(GI.GetUnitCount()):
+            UI = GI.GetPlatformInterface(n)
+            BB = UI.GetBlackboardInterface()
+            target = UI.GetTarget()
+            temp_dict = Read_Message_Dict(BB, 'ID_EngageLimit')
+            temp_dict[target] = input
+            Write_Message_List(BB, temp_dict, 'ID_EngageLimit')
+    elif param is 13:
+        #individual function
+        UI = interface
+        BB = UI.GetBlackboardInterface()
+        target = UI.GetTarget()
+        temp_dict = Read_Message_Dict(BB, 'ID_EngageLimit')
+        temp_dict[target] = input
+        Write_Message_List(BB, temp_dict, 'ID_EngageLimit')
+    BB.WriteGlobal('UseOwnRules','')
+
+def IdEngageLimitHandler(interface,limit):
+    try:
+        #GetPlatformId ONLY works on UnitInfo, so if we throw an error, we got called by GroupInfo instead
+        test = interface.GetPlatformId()
+        group = False
+    except:
+        group = True
+    if group:
+        GI = interface
+        for n in xrange(GI.GetUnitCount()):
+            UI = GI.GetPlatformInterface(n)
+            track = UI.GetTargetTrackInfo()
+            id = track.ID
+            OptionHandler(interface, 'ID_EngageLimit|DictSet|%s~%s' % (ID,limit))
+    else:
+            UI = interface
+            track = UI.GetTargetTrackInfo()
+            id = track.ID
+            OptionHandler(interface, 'ID_EngageLimit|DictSet|%s~%s' % (ID,limit))
+    BB.WriteGlobal('UseOwnRules','')
+            
+def CoOrdsEngageLimitHandler(interface,*params):
+    param = params[-1]
+    params = params[0],params[1],params[2],params[3]
+
+    if param is 1:
+        #Box, Include
+        include = True
+    elif param is 2:
+        #Box, Exclude
+        include = False
+
+    try:
+        #GetPlatformId ONLY works on UnitInfo, so if we throw an error, we got called by GroupInfo instead
+        test = interface.GetPlatformId()
+        group = False
+    except:
+        group = True
+    if group:
+        GI = interface
+        for n in xrange(GI.GetUnitCount()):
+            UI = GI.GetPlatformInterface(n)
+            BB = UI.GetBlackboardInterface()
+            engage_zones = Read_Message_Dict(BB, 'Engagement_Zones')
+            taken_keys = []
+            x = ['Include','Exclude']
+            for set in x:
+                if set in engage_zones:
+                    for key in engage_zones[set]:
+                        taken_keys.append(int(float(str(key))))
+            for n in xrange(1000):
+                if n not in taken_keys:
+                    try:
+                        if include:
+                            engage_zones['Include'][n] = params
+                            break
+                        else:
+                            engage_zones['Exclude'][n] = params
+                            break
+                    except KeyError:
+                        if include:
+                            engage_zones['Include'] = {n:params}
+                            break
+                        else:
+                            engage_zones['Exclude'] = {n:params}
+                            break
+            Write_Message_List(BB, 'Engagement_Zones', engage_zones)
+    else:
+        UI = interface
+        BB = UI.GetBlackboardInterface()
+        engage_zones = Read_Message_Dict(BB, 'Engagement_Zones')
+        taken_keys = []
+        x = ['Include','Exclude']
+        for set in x:
+            if set in engage_zones:
+                for key in engage_zones[set]:
+                    taken_keys.append(int(float(str(key))))
+        for n in xrange(1000):
+            if n not in taken_keys:
+                try:
+                    if include:
+                        engage_zones['Include'][n] = params
+                        break
+                    else:
+                        engage_zones['Exclude'][n] = params
+                        break
+                except KeyError:
+                    if include:
+                        engage_zones['Include'] = {n:params}
+                        break
+                    else:
+                        engage_zones['Exclude'] = {n:params}
+                        break
+        Write_Message_List(BB, 'Engagement_Zones', engage_zones)
+    BB.WriteGlobal('UseOwnRules','')
+
+def DefaultCombatLimitInputs(interface, param):
+    #used to zero out various combat targeting limitations.
+    try:
+        #GetPlatformId ONLY works on UnitInfo, so if we throw an error, we got called by GroupInfo instead
+        test = interface.GetPlatformId()
+        group = False
+    except:
+        group = True
+        
+    if param in ['EngageLimits','All']:
+        for num in [16,17,18,22,32,33,34,64,129,256,258,257]:  #unit classification id's
+            limit = {32:1,33:1,34:1,256:2,258:2,257:24,64:1,16:4,17:6,18:12,22:24,129:1}
+            OptionHandler(interface, '%s_EngageLimit|Set|%s' % (num,limit[num]))
+    if param in ['IdLimits','All']:
+        if group:
+            GI = interface
+            for n in xrange(GI.GetUnitCount()):
+                UI = GI.GetPlatformInterface(n)
+                BB = UI.GetBlackboardInterface()
+                newdict = {}
+                Write_Message_List(BB,'ID_EngageLimit',newdict)
+        else:
+                UI = interface
+                BB = UI.GetBlackboardInterface()
+                newdict = {}
+                Write_Message_List(BB,'ID_EngageLimit',newdict)
+    if param in ['Zones','All']:
+        if group:
+            GI = interface
+            for n in xrange(GI.GetUnitCount()):
+                UI = GI.GetPlatformInterface(n)
+                BB = UI.GetBlackboardInterface()
+                newdict = {}
+                Write_Message_List(BB,'Engagement_Zones',newdict)
+        else:
+                UI = interface
+                BB = UI.GetBlackboardInterface()
+                newdict = {}
+                Write_Message_List(BB,'Engagement_Zones',newdict)
+    BB.WriteGlobal('UseOwnRules','')
+        
+def classify_item(UI, item):
+    if UI.QueryDatabase('torpedo',item,'ClassificationId').GetRow(0).GetString(0) == '130':  #torpedo
+        return True, 'torpedo'
+    elif UI.QueryDatabase('torpedo',item,'ClassificationId').GetRow(0).GetString(0) == '138':  #mine
+        return True, 'torpedo'
+    elif UI.QueryDatabase('missile',item,'ClassificationId').GetRow(0).GetString(0) == '64':  #missile
+        return True, 'missile'
+    elif UI.QueryDatabase('ballistic',item,'BallisticType').GetRow(0).GetString(0) != 'Error':
+        return True, 'ballistic'
+    elif UI.QueryDatabase('cm',item,'ClassificationId').GetRow(0).GetString(0) != 'Error':  #gun cm, air cm, water cm
+        return True, 'cm'
+    elif UI.QueryDatabase('sonobuoy',item,'ClassificationId').GetRow(0).GetString(0) != 'Error':
+        return True, 'sonobuoy'
+    elif UI.QueryDatabase('fueltank',item,'ClassificationId').GetRow(0).GetString(0) != 'Error':
+        return True, 'fueltank'
+    else:
+        return False, ''
+
+

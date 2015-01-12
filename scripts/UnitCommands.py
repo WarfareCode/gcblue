@@ -173,7 +173,19 @@ def AddWaypointOrderDeg2(UI, lon_deg, lat_deg, alt_m, speed_kts):
     
 
 def EditWaypoint(UI, idx, lon, lat):
-    UI.EditNavWaypoint(idx, lon, lat)
+    try:
+        #GetPlatformId ONLY works on UnitInfo, so if we throw an error, we got called by GroupInfo instead
+        test = UI.GetPlatformId()
+        group = False
+    except:
+        group = True
+    if group:
+        GI = UI
+        for n in xrange(GI.GetUnitCount()):
+            UI = GI.GetPlatformInterface(n)
+            UI.EditNavWaypoint(idx, lon, lat)
+    else:
+        UI.EditNavWaypoint(idx, lon, lat)
 
 def EditWaypointAdvanced(UI, idx, lon, lat, alt_m, speed_kts):
     UI.EditNavWaypointAdvanced(idx, lon, lat, alt_m, speed_kts)
@@ -326,8 +338,17 @@ def AddNamedTask(UI, task_name):
 def ClearTasks(UI):
     UI.ClearTasks()
 
-def ClearWaypoints(UI):
-    UI.DeleteTask('Nav')
+def ClearWaypoints(interface):
+    try:
+        #GetPlatformId ONLY works on UnitInfo, so if we throw an error, we got called by GroupInfo instead
+        test = interface.GetPlatformId()
+        UI = interface
+        UI.DeleteTask('Nav')
+    except:
+        GI = interface
+        for n in xrange(GI.GetUnitCount()):
+            UI = GI.GetPlatformInterface(n)
+            UI.DeleteTask('Nav')
 
         
 # gets info on closest (known) enemy or unknown platform within search range
@@ -689,11 +710,14 @@ def SetSnorkel(UI, state):
 
 # first char of s is assumed to be launcher_idx (only works
 # for launchers 0-9)
+# no longer true, reworked by Amram, now permits ANY launcher number, ex: '1337~Mk-46 Mod5',
+# idx 1337, item Mk-46 Mod5
 def ReloadLauncher(UI, s):
-    idx = int(s[0])
-    item = s[1:]
-    UI.LoadLauncher(idx, item)
-
+    #assume s is 'id~weapon'
+    #use split to retrieve.
+    idx, item = s.split('~')
+    UI.LoadLauncher(int(idx), item)
+    
 def Reload0(UI, weap_name):
     UI.LoadLauncher(0, weap_name)
 
@@ -733,8 +757,11 @@ def SetFractionalSpeed(UI, k, dispMessage=0):
                 UI.DisplayMessage('Set throttle to afterburn')
     else:
         if (k > 1):
-            k = 1
-        max_speed = UI.GetMaxSpeed()
+            k = 1.0
+        if UI.IsSub():
+            max_speed = float(UI.QueryDatabase('sub', UI.GetPlatformClass(), 'MaxSpeed_kts').GetRow(0).GetString(0))
+        else:
+            max_speed = UI.GetMaxSpeed()
         UI.SetSpeed(k*max_speed)
 
 
@@ -981,11 +1008,6 @@ def cruiseclimb(TI):
             if new_pitch > want_pitch:
                 new_pitch = want_pitch
     
-        #current_climb_rate = (UI.GetSpeed() * 0.514444) * math.sin(math.radians(abs(pitch)))
-        #UI.DisplayMessage('alt %0.1f, Rate %0.1f, Pitch %0.1f' % (alt, current_climb_rate, pitch))
-        #UI.DisplayMessage('Alt %0.1f, cruise %0.2f, current %0.2f' % (UI.GetAlt(), cruise_spd, UI.GetSpeed()))
-        #UI.DisplayMessage('GLos %0.2f, amod %0.2f, acel %0.2f' % (gravity_losses, accel_mod, acceleration))
-        
         SetPitch(UI, new_pitch, rate=rate_mod, uncontrolled=False)
         write_speed = str(UI.GetSpeed())
         BB.Write('Last_Speed',write_speed)
@@ -1002,33 +1024,6 @@ def SetAlt(UI, alt):
             UI.SetThrottle(1.0)
         OptionHandler(UI,'ClimbInitThrottle|Set|%s;ClimbInitAlt|Set|%s;cruiseclimb|Task|Start~0.2~-1' % (throttle, alt))
 
-def CruiseEnforcement(TI):
-    from Landing import GetCruiseAltitude
-    UI = TI.GetPlatformInterface()
-    BB = UI.GetBlackboardInterface()
-    TI.SetUpdateInterval(5)
-    if not(UI.TaskExists('CruiseEnforcement')):
-        AddTask('CruiseEnforcement', 5,-1)
-    if not(UI.TaskExists('TakeOff')):
-        if UI.TaskExists('AutoLoiter'):
-            DeleteHiddenTask(UI, 'AutoLoiter')
-    
-    if BB.KeyExists('Cruise_Speed_Only'):
-        if UI.GetClimbDeg() == 0:
-            if UI.GetPlatformClass() == 'SR-71':
-                UI.SetThrottle(1.0)
-            else:
-                UI.SetSpeed(UI.GetCruiseSpeedForAltitude(GetCruiseAltitude(UI)))
-            BB.Erase('Cruise_Speed_Only')
-            TI.EndTask()
-    else:
-        if abs(UI.GetAlt() == GetCruiseAltitude(UI)) < 5 and UI.GetClimbDeg() == 0:  #matched altitude to within 5m, and have stopped changing altitude
-            if UI.GetPlatformClass() == 'SR-71':
-                UI.SetThrottle(1.0)
-            else:
-                UI.SetSpeed(UI.GetCruiseSpeedForAltitude(GetCruiseAltitude(UI)))
-            TI.EndTask()
-        SetAlt(UI, GetCruiseAltitude(UI))            
         
 def Check_Status(UI, launcher, mode):
         # 0 = LAUNCHER_READY
@@ -1056,57 +1051,14 @@ def Check_Status(UI, launcher, mode):
         #22 = TOO_CLOSE                 ///< target is inside minimum range
         #23 = LAUNCHER_EMPTY_AUTORELOAD ///< empty, try autoreload when ready, workaround to delay auto-reload until after launch
         #24 = ROE_HOLD                  ///< ready, but launch violates ROE
-    weap_name = UI.GetLauncherWeaponName(launcher.Launcher)
-    launch_mode = launcher.LaunchMode
 
-    IsMissile = False
-    IsTorp = False
-    IsRocket = False
-    if mode is 0:
-        #used to validate the launcher for firing without the effort of validating the specific weapon loaded.
-        status = [2, 3, 9, 10, 11, 12, 13, 14, 15, 19, 20, 23]
-    else:
-        if launch_mode == 0:
-            if UI.QueryDatabase('missile',weap_name,'ClassificationId').GetString(0) == '64':  #missile
-                IsMissile = True
-            elif UI.QueryDatabase('torpedo',weap_name,'ClassificationId').GetString(0) == '130':  #torpedo
-                IsTorp = True
-            elif UI.QueryDatabase('torpedo',weap_name,'ClassificationId').GetString(0) == '138':  #mine
-                IsTorp = True
-        elif launch_mode == 4:
-            if UI.QueryDatabase('ballistic',weap_name,'BallisticType').GetString(0) == '5':  #rocket
-                IsRocket = True
-
-        #common status checks: empty, busy, too deep, too low, too high, damaged, invalid target, too close
-        if launch_mode == 0 and IsMissile:
-            status = [4, 16, 22]
-            #additional status checks:  No datum
-        elif launch_mode == 0 and not IsMissile:
-            status = [4, 16, 17, 22]
-            #additional status checks:  No datum, out of range
-        elif launch_mode == 4 and not IsRocket:
-            status = [4, 16, 21, 22]
-            #additional status checks:  No datum, Out of FoV
-        elif launch_mode == 4 and IsRocket:
-            status = [5, 16, 22]
-            #additional status checks:  No target
-        elif launch_mode == 0 and IsTorp:
-            status = [4, 16, 17, 22]
-            #additional status checks:  No target, Out of range
-        elif launch_mode == 1 or launch_mode == 2:
-            status = [5, 6, 7, 8, 11, 16, 21, 22]
-            #additional status checks:  no target, no FC lock, no Seeker lock, no FC, out of FoV
-        elif launch_mode == 3:
-            status = [4, 21, 22]
-            #additional status checks:  No datum, Out of FoV
-        else:
-            status = []
-        
     status_num = launcher.Status
-    if status_num not in status:
-        excuse = 'firing as ordered'
-        return True, excuse
-    else:
+    status_test = False
+    if status_num:
+        status_test = True
+    UI.DisplayMessage('launcher(%s) Status = %s = %s' % (launcher.Launcher, status_num, status_test))
+
+    if status_num:
         status_strings = [
             'Launcher ready to fire...',
             'Launcher does not exist',
@@ -1135,10 +1087,16 @@ def Check_Status(UI, launcher, mode):
             'ROE restrictions, holding fire']
         excuse = status_strings[status_num]
         return False, excuse
+    else:
+        excuse = 'firing as ordered'
+        return True, excuse
 
 def Use_Launcher_On_Target_Amram(UI, launcher, launch_type, *target):
     #dependency on current set target removed.  Must now be handed target criteria.
     launcher = UI.GetLauncherInfo(launcher)
+    if launcher.Status != 0:
+        return False
+    
     launch_mode = launcher.LaunchMode
     isdatum = False
     if len(target) == 2:
@@ -1156,13 +1114,13 @@ def Use_Launcher_On_Target_Amram(UI, launcher, launch_type, *target):
     if launch_type == -2:
         #we need to determine our launch_type now.
         weapon_name = UI.GetLauncherWeaponName(launcher.Launcher)
-        if UI.QueryDatabase('torpedo',weapon_name,'ClassificationId').GetString(0) == '130':
+        if UI.QueryDatabase('torpedo',weapon_name,'ClassificationId').GetRow(0).GetString(0) == '130':
             #its a torpedo
             launch_type = 2
-        elif UI.QueryDatabase('missile',weapon_name,'ClassificationId').GetString(0) == '64':
+        elif UI.QueryDatabase('missile',weapon_name,'ClassificationId').GetRow(0).GetString(0) == '64':
              #its a missile
              launch_type = 0
-        elif UI.QueryDatabase('ballistic',weap_name,'BallisticType').GetString(0) == '5':  #rocket
+        elif UI.QueryDatabase('ballistic',weap_name,'BallisticType').GetRow(0).GetString(0) == '5':  #rocket
             #its a rocket
             launch_type = 3
         else:
@@ -1180,12 +1138,12 @@ def Use_Launcher_On_Target_Amram(UI, launcher, launch_type, *target):
                 if alt < 0: alt = 0
             else:
                 #is target, determine lead
-                speed1 = UI.QueryDatabase('torpedo',UI.GetLauncherWeaponName(launcher.Launcher),'preEnableSpeed_kts').GetString(0)
-                speed2 = UI.QueryDatabase('torpedo',UI.GetLauncherWeaponName(launcher.Launcher),'maxSpeed_kts').GetString(0)
+                speed1 = UI.QueryDatabase('torpedo',UI.GetLauncherWeaponName(launcher.Launcher),'preEnableSpeed_kts').GetRow(0).GetString(0)
+                speed2 = UI.QueryDatabase('torpedo',UI.GetLauncherWeaponName(launcher.Launcher),'maxSpeed_kts').GetRow(0).GetString(0)
                 speed_mps = 0.514444 / 2 * (float(speed1)+float(speed2))
                 range_km = UI.GetRangeToTrack(target_info)
                 travel_time_s = 1000.0 * range_km / speed_mps
-                travel_time_s = travel_time_s + 20.0 # add a little time to compensate for snaking.
+                travel_time_s = travel_time_s *1.2 # add a 20 percent to compensate for snaking.
                 target_info = target_info.PredictAhead(travel_time_s)
                 lat = target_info.Lat
                 lon = target_info.Lon
@@ -1213,7 +1171,7 @@ def Use_Launcher_On_Target_Amram(UI, launcher, launch_type, *target):
                 alt = UI.GetMapTerrainElevation(datum[0], datum[1])
                 if alt < 0: alt = 0
             else:
-                flag = int(UI.QueryDatabase('missile',UI.GetLauncherWeaponName(launcher.Launcher),'targetFlags').GetString(0))
+                flag = int(UI.QueryDatabase('missile',UI.GetLauncherWeaponName(launcher.Launcher),'targetFlags').GetRow(0).GetString(0))
                 if target_info.IsSurface() and flag != 'Error':
                     
                     if not has_target_flag(flag, 1):

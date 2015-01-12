@@ -2,12 +2,11 @@ import random, time, csv, os, math, Landing, sys
 from os.path import dirname, abspath, join, normpath
 sys.path.append(abspath(join(dirname(__file__), 'Amram_Script_Data')))
 from Amram_Utilities import *
-from Menu import *
+#from Menu import *
 from decimal import Decimal
 from UnitCommands import *
 import json
     
-
 #sets an offsert lead based on number of bombs.
 #if offset is false, 
 #Attempts to center a capret bombing on the target.
@@ -143,12 +142,7 @@ def cruiseclimb(TI):
     BB = UI.GetBlackboardInterface()
     update = 0.2
     TI.SetUpdateInterval(update)
-    #assumes full throttle climb
-    #achieves cruise speed, then pitched up, and tries to manipulate pitch to maintain cruise speed and climb rate to within 5%
-    #later development should also attempt to obey maxclimbrate.
-    #later development should also accept desired altitude inputs so we can level off when we get there.
-    #do everything in absolute values as relative differences, then invert to negative for descent if necessary.
-   
+
     try:
         alt = float(BB.ReadMessage('ClimbInitAlt'))
     except:
@@ -156,30 +150,10 @@ def cruiseclimb(TI):
         return
     if alt == -1:
         alt = UI.GetCruiseAlt()
-    if alt <  UI.GetTerrainElevation():
+    elif alt <  UI.GetTerrainElevation() + 50:
         alt = UI.GetTerrainElevation() + 50
-    if alt > UI.GetAlt() + 5 or alt < UI.GetAlt() - 5:
-        do_pitch = True
-    else:
-        throttle = float(BB.ReadMessage('ClimbInitThrottle'))
-        if throttle == -1:
-            SpeedCruise(UI)
-        else:
-            UI.SetThrottle(throttle)
-            
-        alt = float(BB.ReadMessage('ClimbInitAlt'))
-        if alt == -1:
-            alt = UI.GetCruiseAlt()
 
-        BB.Erase('Last_Speed')
-        BB.Erase('ClimbInitThrottle')
-        BB.Erase('ClimbInitAlt')
-        TI.EndTask()
-        UI.SetClimbDeg(0.0)
-        SetAlt(UI, alt)
-        return
-
-    if do_pitch:
+    def climb():
         if BB.KeyExists('Last_Speed'):
             last_speed = float(BB.ReadMessage('Last_Speed'))
         else:
@@ -187,47 +161,53 @@ def cruiseclimb(TI):
 
         pitch = UI.GetClimbDeg()
         rate_mod = 3
-        
-        want_pitch = math.degrees(math.atan((alt - UI.GetAlt()) / 1500))
-        if want_pitch < -67:
-            want_pitch = -67
-
-        cruise_spd = UI.GetCruiseSpeedForAltitude(UI.GetAlt()) + 10
+        cruise_spd = UI.GetCruiseSpeedForAltitude(UI.GetAlt()) * 1.02
         gravity_losses = math.sin(math.radians(pitch)) * 9.80665
         accel_mod = ((1-(cruise_spd / UI.GetSpeed())) / 0.4) / update
         accel_mod2 = ((1-((cruise_spd+20) / UI.GetSpeed())) / 0.4) / update
         acceleration = (UI.GetSpeed() - last_speed) / update
-        if alt > UI.GetAlt():
-            if accel_mod2 > 0:
-                SetAlt(UI, alt)
-                return
-            else:
-                new_gravity_losses = gravity_losses + accel_mod + acceleration
-                if new_gravity_losses < 0:
-                    new_gravity_losses = 0
-                rate_mod = max(abs(acceleration) / 10 + 0.5,0.5)
-                if new_gravity_losses < 0:
-                    new_gravity_losses = 0
-                if new_gravity_losses > 9.80665:
-                    new_gravity_losses = 9.80665
-        elif alt < UI.GetAlt():
-            new_gravity_losses = -9.02707
-            if new_gravity_losses < -9.02707:
-                new_gravity_losses = -9.02707
-            if new_gravity_losses > 0:
-                new_gravity_losses = 0
-            
-        new_pitch = math.degrees(math.asin(new_gravity_losses/9.80665))
-        if want_pitch < 0:
-            new_pitch = want_pitch
+        
+        if accel_mod2 > 0:
+            SetAlt(UI, alt)
+            return
         else:
-            if new_pitch > want_pitch:
-                new_pitch = want_pitch
-    
+            rate_mod = max(abs(acceleration) / 10 + 0.5,0.5)
+            new_gravity_losses = gravity_losses + accel_mod + acceleration
+            new_gravity_losses = max(min(new_gravity_losses,9.80665),0)
+        new_pitch = math.degrees(math.asin(new_gravity_losses/9.80665))
         SetPitch(UI, new_pitch, rate=rate_mod, uncontrolled=False)
-        write_speed = str(UI.GetSpeed())
-        BB.Write('Last_Speed',write_speed)
+        
+    def SetThrottle():
+        throttle = float(BB.ReadMessage('ClimbInitThrottle'))
+        if throttle == -1:
+            SpeedCruise(UI)
+        else:
+            UI.SetThrottle(throttle)
+            
+        alt = float(BB.ReadMessage('ClimbInitAlt'))
+        if throttle == -1:
+            UI.SetSpeed(UI.GetCruiseSpeedForAltitude(UI.GetAlt()))
+        else:
+            UI.SetThrottle(throttle)
+        BB.Erase('Last_Speed')
+        BB.Erase('ClimbInitThrottle')
+        BB.Erase('ClimbInitAlt')
 
+        
+
+    if (alt - UI.GetAlt()) < 3 and UI.GetClimbDeg() == 0:
+        SetThrottle()
+        TI.EndTask()
+        return
+    elif alt < UI.GetAlt():
+        #descending, let GCB handle it.
+        UI.SetAlt(alt)
+        return
+    else:
+        #our job, climb.
+        climb()
+        BB.Write('Last_Speed',str(UI.GetSpeed()))        
+        
 def Flight_State(TI, reset = False):
     """
     Flight_State(TI, reset = False):
@@ -343,7 +323,13 @@ def BombRun(TI):
             return
         else:
             target = True
-            
+    newheading = False
+    newpitch = False
+    newthrottle = False
+    newspeed = False
+    newalt = False
+    SetAngle = False
+    PitchRate = False
     
     init = TI.GetMemoryValue(1)
     if init != 1:
@@ -407,7 +393,7 @@ def BombRun(TI):
     if BB.KeyExists('Style'):
         style = BB.ReadMessage('Style')
     else:
-        if UI.QueryDatabase('air', UI.GetPlatformClass(),'Designation').GetString(0) == 'Bomber' or UI.QueryDatabase('simpleair', UI.GetPlatformClass(),'Designation').GetString(0) == 'Bomber':
+        if UI.QueryDatabase('air', UI.GetPlatformClass(),'Designation').GetRow(0).GetString(0) == 'Bomber' or UI.QueryDatabase('simpleair', UI.GetPlatformClass(),'Designation').GetRow(0).GetString(0) == 'Bomber':
             style = 'level'
         else:
             if target:
@@ -507,6 +493,7 @@ def BombRun(TI):
                     elif style == 'loft':
                         UI.SetPitchLimit(89.99)
                         pitch = max(pitch[0], pitch[1])
+                        PitchRate = 12
                     newpitch = True
                     update = 0.1
 
@@ -560,7 +547,22 @@ def BombRun(TI):
     
     if newpitch or newalt or newspeed or newthrottle:
         Flight_State(TI)
-        
+    
+    if newheading:
+        UI.SetHeading(heading)
+    if newpitch:
+        if PitchRate:
+            SetPitch(UI, pitch, rate=PitchRate)
+        else:
+            SetPitch(UI, pitch)
+    if newthrottle:
+        UI.SetThrottle(throttle)
+    elif newspeed:
+        UI.SetSpeed(speed)
+    if newalt:
+        SetAlt(UI, alt)            
+    
+    
     if style == 'dive':
         time_s = (range_m - dive_m) / (UI.GetSpeed() * 0.514444)
     elif style == 'loft':
@@ -570,17 +572,98 @@ def BombRun(TI):
     UI.SetActionText('%sbomb target %ds' % (style, time_s))
         
     TI.SetUpdateInterval(update)
-    if newheading:
-        UI.SetHeading(heading)
-    if newpitch:
-        SetPitch(UI, pitch)
-    if newthrottle:
-        UI.SetThrottle(throttle)
-    elif newspeed:
-        UI.SetSpeed(speed)
-    if newalt:
-        SetAlt(UI, alt)
-            
+
+def GBUBombRun(TI):
+    UI = TI.GetPlatformInterface()
+    BB = TI.GetBlackboardInterface()
+    #specialised bombing run that only level bombs, only drops one per target at a time, attacks multiple targets.
+    #attack all valid targets within +/- 30 deg of boresight. track.Bearing_rad = 0.5236
+    #use launcher.MaxRange_km since its altitude dependent and produces a good range reading.
+    #request waypoint(s) for mission?
+    noGBU = 1
+    for launcher in xrange(UI.GetLauncherCount()):
+        weapon = UI.GetLauncherWeaponName(launcher)
+        if UI.QueryDatabase('ballistic',weapon,'BallisticType').GetRow(0).GetString(0) == '3':
+            noGBU = 0
+            break
+    if noGBU:
+        UI.DisplayMessage('No Guided Bombs')
+        TI.EndTask()
+        return
+
+    if BB.KeyExists('GBU_Bomb_EngageLimit'):
+        engagelimit = int(BB.ReadMessage('GBU_Bomb_EngageLimit'))
+    else:
+        engagelimit = 1
+        
+    if not BB.KeyExists('GBURunInit'):
+        if not UI.TaskExists('Nav') and not BB.KeyExists('HadNav'):
+            #how we got here I don't know, but we need waypoints.
+            UI.SetActionText('Please Plot Bombrun')
+            UI.GetUserInput('CreateWaypointScript', 'Datum')
+        elif not UI.TaskExists('Nav') and BB.KeyExists('HadNav'):
+            pass
+            #need to implement a tight loiter to stay local until bombing is completed, then exit.
+        elif UI.TaskExists('Nav') and not BB.KeyExists('HadNav'):
+            BB.Write('HadNav','1')  #this way we loiter at the end of the nav
+        BB.Write('GBURunInit','yes')
+        update = 0.1
+    else:
+        update = 10
+        GBU_launchers = []
+        max_range_km = 0
+        for launcher in range(0,UI.GetLauncherCount()):
+            launcher_info = UI.GetLauncherInfo(launcher)
+            if UI.QueryDatabase('ballistic',UI.GetLauncherWeaponName(launcher),'BallisticType').GetRow(0).GetString(0) == '3':  #guided bomb
+                if UI.GetLauncherQuantity(launcher) > 0:
+                    GBU_launchers.append(launcher)
+                    if launcher_info.MaxRange_km > max_range_km:
+                        max_range_km = launcher_info.MaxRange_km
+        for n in GBU_launchers:
+            #L = GBU_launchers[n]
+            launcher = UI.GetLauncherInfo(n)
+        BB.Write('GBUMaxRange','%0.3f' % max_range_km)
+
+        #get targets and proceed to attack.
+        tracklist = []
+        tracks = UI.GetTrackList(0x0110, max_range_km*3, 100)  #global ROE setting dominates
+        closest = 1e6
+        for n in xrange(tracks.Size()):
+            track = tracks.GetTrack(n)
+            range_km = UI.GetRangeToTrack(track)
+            if range_km < closest:
+                closest = range_km
+            tracklist.append((range_km,track.ID))
+        tracklist = sorted(tracklist)
+        drop = False
+        if closest < max_range_km * 2:
+            #close to targets, start updating faster
+            update = 1
+            if closest < max_range_km:
+                #within reach, start confirming targets
+                for launcher in GBU_launchers:
+                    for track_num in tracklist:
+                        #use a return to exit early if we do drop.
+                        track = UI.GetTrackById(track_num[1])
+                        track.Range = UI.GetRangeToTrack(track)
+                        bearing = UI.GetHeadingToDatum(track.Lon, track.Lat)
+                        heading = UI.GetHeading()
+                        if bearing < 0:
+                            bearing += 360
+                        if heading < 0:
+                            heading += 360
+                        if track.Range < max_range_km and abs(heading - bearing) < 45 and track.GetEngagedCount() < engagelimit and ValidateTargetAllowable(UI, track):
+                            #tracks must be in range, within 30deg of heading, and not engaged in any way in order to fire on them.
+                            launcher_info = UI.GetLauncherInfo(launcher)
+                            UI.SetTarget(track.ID)
+                            UI.SendDatumToLauncher(track.Lon,track.Lat,track.Alt,launcher)
+                            if UI.HandoffTargetToLauncher(launcher):
+                                drop = DropBombs_Amram(UI, track.Lon, track.Lat, track.Alt, 1, LauncherSpecified=launcher)
+                        if drop:
+                            #cancel iterating tracks, this launcher has fired
+                            break
+    TI.SetUpdateInterval(update)
+    
 def Intercept(TI):
     """
     Intercept(TI)
@@ -683,7 +766,7 @@ def Intercept(TI):
         elif track.IsSurface:
             max_range = max(Try_Read_Message(BB, 'sea_max_range', 0), Try_Read_Message(BB, 'sea_max_range_guns', 0))
         if (UI.GetAlt() - track.Alt) > (max_range * 600):
-            alt = track.Alt + (max_range * 500)
+            alt = max(track.Alt + (max_range * 500),200)
             newalt = True
         
 
@@ -740,7 +823,7 @@ def Intercept(TI):
         if newalt:
             SetAlt(UI, alt)
             
-def DropBombs_Amram(UI, tgt_lon, tgt_lat, tgt_alt, qty):
+def DropBombs_Amram(UI, tgt_lon, tgt_lat, tgt_alt, qty, LauncherSpecified=False):
     """
     DropBombs_Amram(UI, tgt_lon, tgt_lat, tgt_alt, qty):
     Provided target co-ordinate, drops the specified quantity of bombs.  Returns true when complete.
@@ -759,7 +842,24 @@ def DropBombs_Amram(UI, tgt_lon, tgt_lat, tgt_alt, qty):
     launchers = 0
     noBombs = True
     
-    if carpet:
+    if LauncherSpecified is not False:
+        #0 is a launcher number, must use is/is not, as = or != will evaulate 0 and False as equals, 
+        #thus launcher 0 is not true, its false.
+        launcher = UI.GetLauncherInfo(LauncherSpecified)
+        status, excuse = Check_Status(UI, launcher, 1)
+        if status:
+            if (launcher.IsNuclear == 1):
+                UI.SetActionText('Dropping Nukes')
+                UI.Launch(launcher.Launcher, 1)
+                return True
+            else:
+                UI.SetActionText('Dropping Bombs')
+                UI.Launch(launcher.Launcher, 1)
+                if qty == 1:
+                    return True
+        else:
+            return False    
+    elif carpet:
         #determine qty per launcher, if we find a nuke, drop it and return true to end the run.
         for n in range(0, UI.GetLauncherCount()):
             launcher = UI.GetLauncherInfo(n)
@@ -811,6 +911,8 @@ def DropBombs_Amram(UI, tgt_lon, tgt_lat, tgt_alt, qty):
                     else:
                         UI.SetActionText('Dropping Bombs')
                         UI.Launch(n, 1)
+                        if qty == 1:
+                            return True
             else:
                 if launcher.Quantity > maxbombs:
                     maxbombs = launcher.Quantity
@@ -819,7 +921,7 @@ def DropBombs_Amram(UI, tgt_lon, tgt_lat, tgt_alt, qty):
             return True
         else:
             return False
-                   
+
 def LoftedRange(UI, Lon, Lat, getTheta):
     """
     LoftedRange(UI, Lon, Lat, getTheta):
@@ -933,32 +1035,60 @@ def CruiseEnforcement(TI, Speed_Only = False):
         Self terminates once cruise speed and altitude have been reached.
     """
     UI = TI.GetPlatformInterface()
+    BB = TI.GetBlackboardInterface()
     TI.SetUpdateInterval(5)
+    if UI.IsSurface() or UI.IsSub() or UI.IsGroundVehicle():
+        if UI.IsSub():
+            max_speed = float(UI.QueryDatabase('sub', UI.GetPlatformClass(), 'MaxSpeed_kts').GetRow(0).GetString(0))
+            SI = UI.GetSubInterface()
+            cruise = max_speed * 2.0/3.0
+            cruise = min(cruise, (SI.GetCavitatingSpeed(-UI.GetAlt())*0.98))
+        else:
+            max_speed = UI.GetMaxSpeed()
+            cruise = max_speed * 2.0/3.0
+        UI.SetSpeed(cruise)
+        TI.EndTask()
+        return
+        
+        
+        
+        
+        
     if not(UI.TaskExists('CruiseEnforcement')):
-        AddTask('CruiseEnforcement', 5,-1)
+        AddTask(UI, 'CruiseEnforcement', 5,-1)
     if not(UI.TaskExists('TakeOff')):
         if UI.TaskExists('AutoLoiter'):
             DeleteHiddenTask(UI, 'AutoLoiter')
-    if Speed_Only:
+    if Speed_Only or BB.KeyExists('Cruise_Speed_Only'):
         if UI.GetClimbDeg() == 0:
             if UI.GetPlatformClass() == 'SR-71':
                 UI.SetThrottle(1.0)
             else:
-                UI.SetSpeed(UI.GetCruiseSpeedForAltitude(Landing.GetCruiseAltitude(UI)))
+                UI.SetSpeed(UI.GetCruiseSpeedForAltitude(UI.GetAlt()))
+            BB.Erase('Cruise_Speed_Only')
             TI.EndTask()
+            return
     else:
-        if abs(UI.GetAlt() == Landing.GetCruiseAltitude(UI)) < 5 and UI.GetClimbDeg() == 0:  #matched altitude to within 5m, and have stopped changing altitude
-            if UI.GetPlatformClass() == 'SR-71':
-                UI.SetThrottle(1.0)
+        if abs(UI.GetAlt() - Landing.GetCruiseAltitude(UI)) < 5 and UI.GetClimbDeg() == 0:  #matched altitude to within 5m, and have stopped changing altitude
+            if BB.KeyExists('Stable Alt'):
+                if UI.GetPlatformClass() == 'SR-71':
+                    UI.SetThrottle(1.0)
+                else:
+                    UI.SetSpeed(UI.GetCruiseSpeedForAltitude(UI.GetAlt()))
+                BB.Erase('Stable Alt')
+                TI.EndTask()
+                return
             else:
-                UI.SetSpeed(UI.GetCruiseSpeedForAltitude(Landing.GetCruiseAltitude(UI)))
-            TI.EndTask()
+                BB.Write('Stable Alt','')
+                TI.SetUpdateInterval(1)
+        elif BB.KeyExists('Stable Alt'):
+            BB.Erase('Stable Alt')
             
         if UI.GetPlatformClass() == 'SR-71':        
             SetAlt(UI, 27000)
         else:
-            SetAlt(UI, Landing.GetCruiseAltitude(UI))
-            
+            SetAlt(UI, Landing.GetCruiseAltitude(UI))  
+        
 def GlideSlope(TI):
     """
     GlideSlope(TI):
@@ -1013,5 +1143,92 @@ def GlideSlope(TI):
     if descending:
         UI.SetActionText('Ditching: %3.0fs' % abs((UI.GetAlt() / (asin(radians(UI.GetClimbDeg())) * UI.GetSpeed()))))
 
+def ValidateTargetAllowable(UI, track):
+    BB = UI.GetBlackboardInterface()
+    
+    ##############
+    #engage limits
+    ##############
+    engaged = track.GetEngagedCount()
+    classid = track.Classification
+    if track.IsAir():
+        catid = 32
+    elif track.IsSurface():
+        catid = 16
+    elif track.IsGround():
+        catid = 256
+    elif track.IsMissile():
+        catid = 64
+    elif track.IsSub():
+        catid = 16
+    else:
+        #its not a track we can engage then
+        return False
+    
+    limit = {32:1,33:1,34:1,256:2,258:2,257:24,64:1,16:4,17:6,18:12,22:24,129:1}
+    if classid in limit:
+        if not BB.KeyExists('%s_EngageLimit' % classid):
+            BB.WriteGlobal('%s_EngageLimit' % classid,'%s' % limit[classid])
+        if not BB.KeyExists('%s_EngageLimit' % catid):
+            BB.WriteGlobal('%s_EngageLimit' % catid,'%s' % limit[catid])
+        cat_limit = int(BB.ReadMessage('%s_EngageLimit' % catid))
+        class_limit = int(BB.ReadMessage('%s_EngageLimit' % classid))
+        hasidlimit = False
+        if BB.KeyExists('ID_EngageLimit'):
+            idlimits = Read_Message_Dict(BB,'ID_EngageLimit')
+            if str(track.ID) in idlimits:
+                id_limit = int(float(idlimits[str(track.ID)]))
+                hasidlimit = True
+            elif str(float(track.ID)) in idlimits:
+                id_limit = int(float(idlimits[str(float(track.ID))]))
+                hasidlimit = True
+        if hasidlimit:
+            if id_limit <= engaged:
+                return False
+        elif ((limit[catid] == cat_limit and limit[classid] == class_limit) or
+              (limit[catid] != cat_limit and limit[classid] != class_limit)):
+            if class_limit <= engaged:
+                return False
+        elif limit[catid] != cat_limit:
+            if cat_limit <= engaged:
+                return False
+        elif limit[classid] != class_limit:
+            if class_limit <= engaged:
+                return False
+                
+        if BB.KeyExists('Engagement_Zones'):
+            engagement_zones = Read_Message_Dict(BB,'Engagement_Zones')
+            #check if inside an exclusion zone
+            for zone in engagement_zones['Exclude']:
+                lon1, lat1, lon2, lat2 = engagement_zones['Exclude'][zone]
+                if min(lon1, lon2) <= track.Lon <= max(lon1, lon2):
+                    exclude = True
+                    #we're inside an exclusion zone, check if also inside an inclusion zone
+                    for zone in engagement_zones['Include']:
+                        lon1, lat1, lon2, lat2 = engagement_zones['Include'][zone]
+                        if min(lon1, lon2) <= track.Lon <= max(lon1, lon2):
+                            exclude = False
+                            break
+                    if exclude:
+                        return False
+        return True  # if we make it to this line, it hasn't been invalidated, its good to go.
+    else:
+        return False
+
+def CopyParentRules(UI):
+    BB = UI.GetBlackboardInterface()
+    
+    if not BB.KeyExists('UseOwnRules'):
+        #we are probably not initialised, duplicate the homebase ruleset.
+        UIx = UI.GetUnitInterface(BB.ReadMessage('Home'))
+        BBx = UIx.GetBlackboardInterface()
+        keys = ['129_EngageLimit','16_EngageLimit','17_EngageLimit','18_EngageLimit','22_EngageLimit','256_EngageLimit','257_EngageLimit','258_EngageLimit','32_EngageLimit','33_EngageLimit','34_EngageLimit','64_EngageLimit']
+        for key in keys:
+            if BBx.KeyExists(key):
+                BB.Write(key, BBx.ReadMessage(key))
+        if BBx.KeyExists('ID_EngageLimit'):
+            Write_Message_List(BB, 'ID_EngageLimit', Read_Message_Dict(BBx, 'ID_EngageLimit'))
+        if BBx.KeyExists('Engagement_Zones'):
+            Write_Message_List(BB, 'Engagement_Zones', Read_Message_Dict(BBx, 'Engagement_Zones'))
 #
 #

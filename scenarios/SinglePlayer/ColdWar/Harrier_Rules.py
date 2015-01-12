@@ -1,4 +1,4 @@
-# Created on 07/31/11 15:59:03
+# Created on 01/09/15 06:57:31
 from math import *
 from random import *
 from UnitCommands import *
@@ -21,7 +21,7 @@ def CreateScenario(SM):
     SM.SetUserAlliance(1)
 
     SM.SetDateTime(1985,6,15,4,0,0)
-    SM.SetStartTheater(6.529167, 63.737495) # (lon, lat) in degrees, negative is West or South
+    SM.SetStartTheater(-1.383335, 55.883339) # (lon, lat) in degrees, negative is West or South
     SM.SetScenarioLoaded(1)
 
     SM.SetSeaState(3)
@@ -47,28 +47,44 @@ def CreateScenario(SM):
     unit.SetPosition(-3.304821, 57.368603, -0.0)
     unit.heading = 90.00
     unit.speed = 0.0
+    unit.cost = 20000000.0
     SM.AddUnitToAlliance(unit, 1)
     UI = SM.GetUnitInterface(unit.unitName)
     SM.AddToUnitMagazine("RAF Kinloss", 'Fuel', 1003980)
-    SM.AddToUnitMagazine("RAF Kinloss", 'Chaff-1', 10150)
-    SM.AddToUnitMagazine("RAF Kinloss", 'Flare-1', 10150)
-    SM.AddToUnitMagazine("RAF Kinloss", '20mm PGU', 48)
-    SM.AddToUnitMagazine("RAF Kinloss", '600 gallon tank', 18)
-    SM.AddToUnitMagazine("RAF Kinloss", 'AIM-9L', 194)
-    SM.AddToUnitMagazine("RAF Kinloss", 'AGM-88A', 30)
-    SM.AddToUnitMagazine("RAF Kinloss", 'AGM-78A', 20)
-    SM.AddToUnitMagazine("RAF Kinloss", 'AGM-45A', 20)
-    SM.AddToUnitMagazine("RAF Kinloss", 'FPU-8', 20)
-    SM.AddToUnitMagazine("RAF Kinloss", 'Skyflash', 268)
-    SM.AddToUnitMagazine("RAF Kinloss", '330 gallon wing tank', 200)
+    SM.AddToUnitMagazine("RAF Kinloss", '27mm BK27 27x145mm', 4562)
+    SM.AddToUnitMagazine("RAF Kinloss", '300 gallon tank', 5)
+    SM.AddToUnitMagazine("RAF Kinloss", '330 gallon wing tank', 32)
+    SM.AddToUnitMagazine("RAF Kinloss", 'AGM-45B', 106)
+    SM.AddToUnitMagazine("RAF Kinloss", 'AGM-78D', 20)
+    SM.AddToUnitMagazine("RAF Kinloss", 'AGM-88A', 34)
+    SM.AddToUnitMagazine("RAF Kinloss", 'AIM-9L', 111)
+    SM.AddToUnitMagazine("RAF Kinloss", 'AIM-9M', 423)
+    SM.AddToUnitMagazine("RAF Kinloss", 'Chaff-1', 14142)
+    SM.AddToUnitMagazine("RAF Kinloss", 'Flare-1', 14142)
+    SM.AddToUnitMagazine("RAF Kinloss", 'Skyflash', 831)
     UI.AddTask('RefuelAllAircraft', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
+    BB.Write('129_EngageLimit', '1')
+    BB.Write('16_EngageLimit', '4')
+    BB.Write('17_EngageLimit', '6')
+    BB.Write('18_EngageLimit', '12')
+    BB.Write('22_EngageLimit', '24')
+    BB.Write('256_EngageLimit', '2')
+    BB.Write('257_EngageLimit', '24')
+    BB.Write('258_EngageLimit', '2')
+    BB.Write('32_EngageLimit', '1')
+    BB.Write('33_EngageLimit', '1')
+    BB.Write('34_EngageLimit', '1')
+    BB.Write('64_EngageLimit', '1')
+    BB.Write('InvMulti', '1')
+    BB.Write('MagTonnage', '25')
+    BB.Write('Selected', '{"RotaryWing": 0, "Speed-": 0, "Alt+": 0, "Speed+": 0, "RadarMast+": 0, "RadarMast-": 0, "34_EngageLimit": "1", "257_EngageLimit": "24", "17_EngageLimit": "6", "UnitCount": 1, "HasECM": 0, "HasTarget": 0, "TargetDatum": 0, "Alliance0_EngageLimit": -1, "FixedLand": 1, "Launchers": 0, "Periscope-": 0, "FixedWing": 0, "MagWeaponList": {}, "Air": 0, "64_EngageLimit": "1", "HasAIWeap": 0, "18_EngageLimit": "12", "256_EngageLimit": "2", "Depth+": 0, "MobileLand": 0, "CanStrafe": 0, "Depth-": 0, "HasSonarP": 0, "HasThrottle": 0, "PeriDeep": 0, "Sub": 0, "HasSonarA": 0, "HasFlightPort": 1, "HasMagazine": 1, "DieselSub": 0, "HasGBU": 0, "HasAINav": 0, "FormMember": 0, "Alliance1_EngageLimit": -1, "HasBombs": 0, "Snorkel-": 0, "TargetTrack": 0, "Snorkel+": 0, "16_EngageLimit": "4", "Alliance2_EngageLimit": -1, "258_EngageLimit": "2", "FormLeader": 0, "129_EngageLimit": "1", "HasESM": 0, "Periscope+": 0, "22_EngageLimit": "24", "FormModeSprint": 0, "32_EngageLimit": "1", "Tasks": {}, "HasOptical": 1, "33_EngageLimit": "1", "HasRadar": 1, "Ship": 0, "TargetSet": 0, "FormModePace": 0, "WeaponList": {}}')
     
     SM.AddUnitToFlightDeck('RAF Kinloss', 'E-3C', 'Sentry-2', 2)
     SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Sentry-2', '')
     
     SM.AddUnitToFlightDeck('RAF Kinloss', 'EA-6B', 'Flash-2', 2)
-    SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Flash-2', '2 AGM-45A;2 AGM-45A;')
+    SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Flash-2', '2 AGM-45A;2 AGM-45A;1 Mk-84;30 Flare-1;30 Chaff-1;')
     
     SM.AddUnitToFlightDeck('RAF Kinloss', 'KC-767A', 'Milk-7', 2)
     SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Milk-7', '')
@@ -76,29 +92,31 @@ def CreateScenario(SM):
     SM.AddUnitToFlightDeck('RAF Kinloss', 'KC-767A', 'Milk-8', 2)
     SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Milk-8', '')
     
-    SM.AddUnitToFlightDeck('RAF Kinloss', 'Tornado F.Mk.2', 'Arrow-9', 2)
-    SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Arrow-9', '2 330 gallon wing tank;2 AIM-9L;2 Skyflash;2 Skyflash;')
+    SM.AddUnitToFlightDeck('RAF Kinloss', 'Tornado F.Mk.3', 'Arrow-9', 2)
+    SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Arrow-9', '2 AIM-9L;2 330 gallon wing tank;4 Skyflash;30 27mm BK27 27x145mm;45 Flare-1;45 Chaff-1;')
     
-    SM.AddUnitToFlightDeck('RAF Kinloss', 'Tornado F.Mk.2', 'Arrow-10', 2)
-    SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Arrow-10', '2 330 gallon wing tank;2 AIM-9L;2 Skyflash;2 Skyflash;')
+    SM.AddUnitToFlightDeck('RAF Kinloss', 'Tornado F.Mk.3', 'Arrow-10', 2)
+    SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Arrow-10', '2 AIM-9L;2 330 gallon wing tank;4 Skyflash;30 27mm BK27 27x145mm;45 Flare-1;45 Chaff-1;')
     
-    SM.AddUnitToFlightDeck('RAF Kinloss', 'Tornado F.Mk.2', 'Arrow-11', 2)
-    SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Arrow-11', '2 330 gallon wing tank;2 AIM-9L;2 Skyflash;2 Skyflash;')
+    SM.AddUnitToFlightDeck('RAF Kinloss', 'Tornado F.Mk.3', 'Arrow-11', 2)
+    SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Arrow-11', '2 AIM-9L;2 330 gallon wing tank;4 Skyflash;30 27mm BK27 27x145mm;45 Flare-1;45 Chaff-1;')
     
-    SM.AddUnitToFlightDeck('RAF Kinloss', 'Tornado F.Mk.2', 'Arrow-12', 2)
-    SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Arrow-12', '2 330 gallon wing tank;2 AIM-9L;2 Skyflash;2 Skyflash;')
+    SM.AddUnitToFlightDeck('RAF Kinloss', 'Tornado F.Mk.3', 'Arrow-12', 2)
+    SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Arrow-12', '2 AIM-9L;2 330 gallon wing tank;4 Skyflash;30 27mm BK27 27x145mm;45 Flare-1;45 Chaff-1;')
     
-    SM.AddUnitToFlightDeck('RAF Kinloss', 'Tornado F.Mk.2', 'Arrow-13', 1)
-    SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Arrow-13', '2 330 gallon wing tank;2 AIM-9L;2 Skyflash;2 Skyflash;')
+    SM.AddUnitToFlightDeck('RAF Kinloss', 'Tornado F.Mk.3', 'Arrow-13', 1)
+    SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Arrow-13', '2 AIM-9L;2 330 gallon wing tank;4 Skyflash;30 27mm BK27 27x145mm;45 Flare-1;45 Chaff-1;')
     
-    SM.AddUnitToFlightDeck('RAF Kinloss', 'Tornado F.Mk.2', 'Arrow-14', 1)
-    SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Arrow-14', '2 330 gallon wing tank;2 AIM-9L;2 Skyflash;2 Skyflash;')
+    SM.AddUnitToFlightDeck('RAF Kinloss', 'Tornado F.Mk.3', 'Arrow-14', 1)
+    SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Arrow-14', '2 AIM-9L;2 330 gallon wing tank;4 Skyflash;30 27mm BK27 27x145mm;45 Flare-1;45 Chaff-1;')
     
-    SM.AddUnitToFlightDeck('RAF Kinloss', 'Tornado F.Mk.2', 'Arrow-15', 1)
-    SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Arrow-15', '2 330 gallon wing tank;2 AIM-9L;2 Skyflash;2 Skyflash;')
+    SM.AddUnitToFlightDeck('RAF Kinloss', 'Tornado F.Mk.3', 'Arrow-15', 1)
+    SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Arrow-15', '2 AIM-9L;2 330 gallon wing tank;4 Skyflash;30 27mm BK27 27x145mm;45 Flare-1;45 Chaff-1;')
     
-    SM.AddUnitToFlightDeck('RAF Kinloss', 'Tornado F.Mk.2', 'Arrow-16', 1)
-    SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Arrow-16', '2 330 gallon wing tank;2 AIM-9L;2 Skyflash;2 Skyflash;')
+    SM.AddUnitToFlightDeck('RAF Kinloss', 'Tornado F.Mk.3', 'Arrow-16', 1)
+    SM.SetFlightDeckUnitLoadout('RAF Kinloss', 'Arrow-16', '2 AIM-9L;2 330 gallon wing tank;4 Skyflash;30 27mm BK27 27x145mm;45 Flare-1;45 Chaff-1;')
+    FP = UI.GetFlightPortInfo()
+    base_track = UI.GetTrackById(UI.GetPlatformId())
     
     unit = SM.GetDefaultUnit()
     unit.className = 'Kobben'
@@ -106,6 +124,7 @@ def CreateScenario(SM):
     unit.SetPosition(9.104529, 63.789225, -100.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 1)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'Type-612 Torpedo', 1)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'Type-612 Torpedo', 1)
@@ -118,6 +137,8 @@ def CreateScenario(SM):
     UI = SM.GetUnitInterface(unit.unitName)
     SM.AddToUnitMagazine("HNoMS Skolpen", 'Type-612 Torpedo', 12)
     UI.SetSensorState(3, 0)
+    UI.AddTask('AvoidCav', 3.000000, 3)
+    UI.AddTask('SubBattery', 4.000000, 3)
     UI.AddTask('SubEvade', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
@@ -127,6 +148,7 @@ def CreateScenario(SM):
     unit.SetPosition(9.264613, 63.932866, -100.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 900000000.0
     SM.AddUnitToAlliance(unit, 1)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'mk-24 Tigerfish', 1)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'mk-24 Tigerfish', 1)
@@ -139,6 +161,8 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("HMS Splendid", 'mk-24 Tigerfish', 20)
     UI.SetSensorState(0, 0)
     UI.SetSensorState(1, 0)
+    UI.AddTask('AvoidCav', 3.000000, 3)
+    UI.AddTask('SubBattery', 4.000000, 3)
     UI.AddTask('SubEvade', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
@@ -148,6 +172,7 @@ def CreateScenario(SM):
     unit.SetPosition(8.280501, 63.756280, -50.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 900000000.0
     SM.AddUnitToAlliance(unit, 1)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'mk-24 Tigerfish', 1)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'mk-24 Tigerfish', 1)
@@ -161,6 +186,8 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("HMS Otus", 'mk-24 Tigerfish', 13)
     UI.SetSensorState(0, 0)
     UI.SetSensorState(1, 0)
+    UI.AddTask('AvoidCav', 3.000000, 3)
+    UI.AddTask('SubBattery', 4.000000, 3)
     UI.AddTask('SubEvade', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
@@ -170,12 +197,10 @@ def CreateScenario(SM):
     unit.SetPosition(6.853779, 63.869270, 510.2)
     unit.heading = 92.36
     unit.speed = 100.0
+    unit.cost = 20000000.0
     SM.AddUnitToAlliance(unit, 1)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'Stingray', 1)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'AS 12', 2)
-    SM.SetUnitLauncherItem(unit.unitName, 2, 'DICASS (80) Sonobuoy', 5)
-    SM.SetUnitLauncherItem(unit.unitName, 3, 'LOFAR (80) Sonobuoy', 5)
-    SM.SetUnitLauncherItem(unit.unitName, 4, 'DIFAR (80) Sonobuoy', 14)
     UI = SM.GetUnitInterface(unit.unitName)
     UI.AddTask('AirEvade', 3.000000, 3)
     UI.AddTask('Nav', 1.000000, 0)
@@ -188,20 +213,21 @@ def CreateScenario(SM):
     BB.Write('Home', 'HMS Battleaxe')
     
     unit = SM.GetDefaultUnit()
-    unit.className = 'Invincible CV'
+    unit.className = 'CV (R05/6/7) Invincible'
     unit.unitName = "HMS Invincible"
     unit.SetPosition(6.783133, 63.746887, 0.0)
     unit.heading = 90.00
     unit.speed = 8.4
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 1)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'Sea Dart Mod0', 2)
     SM.SetUnitLauncherItem(unit.unitName, 1, '30mm PGU-14/B API', 79)
     SM.SetUnitLauncherItem(unit.unitName, 2, '30mm PGU-14/B API', 79)
     SM.SetUnitLauncherItem(unit.unitName, 3, '30mm PGU-14/B API', 79)
     UI = SM.GetUnitInterface(unit.unitName)
-    SM.AddToUnitMagazine("HMS Invincible", '30mm PGU-13/B HE-I', 578)
-    SM.AddToUnitMagazine("HMS Invincible", 'Sea Dart Mod0', 40)
     SM.AddToUnitMagazine("HMS Invincible", 'Fuel', 2000000)
+    SM.AddToUnitMagazine("HMS Invincible", 'Sea Dart Mod0', 40)
+    SM.AddToUnitMagazine("HMS Invincible", '30mm PGU-13/B HE-I', 578)
     SM.AddToUnitMagazine("HMS Invincible", 'AIM-9L', 284)
     SM.AddToUnitMagazine("HMS Invincible", '68mm SNEB Rockets', 13500)
     SM.AddToUnitMagazine("HMS Invincible", 'Mk-83', 1520)
@@ -227,6 +253,7 @@ def CreateScenario(SM):
     UI.AddNavWaypointAdvanced(0.150557, 1.116489, 0.000000, 0.000000)
     UI.AddNavWaypointAdvanced(0.153687, 1.115586, 0.000000, 0.000000)
     UI.AddNavWaypointAdvanced(0.160107, 1.112115, 0.000000, 0.000000)
+    UI.AddTask('PointDefense', 3.000000, 3)
     UI.AddTask('RefuelAllAircraft', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
@@ -293,18 +320,25 @@ def CreateScenario(SM):
     unit = SM.GetDefaultUnit()
     unit.className = 'EA-6B'
     unit.unitName = "Flash-1"
-    unit.SetPosition(9.206000, 61.878414, 72.1)
+    unit.SetPosition(9.206000, 61.878414, 10.0)
     unit.heading = 90.00
     unit.speed = 566.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 1)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'AGM-88A', 2)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'AGM-45A', 2)
+    SM.SetUnitLauncherItem(unit.unitName, 2, 'Mk-84', 1)
+    SM.SetUnitLauncherItem(unit.unitName, 3, 'Flare-1', 30)
+    SM.SetUnitLauncherItem(unit.unitName, 4, 'Chaff-1', 30)
     UI = SM.GetUnitInterface(unit.unitName)
     UI.SetSensorState(0, 0)
+    UI.SetSensorState(1, 0)
+    UI.SetSensorState(2, 0)
     UI.AddTask('AirEvade', 3.000000, 3)
     UI.AddTask('RTB', 2.000000, 3)
     BB = UI.GetBlackboardInterface()
     BB.Write('Home', 'RAF Kinloss')
+    UI.SetThrottle(2.000000)
     
     unit = SM.GetDefaultUnit()
     unit.className = 'E-3C'
@@ -312,6 +346,7 @@ def CreateScenario(SM):
     unit.SetPosition(-0.259493, 59.053044, 10000.0)
     unit.heading = 90.00
     unit.speed = 461.0
+    unit.cost = 270000000.0
     SM.AddUnitToAlliance(unit, 1)
     UI = SM.GetUnitInterface(unit.unitName)
     UI.AddTask('AirEvade', 3.000000, 3)
@@ -325,6 +360,7 @@ def CreateScenario(SM):
     unit.SetPosition(2.567195, 60.708259, 10000.0)
     unit.heading = 90.00
     unit.speed = 495.0
+    unit.cost = 175000000.0
     SM.AddUnitToAlliance(unit, 1)
     UI = SM.GetUnitInterface(unit.unitName)
     UI.AddTask('AirEvade', 3.000000, 3)
@@ -338,6 +374,7 @@ def CreateScenario(SM):
     unit.SetPosition(1.537704, 63.147401, 10000.0)
     unit.heading = 90.00
     unit.speed = 495.0
+    unit.cost = 175000000.0
     SM.AddUnitToAlliance(unit, 1)
     UI = SM.GetUnitInterface(unit.unitName)
     UI.AddTask('AirEvade', 3.000000, 3)
@@ -351,17 +388,20 @@ def CreateScenario(SM):
     unit.SetPosition(0.271525, 59.640038, 10000.0)
     unit.heading = 90.00
     unit.speed = 200.0
+    unit.cost = 15000000.0
     SM.AddUnitToAlliance(unit, 1)
-    SM.SetUnitLauncherItem(unit.unitName, 0, '330 gallon wing tank', 2)
-    SM.SetUnitLauncherItem(unit.unitName, 1, 'AIM-9L', 4)
-    SM.SetUnitLauncherItem(unit.unitName, 2, 'Skyflash', 2)
-    SM.SetUnitLauncherItem(unit.unitName, 3, 'Skyflash', 2)
+    SM.SetUnitLauncherItem(unit.unitName, 0, 'AIM-9L', 4)
+    SM.SetUnitLauncherItem(unit.unitName, 1, '330 gallon wing tank', 2)
+    SM.SetUnitLauncherItem(unit.unitName, 2, 'Skyflash', 4)
+    SM.SetUnitLauncherItem(unit.unitName, 3, '27mm BK27 27x145mm', 30)
+    SM.SetUnitLauncherItem(unit.unitName, 4, 'Chaff-1', 45)
+    SM.SetUnitLauncherItem(unit.unitName, 5, 'Chaff-1', 45)
     UI = SM.GetUnitInterface(unit.unitName)
     UI.AddTask('AirEvade', 3.000000, 3)
     UI.AddTask('RTB', 2.000000, 3)
     BB = UI.GetBlackboardInterface()
-    UI.SetThrottle(0.298478)
     BB.Write('Home', 'RAF Kinloss')
+    UI.SetThrottle(0.298478)
     
     unit = SM.GetDefaultUnit()
     unit.className = 'Tornado F.Mk.3'
@@ -369,17 +409,20 @@ def CreateScenario(SM):
     unit.SetPosition(2.614120, 63.577059, 10000.0)
     unit.heading = 90.00
     unit.speed = 200.0
+    unit.cost = 15000000.0
     SM.AddUnitToAlliance(unit, 1)
-    SM.SetUnitLauncherItem(unit.unitName, 0, '330 gallon wing tank', 2)
-    SM.SetUnitLauncherItem(unit.unitName, 1, 'AIM-9L', 4)
-    SM.SetUnitLauncherItem(unit.unitName, 2, 'Skyflash', 2)
-    SM.SetUnitLauncherItem(unit.unitName, 3, 'Skyflash', 2)
+    SM.SetUnitLauncherItem(unit.unitName, 0, 'AIM-9L', 4)
+    SM.SetUnitLauncherItem(unit.unitName, 1, '330 gallon wing tank', 2)
+    SM.SetUnitLauncherItem(unit.unitName, 2, 'Skyflash', 4)
+    SM.SetUnitLauncherItem(unit.unitName, 3, '27mm BK27 27x145mm', 30)
+    SM.SetUnitLauncherItem(unit.unitName, 4, 'Chaff-1', 45)
+    SM.SetUnitLauncherItem(unit.unitName, 5, 'Chaff-1', 45)
     UI = SM.GetUnitInterface(unit.unitName)
     UI.AddTask('AirEvade', 3.000000, 3)
     UI.AddTask('RTB', 2.000000, 3)
     BB = UI.GetBlackboardInterface()
-    UI.SetThrottle(0.521962)
     BB.Write('Home', 'RAF Kinloss')
+    UI.SetThrottle(0.521962)
     
     unit = SM.GetDefaultUnit()
     unit.className = 'Sea Harrier FRS.Mk.1 (85)'
@@ -387,6 +430,7 @@ def CreateScenario(SM):
     unit.SetPosition(7.160540, 63.757540, 4000.0)
     unit.heading = 90.00
     unit.speed = 200.0
+    unit.cost = 15000000.0
     SM.AddUnitToAlliance(unit, 1)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'AIM-9L', 2)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'BAe Sea Eagle', 2)
@@ -410,10 +454,11 @@ def CreateScenario(SM):
     UI = SM.GetUnitInterface('Hornet 1')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
     lon_deg = 57.296*leader_track.Lon + -0.0138
-    lat_deg = 57.296*leader_track.Lat + 0.0521
+    lat_deg = 57.296*leader_track.Lat + 0.0525
     unit.SetPosition(lon_deg, lat_deg, 50.0)
     unit.heading = 90.00
     unit.speed = 200.0
+    unit.cost = 15000000.0
     SM.AddUnitToAlliance(unit, 1)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'AIM-9L', 2)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'BAe Sea Eagle', 2)
@@ -438,10 +483,11 @@ def CreateScenario(SM):
     UI = SM.GetUnitInterface('HMS Invincible')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
     lon_deg = 57.296*leader_track.Lon + 0.1648
-    lat_deg = 57.296*leader_track.Lat + 0.0359
+    lat_deg = 57.296*leader_track.Lat + 0.0363
     unit.SetPosition(lon_deg, lat_deg, 0.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 1)
     SM.SetUnitLauncherItem(unit.unitName, 0, '127mm mk 41 HC', 40)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'RUM-139 Mod4 ASROC', 4)
@@ -459,6 +505,7 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("USS Donald B. Beary", '127mm mk 41 HC', 340)
     SM.AddToUnitMagazine("USS Donald B. Beary", '127mm mk 41 AAC', 120)
     UI.AddTask('MissileWarning', 3.000000, 3)
+    UI.AddTask('PointDefense', 3.000000, 3)
     UI.AddTask('RefuelAllAircraft', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     leader_id = UI.LookupFriendlyId('HMS Invincible')
@@ -477,10 +524,11 @@ def CreateScenario(SM):
     UI = SM.GetUnitInterface('HMS Invincible')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
     lon_deg = 57.296*leader_track.Lon + -0.1412
-    lat_deg = 57.296*leader_track.Lat + 0.0688
+    lat_deg = 57.296*leader_track.Lat + 0.0692
     unit.SetPosition(lon_deg, lat_deg, 0.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 125000000.0
     SM.AddUnitToAlliance(unit, 1)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'Sea Wolf', 6)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'Sea Wolf', 6)
@@ -504,6 +552,7 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("HMS Battleaxe", '30mm/75 GCM-AO3-2 APDS', 1660)
     SM.AddToUnitMagazine("HMS Battleaxe", '20mm/85  GAM-B01 HE-I', 500)
     UI.AddTask('MissileWarning', 3.000000, 3)
+    UI.AddTask('PointDefense', 3.000000, 3)
     UI.AddTask('RefuelAllAircraft', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     leader_id = UI.LookupFriendlyId('HMS Invincible')
@@ -514,7 +563,7 @@ def CreateScenario(SM):
     UI.SetFormationUseNorthBearing(0)
     
     SM.AddUnitToFlightDeck('HMS Battleaxe', 'Lynx HAS.Mk.2', 'Type 22 B1 Lynx 101', 1)
-    SM.SetFlightDeckUnitLoadout('HMS Battleaxe', 'Type 22 B1 Lynx 101', '2 AS 12;2 AS 12;5 DICASS (80) Sonobuoy;5 LOFAR (80) Sonobuoy;14 DIFAR (80) Sonobuoy;')
+    SM.SetFlightDeckUnitLoadout('HMS Battleaxe', 'Type 22 B1 Lynx 101', '2 AS 12;2 AS 12;')
     
     unit = SM.GetDefaultUnit()
     unit.className = 'Type 22 FF Batch 1'
@@ -522,10 +571,11 @@ def CreateScenario(SM):
     UI = SM.GetUnitInterface('HMS Invincible')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
     lon_deg = 57.296*leader_track.Lon + 0.0157
-    lat_deg = 57.296*leader_track.Lat + -0.1001
+    lat_deg = 57.296*leader_track.Lat + -0.0997
     unit.SetPosition(lon_deg, lat_deg, 0.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 125000000.0
     SM.AddUnitToAlliance(unit, 1)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'Sea Wolf', 6)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'Sea Wolf', 6)
@@ -548,6 +598,7 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("HMS Brilliant", '30mm/75 GCM-AO3-2 APDS', 1660)
     SM.AddToUnitMagazine("HMS Brilliant", '20mm/85  GAM-B01 HE-I', 500)
     UI.AddTask('MissileWarning', 3.000000, 3)
+    UI.AddTask('PointDefense', 3.000000, 3)
     UI.AddTask('RefuelAllAircraft', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     leader_id = UI.LookupFriendlyId('HMS Invincible')
@@ -558,30 +609,31 @@ def CreateScenario(SM):
     UI.SetFormationUseNorthBearing(0)
     
     SM.AddUnitToFlightDeck('HMS Brilliant', 'Lynx HAS.Mk.2', 'Type 22 B1 Lynx 1', 1)
-    SM.SetFlightDeckUnitLoadout('HMS Brilliant', 'Type 22 B1 Lynx 1', '1 Stingray;1 Stingray;5 DICASS (80) Sonobuoy;5 LOFAR (80) Sonobuoy;14 DIFAR (80) Sonobuoy;')
+    SM.SetFlightDeckUnitLoadout('HMS Brilliant', 'Type 22 B1 Lynx 1', '1 Stingray;1 Stingray;')
     
     SM.AddUnitToFlightDeck('HMS Brilliant', 'Lynx HAS.Mk.2', 'Type 22 B1 Lynx 2', 1)
-    SM.SetFlightDeckUnitLoadout('HMS Brilliant', 'Type 22 B1 Lynx 2', '1 Stingray;1 Stingray;5 DICASS (80) Sonobuoy;5 LOFAR (80) Sonobuoy;14 DIFAR (80) Sonobuoy;')
+    SM.SetFlightDeckUnitLoadout('HMS Brilliant', 'Type 22 B1 Lynx 2', '1 Stingray;1 Stingray;')
     
     unit = SM.GetDefaultUnit()
-    unit.className = 'Invincible CV'
+    unit.className = 'CV (R05/6/7) Invincible'
     unit.unitName = "HMS Illustrious"
     UI = SM.GetUnitInterface('HMS Invincible')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
     lon_deg = 57.296*leader_track.Lon + 0.0457
-    lat_deg = 57.296*leader_track.Lat + 0.0419
+    lat_deg = 57.296*leader_track.Lat + 0.0423
     unit.SetPosition(lon_deg, lat_deg, 0.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 1)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'Sea Dart Mod0', 2)
     SM.SetUnitLauncherItem(unit.unitName, 1, '30mm PGU-14/B API', 79)
     SM.SetUnitLauncherItem(unit.unitName, 2, '30mm PGU-14/B API', 79)
     SM.SetUnitLauncherItem(unit.unitName, 3, '30mm PGU-14/B API', 79)
     UI = SM.GetUnitInterface(unit.unitName)
-    SM.AddToUnitMagazine("HMS Illustrious", '30mm PGU-13/B HE-I', 578)
-    SM.AddToUnitMagazine("HMS Illustrious", 'Sea Dart Mod0', 40)
     SM.AddToUnitMagazine("HMS Illustrious", 'Fuel', 2000000)
+    SM.AddToUnitMagazine("HMS Illustrious", 'Sea Dart Mod0', 40)
+    SM.AddToUnitMagazine("HMS Illustrious", '30mm PGU-13/B HE-I', 578)
     SM.AddToUnitMagazine("HMS Illustrious", 'AIM-9L', 284)
     SM.AddToUnitMagazine("HMS Illustrious", '68mm SNEB Rockets', 13500)
     SM.AddToUnitMagazine("HMS Illustrious", 'Mk-83', 1520)
@@ -601,6 +653,7 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("HMS Illustrious", 'LOFAR (80) Sonobuoy', 2100)
     SM.AddToUnitMagazine("HMS Illustrious", 'DIFAR (80) Sonobuoy', 6100)
     UI.AddTask('MissileWarning', 3.000000, 3)
+    UI.AddTask('PointDefense', 3.000000, 3)
     UI.AddTask('RefuelAllAircraft', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     leader_id = UI.LookupFriendlyId('HMS Invincible')
@@ -682,10 +735,11 @@ def CreateScenario(SM):
     UI = SM.GetUnitInterface('HMS Invincible')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
     lon_deg = 57.296*leader_track.Lon + 0.1893
-    lat_deg = 57.296*leader_track.Lat + -0.0523
+    lat_deg = 57.296*leader_track.Lat + -0.0519
     unit.SetPosition(lon_deg, lat_deg, 0.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 20000000.0
     SM.AddUnitToAlliance(unit, 1)
     SM.SetUnitLauncherItem(unit.unitName, 0, '20mm Mark 149-4', 90)
     SM.SetUnitLauncherItem(unit.unitName, 1, '20mm Mark 149-4', 90)
@@ -704,6 +758,7 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("HMS Glasgow", '20mm Mark 149-4', 970)
     SM.AddToUnitMagazine("HMS Glasgow", 'Sea Dart Mod0', 22)
     UI.AddTask('MissileWarning', 3.000000, 3)
+    UI.AddTask('PointDefense', 3.000000, 3)
     UI.AddTask('RefuelAllAircraft', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     leader_id = UI.LookupFriendlyId('HMS Invincible')
@@ -714,7 +769,7 @@ def CreateScenario(SM):
     UI.SetFormationUseNorthBearing(0)
     
     SM.AddUnitToFlightDeck('HMS Glasgow', 'Lynx HAS.Mk.2', 'Type 42 B1 Lynx 1', 1)
-    SM.SetFlightDeckUnitLoadout('HMS Glasgow', 'Type 42 B1 Lynx 1', '2 AS 12;2 AS 12;5 DICASS (80) Sonobuoy;5 LOFAR (80) Sonobuoy;14 DIFAR (80) Sonobuoy;')
+    SM.SetFlightDeckUnitLoadout('HMS Glasgow', 'Type 42 B1 Lynx 1', '2 AS 12;2 AS 12;')
     
     unit = SM.GetDefaultUnit()
     unit.className = 'Type 42 DDG Batch 1'
@@ -722,10 +777,11 @@ def CreateScenario(SM):
     UI = SM.GetUnitInterface('HMS Invincible')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
     lon_deg = 57.296*leader_track.Lon + 0.1753
-    lat_deg = 57.296*leader_track.Lat + 0.0810
+    lat_deg = 57.296*leader_track.Lat + 0.0814
     unit.SetPosition(lon_deg, lat_deg, 0.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 20000000.0
     SM.AddUnitToAlliance(unit, 1)
     SM.SetUnitLauncherItem(unit.unitName, 0, '20mm Mark 149-4', 90)
     SM.SetUnitLauncherItem(unit.unitName, 1, '20mm Mark 149-4', 90)
@@ -744,6 +800,7 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("HMS Newcastle", '20mm Mark 149-4', 970)
     SM.AddToUnitMagazine("HMS Newcastle", 'Sea Dart Mod0', 22)
     UI.AddTask('MissileWarning', 3.000000, 3)
+    UI.AddTask('PointDefense', 3.000000, 3)
     UI.AddTask('RefuelAllAircraft', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     leader_id = UI.LookupFriendlyId('HMS Invincible')
@@ -754,7 +811,7 @@ def CreateScenario(SM):
     UI.SetFormationUseNorthBearing(0)
     
     SM.AddUnitToFlightDeck('HMS Newcastle', 'Lynx HAS.Mk.2', 'Type 42 B1 Lynx 101', 1)
-    SM.SetFlightDeckUnitLoadout('HMS Newcastle', 'Type 42 B1 Lynx 101', '2 AS 12;2 AS 12;5 DICASS (80) Sonobuoy;5 LOFAR (80) Sonobuoy;14 DIFAR (80) Sonobuoy;')
+    SM.SetFlightDeckUnitLoadout('HMS Newcastle', 'Type 42 B1 Lynx 101', '2 AS 12;2 AS 12;')
     
     unit = SM.GetDefaultUnit()
     unit.className = 'Type 42 DDG Batch 1'
@@ -762,10 +819,11 @@ def CreateScenario(SM):
     UI = SM.GetUnitInterface('HMS Invincible')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
     lon_deg = 57.296*leader_track.Lon + -0.0920
-    lat_deg = 57.296*leader_track.Lat + 0.0020
+    lat_deg = 57.296*leader_track.Lat + 0.0024
     unit.SetPosition(lon_deg, lat_deg, 0.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 20000000.0
     SM.AddUnitToAlliance(unit, 1)
     SM.SetUnitLauncherItem(unit.unitName, 0, '20mm Mark 149-4', 90)
     SM.SetUnitLauncherItem(unit.unitName, 1, '20mm Mark 149-4', 90)
@@ -784,6 +842,7 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("HMS Birmingham", '20mm Mark 149-4', 970)
     SM.AddToUnitMagazine("HMS Birmingham", 'Sea Dart Mod0', 22)
     UI.AddTask('MissileWarning', 3.000000, 3)
+    UI.AddTask('PointDefense', 3.000000, 3)
     UI.AddTask('RefuelAllAircraft', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     leader_id = UI.LookupFriendlyId('HMS Invincible')
@@ -794,7 +853,7 @@ def CreateScenario(SM):
     UI.SetFormationUseNorthBearing(0)
     
     SM.AddUnitToFlightDeck('HMS Birmingham', 'Lynx HAS.Mk.2', 'Type 42 B1 Lynx 201', 1)
-    SM.SetFlightDeckUnitLoadout('HMS Birmingham', 'Type 42 B1 Lynx 201', '2 AS 12;2 AS 12;5 DICASS (80) Sonobuoy;5 LOFAR (80) Sonobuoy;14 DIFAR (80) Sonobuoy;')
+    SM.SetFlightDeckUnitLoadout('HMS Birmingham', 'Type 42 B1 Lynx 201', '2 AS 12;2 AS 12;')
     
     unit = SM.GetDefaultUnit()
     unit.className = 'Tornado F.Mk.3'
@@ -802,19 +861,23 @@ def CreateScenario(SM):
     UI = SM.GetUnitInterface('Escort 1')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
     lon_deg = 57.296*leader_track.Lon + 0.8394
-    lat_deg = 57.296*leader_track.Lat + -0.3259
+    lat_deg = 57.296*leader_track.Lat + -0.3255
     unit.SetPosition(lon_deg, lat_deg, 10000.0)
     unit.heading = 90.00
     unit.speed = 200.0
+    unit.cost = 15000000.0
     SM.AddUnitToAlliance(unit, 1)
-    SM.SetUnitLauncherItem(unit.unitName, 0, '330 gallon wing tank', 2)
-    SM.SetUnitLauncherItem(unit.unitName, 1, 'AIM-9L', 4)
-    SM.SetUnitLauncherItem(unit.unitName, 2, 'Skyflash', 2)
-    SM.SetUnitLauncherItem(unit.unitName, 3, 'Skyflash', 2)
+    SM.SetUnitLauncherItem(unit.unitName, 0, 'AIM-9L', 4)
+    SM.SetUnitLauncherItem(unit.unitName, 1, '330 gallon wing tank', 2)
+    SM.SetUnitLauncherItem(unit.unitName, 2, 'Skyflash', 4)
+    SM.SetUnitLauncherItem(unit.unitName, 3, '27mm BK27 27x145mm', 30)
+    SM.SetUnitLauncherItem(unit.unitName, 4, 'Chaff-1', 45)
+    SM.SetUnitLauncherItem(unit.unitName, 5, 'Chaff-1', 45)
     UI = SM.GetUnitInterface(unit.unitName)
     UI.AddTask('AirEvade', 3.000000, 3)
     UI.AddTask('RTB', 2.000000, 3)
     BB = UI.GetBlackboardInterface()
+    BB.Write('Home', 'RAF Kinloss')
     leader_id = UI.LookupFriendlyId('Escort 1')
     UI.SetFormationLeader(leader_id)
     UI.SetFormationMode(2)
@@ -822,7 +885,6 @@ def CreateScenario(SM):
     UI.SetFormationAltitudeOffset(0.0)
     UI.SetFormationUseNorthBearing(0)
     UI.SetThrottle(0.298136)
-    BB.Write('Home', 'RAF Kinloss')
     
     unit = SM.GetDefaultUnit()
     unit.className = 'Tornado F.Mk.3'
@@ -830,19 +892,23 @@ def CreateScenario(SM):
     UI = SM.GetUnitInterface('Escort 3')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
     lon_deg = 57.296*leader_track.Lon + 0.1499
-    lat_deg = 57.296*leader_track.Lat + -0.4572
+    lat_deg = 57.296*leader_track.Lat + -0.4568
     unit.SetPosition(lon_deg, lat_deg, 10000.0)
     unit.heading = 90.00
     unit.speed = 200.0
+    unit.cost = 15000000.0
     SM.AddUnitToAlliance(unit, 1)
-    SM.SetUnitLauncherItem(unit.unitName, 0, '330 gallon wing tank', 2)
-    SM.SetUnitLauncherItem(unit.unitName, 1, 'AIM-9L', 4)
-    SM.SetUnitLauncherItem(unit.unitName, 2, 'Skyflash', 2)
-    SM.SetUnitLauncherItem(unit.unitName, 3, 'Skyflash', 2)
+    SM.SetUnitLauncherItem(unit.unitName, 0, 'AIM-9L', 4)
+    SM.SetUnitLauncherItem(unit.unitName, 1, '330 gallon wing tank', 2)
+    SM.SetUnitLauncherItem(unit.unitName, 2, 'Skyflash', 4)
+    SM.SetUnitLauncherItem(unit.unitName, 3, '27mm BK27 27x145mm', 30)
+    SM.SetUnitLauncherItem(unit.unitName, 4, 'Chaff-1', 45)
+    SM.SetUnitLauncherItem(unit.unitName, 5, 'Chaff-1', 45)
     UI = SM.GetUnitInterface(unit.unitName)
     UI.AddTask('AirEvade', 3.000000, 3)
     UI.AddTask('RTB', 2.000000, 3)
     BB = UI.GetBlackboardInterface()
+    BB.Write('Home', 'RAF Kinloss')
     leader_id = UI.LookupFriendlyId('Escort 3')
     UI.SetFormationLeader(leader_id)
     UI.SetFormationMode(2)
@@ -850,8 +916,7 @@ def CreateScenario(SM):
     UI.SetFormationAltitudeOffset(0.0)
     UI.SetFormationUseNorthBearing(0)
     UI.SetThrottle(0.521962)
-    BB.Write('Home', 'RAF Kinloss')
- 
+    
     ##############################
     ### Alliance 2 units
     ##############################
@@ -859,12 +924,12 @@ def CreateScenario(SM):
     unit = SM.GetDefaultUnit()
     unit.className = 'A-50'
     unit.unitName = "Albatross"
-    unit.SetPosition(9.232928, 63.374747, 9835.6)
+    unit.SetPosition(9.232928, 63.374747, 9726.0)
     unit.heading = 90.00
-    unit.speed = 100.0
+    unit.speed = 200.0
+    unit.cost = 20000000.0
     SM.AddUnitToAlliance(unit, 2)
     UI = SM.GetUnitInterface(unit.unitName)
-    UI.SetSensorState(1, 1)
     UI.AddTask('AirEvade', 3.000000, 3)
     UI.AddTask('Nav', 1.000000, 0)
     UI.AddNavWaypointAdvanced(0.162131, 1.106714, 0.000000, 0.000000)
@@ -873,17 +938,21 @@ def CreateScenario(SM):
     UI.SetNavLoopState(1)
     UI.AddTask('RTB', 2.000000, 3)
     BB = UI.GetBlackboardInterface()
+    UI.SetThrottle(1.000000)
     
     unit = SM.GetDefaultUnit()
-    unit.className = 'MiG-21'
+    unit.className = 'MiG-21F'
     unit.unitName = "Archer 2"
-    unit.SetPosition(9.110029, 63.353090, 9959.5)
+    unit.SetPosition(9.110029, 63.353090, 9932.5)
     unit.heading = 90.00
     unit.speed = 270.0
+    unit.cost = 1800000.0
     SM.AddUnitToAlliance(unit, 2)
-    SM.SetUnitLauncherItem(unit.unitName, 0, 'AA-2', 4)
+    SM.SetUnitLauncherItem(unit.unitName, 0, 'FAB-100', 1)
+    SM.SetUnitLauncherItem(unit.unitName, 1, 'PTB-400', 1)
+    SM.SetUnitLauncherItem(unit.unitName, 2, '30mm NR-30 HEI x2', 60)
+    SM.SetUnitLauncherItem(unit.unitName, 3, 'FAB-100', 1)
     UI = SM.GetUnitInterface(unit.unitName)
-    UI.SetSensorState(2, 1)
     UI.AddTask('AirEvade', 3.000000, 3)
     UI.AddTask('EngageAll', 2.000000, 0)
     UI.AddTask('Nav', 1.000000, 0)
@@ -893,6 +962,7 @@ def CreateScenario(SM):
     UI.SetNavLoopState(1)
     UI.AddTask('RTB', 2.000000, 3)
     BB = UI.GetBlackboardInterface()
+    UI.SetThrottle(0.181742)
     
     unit = SM.GetDefaultUnit()
     unit.className = 'Ammunition Bunker'
@@ -900,8 +970,10 @@ def CreateScenario(SM):
     unit.SetPosition(9.401149, 63.375607, 1.0)
     unit.heading = 90.00
     unit.speed = 0.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     UI = SM.GetUnitInterface(unit.unitName)
+    UI.AddTask('PointDefense', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
     unit = SM.GetDefaultUnit()
@@ -910,6 +982,7 @@ def CreateScenario(SM):
     unit.SetPosition(9.299105, 63.804065, 0.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, '100mm OF-58 FRAG', 46)
     SM.SetUnitLauncherItem(unit.unitName, 1, '30mm OF-83 HE-FRAG', 250)
@@ -932,13 +1005,12 @@ def CreateScenario(SM):
     UI.AddNavWaypointAdvanced(0.158081, 1.112562, 0.000000, 0.000000)
     UI.AddNavWaypointAdvanced(0.162109, 1.113072, 0.000000, 0.000000)
     UI.SetNavLoopState(1)
+    UI.AddTask('PointDefense', 3.000000, 3)
     UI.AddTask('RefuelAllAircraft', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
     SM.AddUnitToFlightDeck('Menzhinskiy', 'Ka-27A', 'Nerey Ka-27 101', 1)
     SM.SetFlightDeckUnitLoadout('Menzhinskiy', 'Nerey Ka-27 101', '5 DICASS (75) Sonobuoy;5 LOFAR (75) Sonobuoy;14 DIFAR (75) Sonobuoy;2 AT-1;')
-    FP = UI.GetFlightPortInfo()
-    base_track = UI.GetTrackById(UI.GetPlatformId())
     
     unit = SM.GetDefaultUnit()
     unit.className = 'Pr 11351 Nerey'
@@ -946,6 +1018,7 @@ def CreateScenario(SM):
     unit.SetPosition(9.147271, 63.761895, 0.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, '100mm OF-58 FRAG', 46)
     SM.SetUnitLauncherItem(unit.unitName, 1, '30mm OF-83 HE-FRAG', 250)
@@ -968,13 +1041,12 @@ def CreateScenario(SM):
     UI.AddNavWaypointAdvanced(0.158081, 1.112562, 0.000000, 0.000000)
     UI.AddNavWaypointAdvanced(0.161679, 1.113099, 0.000000, 0.000000)
     UI.SetNavLoopState(1)
+    UI.AddTask('PointDefense', 3.000000, 3)
     UI.AddTask('RefuelAllAircraft', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
     SM.AddUnitToFlightDeck('Dzernhinskiy', 'Ka-27A', 'Nerey Ka-27 1', 1)
     SM.SetFlightDeckUnitLoadout('Dzernhinskiy', 'Nerey Ka-27 1', '5 DICASS (75) Sonobuoy;5 LOFAR (75) Sonobuoy;14 DIFAR (75) Sonobuoy;2 AT-1;')
-    FP = UI.GetFlightPortInfo()
-    base_track = UI.GetTrackById(UI.GetPlatformId())
     
     unit = SM.GetDefaultUnit()
     unit.className = 'Pr 61 Kashin'
@@ -986,6 +1058,7 @@ def CreateScenario(SM):
     unit.SetPosition(lon_deg, lat_deg, 0.0)
     unit.heading = 90.00
     unit.speed = 9.8
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, '53-65M', 5)
     SM.SetUnitLauncherItem(unit.unitName, 1, '53-65M', 5)
@@ -1006,6 +1079,7 @@ def CreateScenario(SM):
     UI.AddNavWaypointAdvanced(0.155936, 1.114186, 0.000000, 0.000000)
     UI.AddNavWaypointAdvanced(0.160568, 1.112038, 0.000000, 0.000000)
     UI.AddNavWaypointAdvanced(0.161575, 1.111904, 0.000000, 0.000000)
+    UI.AddTask('PointDefense', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
     unit = SM.GetDefaultUnit()
@@ -1018,6 +1092,7 @@ def CreateScenario(SM):
     unit.SetPosition(lon_deg, lat_deg, -100.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'SET-65M', 1)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'SET-65M', 1)
@@ -1030,7 +1105,9 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("K-38", '53-65M', 6)
     UI.SetSensorState(3, 0)
     UI.SetSensorState(4, 0)
+    UI.AddTask('AvoidCav', 3.000000, 3)
     UI.AddTask('EngageAll', 2.000000, 0)
+    UI.AddTask('SubBattery', 4.000000, 3)
     UI.AddTask('SubEvade', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
@@ -1044,6 +1121,7 @@ def CreateScenario(SM):
     unit.SetPosition(lon_deg, lat_deg, -100.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'SET-65M', 1)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'SET-65M', 1)
@@ -1056,11 +1134,13 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("B-355", '53-65M', 6)
     UI.SetSensorState(6, 0)
     UI.SetSensorState(7, 0)
+    UI.AddTask('AvoidCav', 3.000000, 3)
     UI.AddTask('EngageAll', 2.000000, 0)
     UI.AddTask('Nav', 1.000000, 0)
     UI.AddNavWaypointAdvanced(0.127528, 1.114683, 0.000000, 0.000000)
     UI.AddNavWaypointAdvanced(0.127098, 1.111380, 0.000000, 0.000000)
     UI.SetNavLoopState(1)
+    UI.AddTask('SubBattery', 4.000000, 3)
     UI.AddTask('SubEvade', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
@@ -1074,6 +1154,7 @@ def CreateScenario(SM):
     unit.SetPosition(lon_deg, lat_deg, -100.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'SET-65M', 1)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'SET-65M', 1)
@@ -1086,11 +1167,13 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("B-498", '53-65M', 6)
     UI.SetSensorState(0, 0)
     UI.SetSensorState(4, 0)
+    UI.AddTask('AvoidCav', 3.000000, 3)
     UI.AddTask('EngageAll', 2.000000, 0)
     UI.AddTask('Nav', 1.000000, 0)
     UI.AddNavWaypointAdvanced(0.160390, 1.111676, 0.000000, 0.000000)
     UI.AddNavWaypointAdvanced(0.162377, 1.111622, 0.000000, 0.000000)
     UI.SetNavLoopState(1)
+    UI.AddTask('SubBattery', 4.000000, 3)
     UI.AddTask('SubEvade', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
@@ -1104,6 +1187,7 @@ def CreateScenario(SM):
     unit.SetPosition(lon_deg, lat_deg, -100.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 1000000000.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'SET-65', 1)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'SET-65', 1)
@@ -1117,11 +1201,13 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("K-25", '53-65M', 4)
     UI.SetSensorState(0, 0)
     UI.SetSensorState(4, 0)
+    UI.AddTask('AvoidCav', 3.000000, 3)
     UI.AddTask('EngageAll', 2.000000, 0)
     UI.AddTask('Nav', 1.000000, 0)
     UI.AddNavWaypointAdvanced(0.137785, 1.114226, 0.000000, 0.000000)
     UI.AddNavWaypointAdvanced(0.138000, 1.111649, 0.000000, 0.000000)
     UI.SetNavLoopState(1)
+    UI.AddTask('SubBattery', 4.000000, 3)
     UI.AddTask('SubEvade', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
@@ -1131,8 +1217,10 @@ def CreateScenario(SM):
     unit.SetPosition(9.415415, 63.348334, 1.0)
     unit.heading = 90.00
     unit.speed = 0.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     UI = SM.GetUnitInterface(unit.unitName)
+    UI.AddTask('PointDefense', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
     unit = SM.GetDefaultUnit()
@@ -1141,6 +1229,7 @@ def CreateScenario(SM):
     unit.SetPosition(9.382470, 63.331260, 439.5)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     UI = SM.GetUnitInterface(unit.unitName)
     BB = UI.GetBlackboardInterface()
@@ -1151,6 +1240,7 @@ def CreateScenario(SM):
     unit.SetPosition(9.364766, 63.397780, -0.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     UI = SM.GetUnitInterface(unit.unitName)
     BB = UI.GetBlackboardInterface()
@@ -1161,6 +1251,7 @@ def CreateScenario(SM):
     unit.SetPosition(9.268337, 63.382540, 790.6)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, '23mm OFZ', 25)
     UI = SM.GetUnitInterface(unit.unitName)
@@ -1173,6 +1264,7 @@ def CreateScenario(SM):
     unit.SetPosition(9.433865, 63.343006, 790.6)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, '23mm OFZ', 25)
     UI = SM.GetUnitInterface(unit.unitName)
@@ -1185,6 +1277,7 @@ def CreateScenario(SM):
     unit.SetPosition(9.393414, 63.394514, 342.2)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, '23mm OFZ', 25)
     UI = SM.GetUnitInterface(unit.unitName)
@@ -1197,6 +1290,7 @@ def CreateScenario(SM):
     unit.SetPosition(9.314288, 63.344839, 0.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, '23mm OFZ', 25)
     UI = SM.GetUnitInterface(unit.unitName)
@@ -1209,8 +1303,10 @@ def CreateScenario(SM):
     unit.SetPosition(9.351645, 63.346904, 1.0)
     unit.heading = 90.00
     unit.speed = 0.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     UI = SM.GetUnitInterface(unit.unitName)
+    UI.AddTask('PointDefense', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
     unit = SM.GetDefaultUnit()
@@ -1219,8 +1315,10 @@ def CreateScenario(SM):
     unit.SetPosition(9.370037, 63.379963, 1.0)
     unit.heading = 90.00
     unit.speed = 0.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     UI = SM.GetUnitInterface(unit.unitName)
+    UI.AddTask('PointDefense', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
     unit = SM.GetDefaultUnit()
@@ -1229,6 +1327,7 @@ def CreateScenario(SM):
     unit.SetPosition(9.175518, 63.610348, 0.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, '30mm OF-84 HE-FRAG AK-630M', 59)
     SM.SetUnitLauncherItem(unit.unitName, 1, '30mm OF-84 HE-FRAG AK-630M', 59)
@@ -1242,6 +1341,7 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("BDK-56 Konstantin Olshanskiy", '9M32 Strela 2', 64)
     UI.AddTask('EngageAll', 2.000000, 0)
     UI.AddTask('MissileWarning', 3.000000, 3)
+    UI.AddTask('PointDefense', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
     unit = SM.GetDefaultUnit()
@@ -1250,6 +1350,7 @@ def CreateScenario(SM):
     unit.SetPosition(9.223704, 63.610634, 0.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, '30mm OF-84 HE-FRAG AK-630M', 59)
     SM.SetUnitLauncherItem(unit.unitName, 1, '30mm OF-84 HE-FRAG AK-630M', 59)
@@ -1263,6 +1364,7 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("BDK-45 Georgiy Pobedonosets", '9M32 Strela 2', 64)
     UI.AddTask('EngageAll', 2.000000, 0)
     UI.AddTask('MissileWarning', 3.000000, 3)
+    UI.AddTask('PointDefense', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
     unit = SM.GetDefaultUnit()
@@ -1271,10 +1373,10 @@ def CreateScenario(SM):
     unit.SetPosition(9.387226, 63.353605, 0.0)
     unit.heading = 90.00
     unit.speed = 0.0
+    unit.cost = 20000000.0
     SM.AddUnitToAlliance(unit, 2)
     UI = SM.GetUnitInterface(unit.unitName)
     SM.AddToUnitMagazine("AF Orland", 'Fuel', 1000000)
-    SM.AddToUnitMagazine("AF Orland", 'AA-2', 260)
     SM.AddToUnitMagazine("AF Orland", 'FAB-500', 644)
     SM.AddToUnitMagazine("AF Orland", 'Flare-1', 200)
     SM.AddToUnitMagazine("AF Orland", 'KAB-500L', 176)
@@ -1294,35 +1396,35 @@ def CreateScenario(SM):
     UI.AddTask('RefuelAllAircraft', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
-    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21', 'Fishbed-1', 2)
-    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-1', '4 AA-2;')
+    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21F', 'Fishbed-1', 2)
+    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-1', '0 Empty;1 PTB-400;60 30mm NR-30 HEI x2;1 FAB-100;')
     
-    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21', 'Fishbed-2', 2)
-    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-2', '4 AA-2;')
+    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21F', 'Fishbed-2', 2)
+    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-2', '0 Empty;1 PTB-400;60 30mm NR-30 HEI x2;1 FAB-100;')
     
-    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21', 'Fishbed-3', 2)
-    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-3', '4 AA-2;')
+    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21F', 'Fishbed-3', 2)
+    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-3', '0 Empty;1 PTB-400;60 30mm NR-30 HEI x2;1 FAB-100;')
     
-    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21', 'Fishbed-4', 2)
-    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-4', '4 AA-2;')
+    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21F', 'Fishbed-4', 2)
+    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-4', '0 Empty;1 PTB-400;60 30mm NR-30 HEI x2;1 FAB-100;')
     
-    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21', 'Fishbed-5', 2)
-    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-5', '4 AA-2;')
+    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21F', 'Fishbed-5', 2)
+    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-5', '0 Empty;1 PTB-400;60 30mm NR-30 HEI x2;1 FAB-100;')
     
-    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21', 'Fishbed-6', 2)
-    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-6', '4 AA-2;')
+    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21F', 'Fishbed-6', 2)
+    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-6', '0 Empty;1 PTB-400;60 30mm NR-30 HEI x2;1 FAB-100;')
     
-    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21', 'Fishbed-7', 2)
-    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-7', '4 AA-2;')
+    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21F', 'Fishbed-7', 2)
+    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-7', '0 Empty;1 PTB-400;60 30mm NR-30 HEI x2;1 FAB-100;')
     
-    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21', 'Fishbed-8', 2)
-    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-8', '4 AA-2;')
+    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21F', 'Fishbed-8', 2)
+    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-8', '0 Empty;1 PTB-400;60 30mm NR-30 HEI x2;1 FAB-100;')
     
-    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21', 'Fishbed-9', 1)
-    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-9', '4 AA-2;')
+    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21F', 'Fishbed-9', 1)
+    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-9', '0 Empty;1 PTB-400;60 30mm NR-30 HEI x2;1 FAB-100;')
     
-    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21', 'Fishbed-10', 1)
-    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-10', '4 AA-2;')
+    SM.AddUnitToFlightDeck('AF Orland', 'MiG-21F', 'Fishbed-10', 1)
+    SM.SetFlightDeckUnitLoadout('AF Orland', 'Fishbed-10', '0 Empty;1 PTB-400;60 30mm NR-30 HEI x2;1 FAB-100;')
     
     SM.AddUnitToFlightDeck('AF Orland', 'A-50', 'Eye-1', 1)
     SM.SetFlightDeckUnitLoadout('AF Orland', 'Eye-1', '')
@@ -1577,6 +1679,7 @@ def CreateScenario(SM):
     unit.SetPosition(8.295914, 63.803093, 0.0)
     unit.heading = 90.00
     unit.speed = 3.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, '53-65M', 2)
     SM.SetUnitLauncherItem(unit.unitName, 1, '53-65M', 2)
@@ -1593,6 +1696,7 @@ def CreateScenario(SM):
     UI.AddNavWaypointAdvanced(0.142940, 1.115489, 0.000000, 0.000000)
     UI.AddNavWaypointAdvanced(0.143477, 1.111756, 0.000000, 0.000000)
     UI.SetNavLoopState(1)
+    UI.AddTask('PointDefense', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
     unit = SM.GetDefaultUnit()
@@ -1601,6 +1705,7 @@ def CreateScenario(SM):
     unit.SetPosition(9.321336, 63.386493, -0.0)
     unit.heading = 90.00
     unit.speed = 0.0
+    unit.cost = 0.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'V-600', 4)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'V-600', 4)
@@ -1617,6 +1722,7 @@ def CreateScenario(SM):
     unit.SetPosition(7.357580, 63.583762, 10000.0)
     unit.heading = 90.00
     unit.speed = 200.0
+    unit.cost = 25000000.0
     SM.AddUnitToAlliance(unit, 2)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'R-40R', 2)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'R-40R', 2)
@@ -1636,19 +1742,22 @@ def CreateScenario(SM):
     UI.SetThrottle(0.135203)
     
     unit = SM.GetDefaultUnit()
-    unit.className = 'MiG-21'
+    unit.className = 'MiG-21F'
     unit.unitName = "Archer 1"
     UI = SM.GetUnitInterface('Archer 2')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
     lon_deg = 57.296*leader_track.Lon + -0.0092
-    lat_deg = 57.296*leader_track.Lat + -0.0327
+    lat_deg = 57.296*leader_track.Lat + -0.0323
     unit.SetPosition(lon_deg, lat_deg, 10000.0)
     unit.heading = 90.00
-    unit.speed = 100.0
+    unit.speed = 200.0
+    unit.cost = 1800000.0
     SM.AddUnitToAlliance(unit, 2)
-    SM.SetUnitLauncherItem(unit.unitName, 0, 'AA-2', 4)
+    SM.SetUnitLauncherItem(unit.unitName, 0, 'FAB-100', 1)
+    SM.SetUnitLauncherItem(unit.unitName, 1, 'PTB-400', 1)
+    SM.SetUnitLauncherItem(unit.unitName, 2, '30mm NR-30 HEI x2', 60)
+    SM.SetUnitLauncherItem(unit.unitName, 3, 'FAB-100', 1)
     UI = SM.GetUnitInterface(unit.unitName)
-    UI.SetSensorState(2, 1)
     UI.AddTask('AirEvade', 3.000000, 3)
     UI.AddTask('EngageAll', 2.000000, 0)
     UI.AddTask('RTB', 2.000000, 3)
@@ -1659,6 +1768,7 @@ def CreateScenario(SM):
     UI.SetFormationPosition(3.681, 0.500, 1.679, 0.200)
     UI.SetFormationAltitudeOffset(0.0)
     UI.SetFormationUseNorthBearing(0)
+    UI.SetThrottle(0.195471)
     
     ##############################
     ### Alliance 3 units
@@ -1674,6 +1784,7 @@ def CreateScenario(SM):
     unit.SetPosition(lon_deg, lat_deg, -100.0)
     unit.heading = 90.00
     unit.speed = 6.2
+    unit.cost = 1000000000.0
     SM.AddUnitToAlliance(unit, 3)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'MK-T1', 1)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'UGM-84C Harpoon', 8)
@@ -1681,6 +1792,7 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("Swedish Sub (1)", 'MK-T1', 15)
     UI.SetSensorState(0, 0)
     UI.SetSensorState(4, 0)
+    UI.AddTask('AvoidCav', 3.000000, 3)
     UI.AddTask('Nav', 1.000000, 0)
     UI.AddNavWaypointAdvanced(0.127305, 1.111114, 0.000000, 0.000000)
     UI.AddNavWaypointAdvanced(0.133485, 1.109368, 0.000000, 0.000000)
@@ -1689,6 +1801,7 @@ def CreateScenario(SM):
     UI.AddNavWaypointAdvanced(0.136936, 1.114906, 0.000000, 0.000000)
     UI.AddNavWaypointAdvanced(0.132321, 1.112177, 0.000000, 0.000000)
     UI.SetNavLoopState(1)
+    UI.AddTask('SubBattery', 4.000000, 3)
     UI.AddTask('SubEvade', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
@@ -1702,6 +1815,7 @@ def CreateScenario(SM):
     unit.SetPosition(lon_deg, lat_deg, -100.0)
     unit.heading = 90.00
     unit.speed = 5.7
+    unit.cost = 1000000000.0
     SM.AddUnitToAlliance(unit, 3)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'MK-T1', 1)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'UGM-84C Harpoon', 8)
@@ -1709,6 +1823,7 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("Swedish Sub (2)", 'MK-T1', 16)
     UI.SetSensorState(0, 0)
     UI.SetSensorState(4, 0)
+    UI.AddTask('AvoidCav', 3.000000, 3)
     UI.AddTask('Nav', 1.000000, 0)
     UI.AddNavWaypointAdvanced(0.157883, 1.112378, 0.000000, 0.000000)
     UI.AddNavWaypointAdvanced(0.160732, 1.111595, 0.000000, 0.000000)
@@ -1717,6 +1832,7 @@ def CreateScenario(SM):
     UI.AddNavWaypointAdvanced(0.161013, 1.113220, 0.000000, 0.000000)
     UI.AddNavWaypointAdvanced(0.158324, 1.112478, 0.000000, 0.000000)
     UI.SetNavLoopState(1)
+    UI.AddTask('SubBattery', 4.000000, 3)
     UI.AddTask('SubEvade', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
@@ -1730,6 +1846,7 @@ def CreateScenario(SM):
     unit.SetPosition(lon_deg, lat_deg, 0.0)
     unit.heading = 90.00
     unit.speed = 11.1
+    unit.cost = 20000000.0
     SM.AddUnitToAlliance(unit, 3)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'SAM-I', 10)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'SSM-I', 10)
@@ -1742,6 +1859,7 @@ def CreateScenario(SM):
     UI.AddNavWaypointAdvanced(0.142634, 1.112498, 0.000000, 0.000000)
     UI.AddNavWaypointAdvanced(0.126743, 1.110411, 0.000000, 0.000000)
     UI.SetNavLoopState(1)
+    UI.AddTask('PointDefense', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
     unit = SM.GetDefaultUnit()
@@ -1754,6 +1872,7 @@ def CreateScenario(SM):
     unit.SetPosition(lon_deg, lat_deg, 0.0)
     unit.heading = 90.00
     unit.speed = 11.1
+    unit.cost = 20000000.0
     SM.AddUnitToAlliance(unit, 3)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'SAM-I', 10)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'SSM-I', 10)
@@ -1767,6 +1886,7 @@ def CreateScenario(SM):
     UI.AddNavWaypointAdvanced(0.147818, 1.117973, 0.000000, 0.000000)
     UI.AddNavWaypointAdvanced(0.141197, 1.115726, 0.000000, 0.000000)
     UI.SetNavLoopState(1)
+    UI.AddTask('PointDefense', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
     unit = SM.GetDefaultUnit()
@@ -1779,6 +1899,7 @@ def CreateScenario(SM):
     unit.SetPosition(lon_deg, lat_deg, 0.0)
     unit.heading = 90.00
     unit.speed = 8.1
+    unit.cost = 20000000.0
     SM.AddUnitToAlliance(unit, 3)
     SM.SetUnitLauncherItem(unit.unitName, 0, 'SAM-I', 10)
     SM.SetUnitLauncherItem(unit.unitName, 1, 'SSM-I', 10)
@@ -1791,6 +1912,7 @@ def CreateScenario(SM):
     UI.AddNavWaypointAdvanced(0.163027, 1.114361, 0.000000, 0.000000)
     UI.AddNavWaypointAdvanced(0.161221, 1.115124, 0.000000, 0.000000)
     UI.SetNavLoopState(1)
+    UI.AddTask('PointDefense', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
     
     ##############################
@@ -1800,22 +1922,22 @@ def CreateScenario(SM):
     goal_temp = SM.ProtectGoal('')
     goal_temp.AddTarget('HMS Invincible')
     goal_temp.SetQuantity(1)
-    goal_2_0 = goal_temp
+    goal_0_0 = goal_temp
 
     goal_temp = SM.ProtectGoal('')
     goal_temp.AddTarget('HMS Illustrious')
     goal_temp.SetQuantity(1)
-    goal_2_1 = goal_temp
+    goal_0_1 = goal_temp
 
     goal_temp = SM.DestroyGoal('')
     goal_temp.AddTarget('BDK-56 Konstantin Olshanskiy')
     goal_temp.SetQuantity(1)
-    goal_2_2 = goal_temp
+    goal_0_2 = goal_temp
 
     goal_temp = SM.DestroyGoal('')
     goal_temp.AddTarget('BDK-45 Georgiy Pobedonosets')
     goal_temp.SetQuantity(1)
-    goal_2_3 = goal_temp
+    goal_0_3 = goal_temp
 
     goal_temp = SM.DestroyGoal('')
     goal_temp.AddTarget('ZSU-23 (1)')
@@ -1831,20 +1953,20 @@ def CreateScenario(SM):
     goal_temp.AddTarget('Fuel Tanks')
     goal_temp.AddTarget('Ammunition Bunker')
     goal_temp.SetQuantity(8)
-    goal_2_4 = goal_temp
+    goal_0_4 = goal_temp
 
     goal_temp = SM.TimeGoal()
     goal_temp.SetPassTimeout(5999940.0)
     goal_temp.SetFailTimeout(86400.0)
-    goal_2_5 = goal_temp
+    goal_0_5 = goal_temp
 
     goal_temp = SM.CompoundGoal(0)
-    goal_temp.AddGoal(goal_2_0)
-    goal_temp.AddGoal(goal_2_1)
-    goal_temp.AddGoal(goal_2_2)
-    goal_temp.AddGoal(goal_2_3)
-    goal_temp.AddGoal(goal_2_4)
-    goal_temp.AddGoal(goal_2_5)
+    goal_temp.AddGoal(goal_0_0)
+    goal_temp.AddGoal(goal_0_1)
+    goal_temp.AddGoal(goal_0_2)
+    goal_temp.AddGoal(goal_0_3)
+    goal_temp.AddGoal(goal_0_4)
+    goal_temp.AddGoal(goal_0_5)
     
     SM.SetAllianceGoal(1, goal_temp)
 
@@ -1857,7 +1979,7 @@ def CreateScenario(SM):
     goal_temp = SM.TimeGoal()
     goal_temp.SetPassTimeout(86400.0)
     goal_temp.SetFailTimeout(5999940.0)
-    goal_3_0 = goal_temp
+    goal_1_0 = goal_temp
 
     goal_temp = SM.ProtectGoal('')
     goal_temp.AddTarget('ZSU-23 (1)')
@@ -1873,25 +1995,25 @@ def CreateScenario(SM):
     goal_temp.AddTarget('Fuel Tanks')
     goal_temp.AddTarget('Ammunition Bunker')
     goal_temp.SetQuantity(5)
-    goal_3_1 = goal_temp
+    goal_1_1 = goal_temp
 
     goal_temp = SM.DestroyGoal('')
     goal_temp.AddTarget('HMS Invincible')
     goal_temp.AddTarget('HMS Illustrious')
     goal_temp.SetQuantity(1)
-    goal_3_2 = goal_temp
+    goal_1_2 = goal_temp
 
     goal_temp = SM.ProtectGoal('')
     goal_temp.AddTarget('BDK-56 Konstantin Olshanskiy')
     goal_temp.AddTarget('BDK-45 Georgiy Pobedonosets')
     goal_temp.SetQuantity(1)
-    goal_3_3 = goal_temp
+    goal_1_3 = goal_temp
 
     goal_temp = SM.CompoundGoal(0)
-    goal_temp.AddGoal(goal_3_0)
-    goal_temp.AddGoal(goal_3_1)
-    goal_temp.AddGoal(goal_3_2)
-    goal_temp.AddGoal(goal_3_3)
+    goal_temp.AddGoal(goal_1_0)
+    goal_temp.AddGoal(goal_1_1)
+    goal_temp.AddGoal(goal_1_2)
+    goal_temp.AddGoal(goal_1_3)
     
     SM.SetAllianceGoal(2, goal_temp)
 
