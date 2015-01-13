@@ -325,6 +325,10 @@ Section "GCB2 (required)"
 
   File "scenarios\SinglePlayer\Japan\*.py"
 
+  SetOutPath $INSTDIR\scenarios\SinglePlayer\Modern
+
+  File "scenarios\SinglePlayer\Modern\*.py"
+
 
 ;  SetOutPath $INSTDIR\scenarios\SinglePlayer\Taiwan
  
@@ -378,12 +382,6 @@ Section "GCB2 (required)"
   SetOutPath $INSTDIR\scripts\Amram_Script_Data
   File "scripts\Amram_Script_Data\*.py"
   
-  SetOutPath $INSTDIR\scripts\Amram_Script_Data\Aircraft
-  File "scripts\Amram_Script_Data\Aircraft\*.csv"
-
-  SetOutPath $INSTDIR\scripts\Amram_Script_Data\CSVs
-  File "scripts\Amram_Script_Data\CSVs\*.csv"
-
   !ifdef RELEASE_VERSION
 ; ----- sound\ogg directory -----
   SetOutPath $INSTDIR\sound\ogg
