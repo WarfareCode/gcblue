@@ -125,11 +125,7 @@ def BuildAmramMenu(Menu, interface, EditMode = False):
     #Dev Mode commands
     if single:
         BuildDeveloperMenu(Menu, interface)  
-            
-    Menu.AddItem('Test Formation','TestFormation')
-    Menu.AddItem('Test waypoint','test_waypoint_read')
-    Menu.AddItem('Test launchers','test_child_armaments')
-    Menu.AddItem('Test launchers2','test_child_armaments2')
+      
 
 def Get_Alliance_Members(SM, side_name):
     current_year = DateString_DecimalYear(SM.GetScenarioDateAsString())
