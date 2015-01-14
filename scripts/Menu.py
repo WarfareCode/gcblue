@@ -407,15 +407,16 @@ def CombatMenuItems(Menu, interface, Selected):
     
     Menu.AddItem('Engage Target','');Menu.BeginSubMenu(); Menu.SetStayOpen(1)
     if 1==1:
-        Menu.AddItem('Launch Weapon At Target', '');Menu.BeginSubMenu();Menu.SetStayOpen(1)
-        if 1==1:
-            loaded_list = Selected['WeaponList']
-            weapon_list = loaded_list.keys()
-            weapon_list.sort()
-            for weapon_n in xrange(len(weapon_list)):
-                if loaded_list[weapon_list[weapon_n]][0] > 0:
-                    Menu.AddItemUIWithParam('%s : %d' % (weapon_list[weapon_n], loaded_list[weapon_list[weapon_n]][0]), 'MenuLaunchCommand', 'Target', weapon_n)
-            Menu.EndSubMenu()
+        #Menu.AddItem('Launch Weapon At Target', '');Menu.BeginSubMenu();Menu.SetStayOpen(1)
+        #if 1==1:
+        #    loaded_list = Selected['WeaponList']
+        #    weapon_list = loaded_list.keys()
+        #    weapon_list.sort()
+        #    for weapon_n in xrange(len(weapon_list)):
+        #        if loaded_list[weapon_list[weapon_n]][0] > 0:
+        #            Menu.AddItemUIWithParam('%s : %d' % (weapon_list[weapon_n], loaded_list[weapon_list[weapon_n]][0]), 'MenuLaunchCommand', 'Target', weapon_n)
+        #    Menu.EndSubMenu()
+        Menu.AddItem('Engage Target','');Menu.BeginSubMenu(); Menu.SetStayOpen(1)
         if Selected['Air'] > 0:
             Menu.AddItemWithTextParam('Intercept Target', 'OptionHandler','Intercept|Task|Start~1~0')
             if Selected['HasBombs']:
@@ -1531,7 +1532,10 @@ def MenuLaunchCommand(interface, *args):
         target_id = int(args[0])
         weapon_n = args[1]
         target = True
-        Alt = UI.GetTrackById(target_id).Alt()
+        track = UI.GetTrackById(target_id)
+        Alt = track.Alt
+        track.Lon
+        track.Lat
     elif len(args) == 3:
         #we are given a datum to engage
         Lon = args[0]

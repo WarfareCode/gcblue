@@ -1056,7 +1056,6 @@ def Check_Status(UI, launcher, mode):
     status_test = False
     if status_num:
         status_test = True
-    UI.DisplayMessage('launcher(%s) Status = %s = %s' % (launcher.Launcher, status_num, status_test))
 
     if status_num:
         status_strings = [
