@@ -8,6 +8,21 @@ import json, csv
 
 #once I can step fully away from 1.25, I can proceed with eliminating most of the input handlers, the option handler ~can~ do it, if it can take string params.
 
+def flatten(xs):
+    """
+    flatten(xs):
+    expand_wildcard causes lists to become nested lists.  Flatten() flattens them again.
+    """
+    res = []
+    def loop(ys):
+        for i in ys:
+            if isinstance(i, list):
+                loop(i)
+            else:
+                res.append(i)
+    loop(xs)
+    return res
+
 def DeleteTask(interface, taskname):
     """
     DeleteTask(interface, taskname):

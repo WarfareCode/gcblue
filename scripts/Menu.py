@@ -125,15 +125,31 @@ def BuildAmramMenu(Menu, interface, EditMode = False):
     #Dev Mode commands
     if single:
         BuildDeveloperMenu(Menu, interface)  
-      
+            
+    Menu.AddItem('Test Formation','TestFormation')
+    Menu.AddItem('Test waypoint','test_waypoint_read')
+    Menu.AddItem('Test launchers','test_child_armaments')
+    Menu.AddItem('Test launchers2','test_child_armaments2')
 
 def Get_Alliance_Members(SM, side_name):
     current_year = DateString_DecimalYear(SM.GetScenarioDateAsString())
-    for snapshot in Alliance_List[side_name]:
-        Start = Alliance_List[side_name][snapshot]['Start']
-        Stop = Alliance_List[side_name][snapshot]['Stop']
-        if Start < current_year < Stop:
-            return Alliance_List[side_name][snapshot]['Members']
+    members = []
+    def iterate_snapshots(alliance):
+        for dates in Alliance_List[alliance]:
+            Start = Alliance_List[alliance][dates]['Start']
+            Stop = Alliance_List[alliance][dates]['Stop']
+            if Start < current_year < Stop:
+                return dates
+    
+    def iterate_members(alliance, snapshot):
+        for member in sorted(Alliance_List[alliance][snapshot]['Members']):
+            if member in Alliance_List:
+                initial_snapshot = iterate_members(member, iterate_snapshots(member))
+            else:
+                members.append(member)
+
+    iterate_members(side_name, iterate_snapshots(side_name))
+    return members
 
 def AmramCreateAllianceUnitMenu(Menu, SM):
     page_count = 25
@@ -416,7 +432,6 @@ def CombatMenuItems(Menu, interface, Selected):
         #        if loaded_list[weapon_list[weapon_n]][0] > 0:
         #            Menu.AddItemUIWithParam('%s : %d' % (weapon_list[weapon_n], loaded_list[weapon_list[weapon_n]][0]), 'MenuLaunchCommand', 'Target', weapon_n)
         #    Menu.EndSubMenu()
-        Menu.AddItem('Engage Target','');Menu.BeginSubMenu(); Menu.SetStayOpen(1)
         if Selected['Air'] > 0:
             Menu.AddItemWithTextParam('Intercept Target', 'OptionHandler','Intercept|Task|Start~1~0')
             if Selected['HasBombs']:
@@ -1520,12 +1535,30 @@ def ToggleFilterByYear(SM, state):
         SM.SetFilterByYear(state)
 
 def MenuLaunchCommand(interface, *args):
-    #we do not know:
-        #are we called by group or single unit
-        #are we going to fire on a target, or a datum
-        #the name of the weapon to be fired
-    #lets find out...
-
+    #get our weapon name back
+    #load Selected from the first unit we can find the key saved to.
+    #group or single?
+    group = False
+    try:
+        #maybe we are a group
+        test = interface.GetUnitCount()
+        group = True
+    except:
+        #maybe we are not.
+        group = False
+        
+    if group:
+        for unit in xrange(interface.GetUnitCount()):
+            UI = interface.GetPlatformInterface(unit)
+            BB = UI.GetBlackboardInterface()
+            Selected = Read_Message_Dict(BB, 'Selected')
+            break
+    else:
+        UI = interface
+        BB = UI.GetBlackboardInterface()
+        Selected = Read_Message_Dict(BB, 'Selected')    
+    
+    
     #target or datum?
     if len(args) == 2:
         #we were given a target to engage
@@ -1534,8 +1567,8 @@ def MenuLaunchCommand(interface, *args):
         target = True
         track = UI.GetTrackById(target_id)
         Alt = track.Alt
-        track.Lon
-        track.Lat
+        Lon = track.Lon
+        Lat = track.Lat
     elif len(args) == 3:
         #we are given a datum to engage
         Lon = args[0]
@@ -1551,28 +1584,6 @@ def MenuLaunchCommand(interface, *args):
         weapon_n = args[3]
         target = False
 
-    #group or single?
-    group = False
-    try:
-        #maybe we are a group
-        test = interface.GetUnitCount()
-        group = True
-    except:
-        #maybe we are not.
-        group = False
-        
-    #get our weapon name back
-    #load Selected from the first unit we can find the key saved to.
-    if group:
-        for unit in xrange(interface.GetUnitCount()):
-            UI = interface.GetPlatformInterface(unit)
-            BB = UI.GetBlackboardInterface()
-            Selected = Read_Message_Dict(BB, 'Selected')
-            break
-    else:
-        UI = interface
-        BB = UI.GetBlackboardInterface()
-        Selected = Read_Message_Dict(BB, 'Selected')
     
     #now get the weapon name back.
     loaded_list = Selected['WeaponList']
@@ -1580,6 +1591,44 @@ def MenuLaunchCommand(interface, *args):
     weapon_list.sort()
     weapon_name = weapon_list[weapon_n]
     unit_count = Selected['UnitCount']
+        
+    def Execute_Launch_Target(UI, excuses, weapon_name, target_id):
+        name = UI.GetPlatformName()
+        want_shoot = False
+        for launcher_n in xrange(UI.GetLauncherCount()):
+            if weapon_name == UI.GetLauncherWeaponName(launcher_n):
+                #then we have the chosen weapon, proceed to launch.
+                want_shoot = True
+                launcher = UI.GetLauncherInfo(launcher_n)
+                UI.SetTarget(target_id)
+                UI.HandoffTargetToLauncher(launcher_n)
+                launcher = UI.GetLauncherInfo(launcher_n)
+                status, excuse = Check_Status(UI, launcher, 1)
+                if status and Use_Launcher_On_Target_Amram(UI, launcher_n, -2, target_id):
+                    UI.DisplayMessage('%s, %s' % (name,excuse))
+                    return want_shoot, excuses
+                else:
+                    excuses.append(excuse)
+        return want_shoot, excuses
+    def Execute_Launch_Datum(UI, excuses, Alt, Lon, Lat, weapon_name):
+        name = UI.GetPlatformName()
+        if Alt == -1:
+            Alt = UI.GetMapTerrainElevation(Lon, Lat)+1
+        want_shoot = False
+        for launcher_n in xrange(UI.GetLauncherCount()):
+            if weapon_name == UI.GetLauncherWeaponName(launcher_n):
+                #then we have the chosen weapon, proceed to launch.
+                want_shoot = True
+                launcher = UI.GetLauncherInfo(launcher_n)
+                UI.SendDatumToLauncher(Lon, Lat, Alt, launcher_n)
+                launcher = UI.GetLauncherInfo(launcher_n)
+                status, excuse = Check_Status(UI, launcher, 1)
+                if status and Use_Launcher_On_Target_Amram(UI, launcher_n, -2, Lon, Lat):
+                    UI.DisplayMessage('%s, %s' % (name,excuse))
+                    return want_shoot, excuses
+                else:
+                    excuses.append(excuse)
+        return want_shoot, excuses
         
     #determine weapon name and perform engagement.
     if group:    
@@ -1615,77 +1664,24 @@ def MenuLaunchCommand(interface, *args):
                 if UI.GetPlatformId() == unit[1]:
                     #we have the next unit in the sorted list
                     break
-            want_shoot = False
             excuses = []
-            name = UI.GetPlatformName()
-            if Alt == -1:
-                Alt = UI.GetMapTerrainElevation(Lon, Lat)+1
-            for launcher_n in xrange(UI.GetLauncherCount()):
-                if weapon_name == UI.GetLauncherWeaponName(launcher_n):
-                    #then we have the chosen weapon, proceed to launch.
-                    want_shoot = True
-                    launcher = UI.GetLauncherInfo(launcher_n)
-                    if target:
-                        UI.SetTarget(target_id)
-                        UI.HandoffTargetToLauncher(launcher_n)
-                        launcher = UI.GetLauncherInfo(launcher_n)
-                        status, excuse = Check_Status(UI, launcher, 1)
-                        if status and Use_Launcher_On_Target_Amram(UI, launcher_n, -2, target_id):
-                            UI.DisplayMessage('%s, %s' % (name,excuse))
-                            return
-                        else:
-                            excuses.append(excuse)
-                    else:
-                        UI.SendDatumToLauncher(Lon, Lat, Alt, launcher_n)
-                        launcher = UI.GetLauncherInfo(launcher_n)
-                        status, excuse = Check_Status(UI, launcher, 1)
-                        if status and Use_Launcher_On_Target_Amram(UI, launcher_n, -2, Lon, Lat):
-                            UI.DisplayMessage('%s, %s' % (name,excuse))
-                            return
-                        else:
-                            excuses.append(excuse)
-            if want_shoot:
-                UI.DisplayMessage('%s did not shoot, reasons:%s' % (name, excuses))
+            if target:
+                want_shoot, excuses = Execute_Launch_Target(UI, excuses, weapon_name, target_id)
+            else:
+                want_shoot, excuses = Execute_Launch_Datum(UI, excuses, Alt, Lon, Lat, weapon_name)
     else:
         #its just the one unit, proceed direct to launcher selection.
         #try to get the weapon name back from weapon_n
         UI = interface
-        if Alt == -1:
-            Alt = UI.GetMapTerrainElevation(Lon, Lat)+1
         excuses = []
         name = UI.GetPlatformName()
-        #proceed to determining launcher to fire.
-        for launcher_n in xrange(UI.GetLauncherCount()):
-            if weapon_name == UI.GetLauncherWeaponName(launcher_n):
-                #then we have the chosen weapon, proceed to launch.
-                launcher = UI.GetLauncherInfo(launcher_n)
-                #check basic status
-                status, excuse = Check_Status(UI, launcher, 0)
-                if status:
-                    if target:
-                        UI.SetTarget(targe_idD)
-                        UI.HandoffTargetToLauncher(launcher_n)
-                        launcher = UI.GetLauncherInfo(launcher_n)
-                        #recheck status after assigning launcher.
-                        status, excuse = Check_Status(UI, launcher, 1)
-                        if status and Use_Launcher_On_Target_Amram(UI, launcher_n, -2, target_id):
-                            UI.DisplayMessage('%s, %s' % (name,excuse))
-                            return
-                        else:
-                            excuses.append(excuse)
-                    else:
-                        UI.SendDatumToLauncher(Lon, Lat, Alt, launcher_n)
-                        launcher = UI.GetLauncherInfo(launcher_n)
-                        status, excuse = Check_Status(UI, launcher, 1)
-                        if status and Use_Launcher_On_Target_Amram(UI, launcher_n, -2, Lon, Lat):
-                            UI.DisplayMessage('%s, %s' % (name,excuse))
-                            return
-                        else:
-                            excuses.append(excuse)
-                else:
-                    excuses.append(excuse)
-        UI.DisplayMessage('%s did not shoot, reasons:%s' % (name, excuses))
-    return    
+        if target:
+            want_shoot, excuses = Execute_Launch_Target(UI, excuses, weapon_name, target_id)
+        else:
+            want_shoot, excuses = Execute_Launch_Datum(UI, excuses, Alt, Lon, Lat, weapon_name)
+    if want_shoot:
+        UI.DisplayMessage('%s did not shoot, reasons:%s' % (name, excuses))    
+        
 
 def GetAllUnits(SM, date):
     #iterative climb through the entire run of id's from 0 through 1e6
