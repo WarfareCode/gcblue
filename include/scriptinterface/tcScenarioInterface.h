@@ -35,6 +35,7 @@
 #include <boost/python.hpp>
 #include "tcGoal.h"
 #include "tcStringArray.h"
+#include "tcStringTable.h"
 
 class tcMapData;
 class tcMapOverlay;
@@ -275,11 +276,15 @@ namespace scriptinterface
         static void AttachSimState(tcSimState *apSS) {simState = apSS;}
         static void AttachCommandQueue(tcCommandQueue* cq) {commandQueue = cq;}
 
+
         /**
         * Send command through command queue, used for special commands to game engine
         * such as activating the flight deck control panel. 
         */
         void SendCommand(const std::string& command);
+
+		/// queries field info from database -amram: So I can call this from SM if UI is unavailable(no units).
+		scriptinterface::tcStringTable QueryDatabase(const std::string& table, const std::string& databaseClass, const std::string& fields);
 
 
 		tcScenarioInterface();

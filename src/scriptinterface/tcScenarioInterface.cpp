@@ -296,6 +296,7 @@ namespace scriptinterface
             // database management
             .def("LoadDatabaseMod", &tcScenarioInterface::LoadDatabaseMod)
             .def("RestoreDefaultDatabase", &tcScenarioInterface::RestoreDefaultDatabase)
+			.def("QueryDatabase", &tcScenarioInterface::QueryDatabase)
 
             // more scenario edit commands, started Oct 2008
             .def("SetAirGroupName", &tcScenarioInterface::SetAirGroupName)
@@ -2128,6 +2129,25 @@ namespace scriptinterface
 	void tcScenarioInterface::SetProgressReporting(wxProgressDialog* dlg)
 	{
 		progressDialog = dlg;
+	}
+
+	tcStringTable tcScenarioInterface::QueryDatabase(const std::string& table, const std::string& databaseClass, const std::string& fields)
+	{
+		tcDatabase* database = tcDatabase::Get();
+
+		tcStringTable result = database->GetFieldsForAllRows(table, databaseClass, fields);
+
+		if (result.Size() > 0)
+		{
+			return result;
+		}
+		else
+		{
+			tcStringArray errorArray;
+			errorArray.PushBack("Error");
+			result.AddStringArray(errorArray);
+			return result;
+		}
 	}
 
 
