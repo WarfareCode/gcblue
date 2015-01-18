@@ -1980,6 +1980,9 @@ namespace scriptinterface {
 
         result.RemoveDuplicates();
 
+		return result;   // amram- I'm pre-empting the filter here, I would much prefer the ability to have an unfiltered list I can filter later
+						 //		   than one that unconditionally filters.  Ultimately, the ideal would be for the filtering to be optional.
+
         // filter by current scenario date
         tcDatabase* database = tcDatabase::Get();
         wxArrayString itemList;
@@ -2190,6 +2193,19 @@ namespace scriptinterface {
 
         return stringArray;
     }
+
+	int tcPlatformInterface::GetItemCapacityForLauncher(int launcherIdx, const std::string& item)
+    {
+        if (mpPlatformObj == 0) return 0;
+
+		if (!mpPlatformObj->IsControlled()) return 0;
+        tcLauncher* launcher = mpPlatformObj->GetLauncher(launcherIdx);
+        if (!launcher) return 0;
+        if (!launcher->IsItemCompatible(item)) return 0;
+		unsigned int launcherCapacity = launcher->GetCapacityForItem(item);
+        return launcherCapacity;
+        }
+
 
 
     void tcPlatformInterface::EquipLoadout(const std::string& loadout)

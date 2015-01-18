@@ -358,6 +358,8 @@ namespace scriptinterface {
         bool MaintenanceHold() const;
         /// general database query of equipment
         tcStringArray GetEquipmentListByClass(const std::string& classString);
+		/// launcher item capacity
+		int tcPlatformInterface::GetItemCapacityForLauncher(int launcherIdx, const std::string& item);
 
         /// get list of database loadouts
         tcStringArray GetLoadoutList();

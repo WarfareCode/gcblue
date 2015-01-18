@@ -157,6 +157,7 @@ namespace scriptinterface {
             .def("AddItemToMagazine", &tcPlatformInterface::AddItemToMagazine)
             .def("GetCompatibleItemList", &tcPlatformInterface::GetCompatibleItemList)
             .def("LoadLauncher", &tcPlatformInterface::LoadLauncher)
+			.def("GetItemCapacityForLauncher", &tcPlatformInterface::GetItemCapacityForLauncher)
             .def("LoadLauncherTest", &tcPlatformInterface::LoadLauncherTest)
             .def("UnloadLauncher", &tcPlatformInterface::UnloadLauncher)
 			.def("LoadOther", &tcPlatformInterface::LoadOther)
