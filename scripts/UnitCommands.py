@@ -1051,11 +1051,8 @@ def Check_Status(UI, launcher, mode):
         #22 = TOO_CLOSE                 ///< target is inside minimum range
         #23 = LAUNCHER_EMPTY_AUTORELOAD ///< empty, try autoreload when ready, workaround to delay auto-reload until after launch
         #24 = ROE_HOLD                  ///< ready, but launch violates ROE
-
+    
     status_num = launcher.Status
-    status_test = False
-    if status_num:
-        status_test = True
 
     if status_num:
         status_strings = [
@@ -1134,15 +1131,32 @@ def Use_Launcher_On_Target_Amram(UI, launcher, launch_type, *target):
             if isdatum:
                 lon, lat = datum
                 alt = UI.GetMapTerrainElevation(datum[0], datum[1])
-                if alt < 0: alt = 0
+                if alt < 0:
+                    alt = 0
             else:
                 #is target, determine lead
-                speed1 = UI.QueryDatabase('torpedo',UI.GetLauncherWeaponName(launcher.Launcher),'preEnableSpeed_kts').GetRow(0).GetString(0)
-                speed2 = UI.QueryDatabase('torpedo',UI.GetLauncherWeaponName(launcher.Launcher),'maxSpeed_kts').GetRow(0).GetString(0)
-                speed_mps = 0.514444 / 2 * (float(speed1)+float(speed2))
                 range_km = UI.GetRangeToTrack(target_info)
-                travel_time_s = 1000.0 * range_km / speed_mps
-                travel_time_s = travel_time_s *1.2 # add a 20 percent to compensate for snaking.
+                speed1 = float(UI.QueryDatabase('torpedo',UI.GetLauncherWeaponName(launcher.Launcher),'preEnableSpeed_kts').GetRow(0).GetString(0))
+                speed2 = float(UI.QueryDatabase('torpedo',UI.GetLauncherWeaponName(launcher.Launcher),'maxSpeed_kts').GetRow(0).GetString(0))
+                accel = float(UI.QueryDatabase('torpedo',UI.GetLauncherWeaponName(launcher.Launcher),'acceleration_ktps').GetRow(0).GetString(0))
+                if UI.QueryDatabase('torpedo',UI.GetLauncherWeaponName(launcher.Launcher),'SensorClass').GetRow(0).GetString(0) != '':
+                    seeker=True
+                    UI.DisplayMessage('seeker = %s' % UI.QueryDatabase('torpedo',UI.GetLauncherWeaponName(launcher.Launcher),'SensorClass').GetRow(0).GetString(0)) != ''
+                else:
+                    seeker=False
+                    UI.DisplayMessage('seeker = %s' % UI.QueryDatabase('torpedo',UI.GetLauncherWeaponName(launcher.Launcher),'SensorClass').GetRow(0).GetString(0)) != ''
+                range_m = range_km * 1000
+                launch_speed = UI.GetSpeed()
+                accel_time1 = abs(speed1 - launch_speed) / accel
+                accel_dist1 = 0.5 * (speed1 + launch_speed) * accel_time1
+                travel_time1 = (range_m - accel_dist1) / speed1 + accel_time1
+                accel_time2 = abs(speed1 - speed2) / accel
+                accel_dist2 = 0.5 * (speed1 + speed2) * accel_time1
+                travel_time2 = (range_m - accel_dist2) / speed2 + accel_time2
+                if seeker:
+                    travel_time2 *= 0.07  #add 7% for snaking
+                travel_time_s = travel_time1 + travel_time2
+                UI.DisplayMessage('travel_time = %s' % travel_time)
                 target_info = target_info.PredictAhead(travel_time_s)
                 lat = target_info.Lat
                 lon = target_info.Lon

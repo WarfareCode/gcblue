@@ -6,7 +6,6 @@ sys.path.append(abspath(join(dirname(__file__), 'Magazine_Generator_Module')))
     #script data in, well, script data, '..' to gain access to logs, and logs to access the scenario report file.
 from Amram_Utilities import *
 from Amram_AI_Weapon_Lists import *
-from magazine_generator import *
 from Alliances import *
 
 #importing from stock
@@ -23,23 +22,37 @@ from StockMenu import *
 
 #scenario report log file path    
 reportfile_path = 'log/scenario_script_report.txt'
+import hotshot, hotshot.stats
+import pstats
 
 
 def BuildUnitEditMenu(UnitMenu, UnitInfo):
     UnitMenu.Clear()
-    BuildAmramMenu(UnitMenu, UnitInfo, EditMode=True)
+    #BuildAmramMenu(UnitMenu, UnitInfo, EditMode=True)
+    prof = hotshot.Profile("log/UnitEditMenu.prof")
+    prof.runcall(BuildAmramMenu, UnitMenu, UnitInfo, EditMode=True)
+    prof.close()
     
 def BuildGroupEditMenu(GroupMenu, GroupInfo):
     GroupMenu.Clear()
-    BuildAmramMenu(GroupMenu, GroupInfo, EditMode=True)
+    #BuildAmramMenu(GroupMenu, GroupInfo, EditMode=True)
+    prof = hotshot.Profile("log/GroupEditMenu.prof")
+    prof.runcall(BuildAmramMenu, GroupMenu, GroupInfo, EditMode=True)
+    prof.close()
 
 def BuildGroupMenu(GroupMenu, GroupInfo):
     GroupMenu.Clear()
-    BuildAmramMenu(GroupMenu, GroupInfo)
+    #BuildAmramMenu(GroupMenu, GroupInfo)
+    prof = hotshot.Profile("log/GroupMenu.prof")
+    prof.runcall(BuildAmramMenu, GroupMenu, GroupInfo)
+    prof.close()
     
 def BuildUnitMenu(UnitMenu, UnitInfo):
     UnitMenu.Clear()
-    BuildAmramMenu(UnitMenu, UnitInfo)
+    #BuildAmramMenu(UnitMenu, UnitInfo)
+    prof = hotshot.Profile("log/UnitMenu.prof")
+    prof.runcall(BuildAmramMenu, UnitMenu, UnitInfo)
+    prof.close()
 
 def BuildAmramMenu(Menu, interface, EditMode = False):
     Menu.Clear()
@@ -116,7 +129,7 @@ def BuildAmramMenu(Menu, interface, EditMode = False):
     
     # Management commands
     ManagementMenuItems(Menu, interface, Selected)
-
+    
     #EditMenu Unit Creation
     if EditMode:
         Menu.EndSubMenu()
@@ -125,14 +138,10 @@ def BuildAmramMenu(Menu, interface, EditMode = False):
     #Dev Mode commands
     if single:
         BuildDeveloperMenu(Menu, interface)  
-            
-    Menu.AddItem('Test Formation','TestFormation')
-    Menu.AddItem('Test waypoint','test_waypoint_read')
-    Menu.AddItem('Test launchers','test_child_armaments')
-    Menu.AddItem('Test launchers2','test_child_armaments2')
-
+        
 def Get_Alliance_Members(SM, side_name):
     current_year = DateString_DecimalYear(SM.GetScenarioDateAsString())
+    
     members = []
     def iterate_snapshots(alliance):
         for dates in Alliance_List[alliance]:
@@ -142,14 +151,18 @@ def Get_Alliance_Members(SM, side_name):
                 return dates
     
     def iterate_members(alliance, snapshot):
-        for member in sorted(Alliance_List[alliance][snapshot]['Members']):
-            if member in Alliance_List:
+        for member in Alliance_List[alliance][snapshot]['Members']:
+            if member in Alliance_List and member != alliance:
+                #so we can use Germany as an alliance for east, and west combined with Germany.
                 initial_snapshot = iterate_members(member, iterate_snapshots(member))
             else:
-                members.append(member)
+                if member in Aliases:
+                    members.append(Aliases[member])
+                else:
+                    members.append(member)
 
     iterate_members(side_name, iterate_snapshots(side_name))
-    return members
+    return sorted(members)
 
 def AmramCreateAllianceUnitMenu(Menu, SM):
     page_count = 25
@@ -158,7 +171,6 @@ def AmramCreateAllianceUnitMenu(Menu, SM):
     categories = {'Surface':'Surface','Submarine':'Sub','Air Fixed Wing':'AirFW','Helo':'Helo','Land':'Land','Mine/Torpedo':'Mine'}
     category_list = ['Surface','Submarine','Air Fixed Wing','Helo','Land','Mine/Torpedo']
     alliance = False
-    
     
     def ReturnUnitsListFromGetPlatformArray(platforms, filter):
         units = []
@@ -179,22 +191,38 @@ def AmramCreateAllianceUnitMenu(Menu, SM):
                 for n in xrange(nPlatformsPage):
                     className = Units[country][category][n+sm*page_count]
                     NatoName = SM.GetDisplayName(className)
+                    qty = GetUnitQty(className)
                     if SM.IsUsingNATONames() and ClassName != NatoName:
-                        Menu.AddItemUIWithTextParam('%s (%s)' % (className, NatoName), 'AddNewPlatform', 'Datum', className)
+                        Menu.AddItemUIWithTextParam('%s%s (%s)' % (qty, className, NatoName), 'AddNewPlatform', 'Datum', className)
                     else:
-                        Menu.AddItemUIWithTextParam('%s' % className, 'AddNewPlatform', 'Datum', className)
+                        Menu.AddItemUIWithTextParam('%s%s' % (qty, className), 'AddNewPlatform', 'Datum', className)
                 Menu.EndSubMenu()
         else:
             for className in Units[country][category]:
                 NatoName = SM.GetDisplayName(className)
+                qty = GetUnitQty(className)
                 if SM.IsUsingNATONames() and ClassName != NatoName:
-                    Menu.AddItemUIWithTextParam('%s (%s)' % (className, NatoName), 'AddNewPlatform', 'Datum', className)
+                    Menu.AddItemUIWithTextParam('%s%s (%s)' % (qty, className, NatoName), 'AddNewPlatform', 'Datum', className)
                 else:
-                    Menu.AddItemUIWithTextParam('%s' % className, 'AddNewPlatform', 'Datum', className)
+                    Menu.AddItemUIWithTextParam('%s%s' % (qty, className), 'AddNewPlatform', 'Datum', className)
                     
-                    
+    def GetUnitQty(unit_class):
+        if SM.QueryDatabase('platform_names',unit_class,'Name').GetRow(0).GetString(0) != 'Error':
+            array = SM.QueryDatabase('platform_names',unit_class,'Name')
+        else:
+            return ''
+        for x in xrange(array.Size()):
+            row = array.GetRow(x)
+            for y in xrange(row.Size()):
+                entry = row.GetString(y)
+        return '%s - ' % array.Size()
+
+    
+    if side_name in Aliases:
+        side_name = Aliases[side_name]
+
     #are we an alliance:
-    if side_name in Alliance_List.keys():
+    if side_name in Alliance_List:
         alliance = True
         new_members = sorted(Get_Alliance_Members(SM, side_name))
         members = ['ThIsCoUnTrYdOeSnTeXiSt']
@@ -273,23 +301,7 @@ def AmramCreateAllianceUnitMenu(Menu, SM):
                     Menu.EndSubMenu()
             Menu.EndSubMenu()
     Menu.EndSubMenu()
-        
-def AmramCreateAllianceUnitMenuOld(Menu, SM):
-    side_name = SM.GetAllianceCountry(SM.GetUserAlliance())
-    Menu.AddItem('Create unit','');Menu.BeginSubMenu();Menu.SetStayOpen(1)
-    if side_name in Alliance_List.keys():
-        #we have an alliance, retrieve the country list.
-        alliance = Alliance_List[side_name]['Members']
-        for country in sorted(alliance):
-            Menu.AddItem('%s' % country,'');Menu.BeginSubMenu();Menu.SetStayOpen(1)
-            SM.SetAllianceDefaultCountry(SM.GetUserAlliance(),country)
-            BuildCreateUnitMenu(Menu, SM)
-        Menu.EndSubMenu()
-    else:
-        BuildCreateUnitMenu(Menu, SM)
-    SM.SetAllianceDefaultCountry(SM.GetUserAlliance(), side_name)
-    Menu.EndSubMenu()
-
+    
 def MultiplayerYieldTakeOwnership(Menu, interface):    
     if (interface.IsMultiplayerActive()):
         if (not interface.IsPlayerControlled()):
@@ -976,10 +988,10 @@ def Unit_Characteristics_Menu(Menu, UI, Selected, loadouts_dict, aircraft_dict, 
             for armament in loadouts_dict:
                 for aircraft in loadouts_dict[armament]:
                     if len(loadouts_dict[armament][aircraft].keys()) > 0:
-                        loadouts = 1
+                        Amram_Paged_Loadout_Menu(Menu, UI, loadouts_dict, aircraft_dict)
+                        loadouts = True
                         break
-            if loadouts:
-                Amram_Paged_Loadout_Menu(Menu, UI, loadouts_dict, aircraft_dict)
+                        break
         Menu.AddItem('Launchers', ''); Menu.BeginSubMenu(); Menu.SetStayOpen(1)
         for launcher_num in xrange(UI.GetLauncherCount()):
             Menu.AddItem('L%d' % (launcher_num+1), '')
@@ -1379,6 +1391,11 @@ def PerformInventory(UI, Selected):
     return Selected
 
 def Get_Relevant_Stock(UI, loadouts_dict):
+    prof = hotshot.Profile("log/GetRelevantStock.prof")
+    prof.runcall(Get_Relevant_Stock2, UI, loadouts_dict)
+    prof.close()    
+    
+def Get_Relevant_Stock2(UI, loadouts_dict):
     #do we have children?
     children = 0
     if UI.HasFlightPort():
@@ -1429,101 +1446,111 @@ def Get_Relevant_Stock(UI, loadouts_dict):
     #classify the stocks now.  Begin with parent stocks.
     for stock in parent_stocks:
         done = False
+        owner = 'Parent'
         #just primary categories for now.
         if not done:
-            if ('Nuclear' in UI.QueryDatabase('missile',stock,'DamageModel').GetRow(0).GetString(0) or
-               'Nuclear' in UI.QueryDatabase('ballistic',stock,'DamageModel').GetRow(0).GetString(0) or
-               'Nuclear' in UI.QueryDatabase('torpedo',stock,'DamageModel').GetRow(0).GetString(0)):  #nuke
-                classified['Parent']['NUC'][stock] = None
+            classification = UI.QueryDatabase('missile',stock,'ClassificationId').GetRow(0).GetString(0)
+            if classification == '64':  #missile
+                if 'Nuclear' in UI.QueryDatabase('missile',stock,'DamageModel').GetRow(0).GetString(0):
+                    classified[owner]['NUC'][stock] = None
+                else:
+                    classified[owner]['MIS'][stock] = None
                 done = True
         if not done:
-            if UI.QueryDatabase('missile',stock,'ClassificationId').GetRow(0).GetString(0) == '64':  #missile
-                classified['Parent']['MIS'][stock] = None
+            ballistic_type = UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0)
+            if ballistic_type != 'Error':
+                if 'Nuclear' in UI.QueryDatabase('ballistic',stock,'DamageModel').GetRow(0).GetString(0):
+                    classified[owner]['NUC'][stock] = None
+                else:
+                    if ballistic_type == '1':  #unguided bomb
+                        classified[owner]['UBU'][stock] = None
+                    elif ballistic_type == '3':  #guided bomb
+                        classified[owner]['GBU'][stock] = None
+                    elif ballistic_type == '0':  #Gun Round
+                        classified[owner]['GUN'][stock] = None
+                    elif ballistic_type == '2':  #Gun round
+                        classified[owner]['GUN'][stock] = None
+                    elif ballistic_type == '5':  #rockets
+                        classified[owner]['ROC'][stock] = None
+                    elif ballistic_type == '4':  #gun fired cm
+                        classified[owner]['CM'][stock] = None
                 done = True
         if not done:
-            if UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '1':  #unguided bomb
-                classified['Parent']['UBU'][stock] = None
-                done = True
-            elif UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '3':  #guided bomb
-                classified['Parent']['GBU'][stock] = None
-                done = True
-        if not done:
-            if UI.QueryDatabase('torpedo',stock,'ClassificationId').GetRow(0).GetString(0) == '130':  #torpedo
-                classified['Parent']['TRP'][stock] = None
-                done = True
-            elif UI.QueryDatabase('torpedo',stock,'ClassificationId').GetRow(0).GetString(0) == '138':  #mine
-                classified['Parent']['MIN'][stock] = None
-                done = True
-        if not done:
-            if (UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '0' or
-            UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '2'):  #gun round, autocannon round
-                classified['Parent']['GUN'][stock] = None
-                done = True
-        if not done:
-            if (UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '4' or
-                UI.QueryDatabase('cm',stock,'ClassificationId').GetRow(0).GetString(0) == '36' or
-                UI.QueryDatabase('cm',stock,'ClassificationId').GetRow(0).GetString(0) == '136'):  #gun cm, air cm, water cm
-                classified['Parent']['CM'][stock] = None
-                done = True
-        if not done:
-            if UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '5':  #rockets
-                classified['Parent']['ROC'][stock] = None
+            torpedo_type = UI.QueryDatabase('torpedo',stock,'ClassificationId').GetRow(0).GetString(0)
+            if torpedo_type != 'Error':
+                if 'Nuclear' in UI.QueryDatabase('torpedo',stock,'DamageModel').GetRow(0).GetString(0):
+                    classified[owner]['NUC'][stock] = None
+                else:
+                    if torpedo_type == '130':  #torpedo
+                        classified[owner]['TRP'][stock] = None
+                    elif torpedo_type == '138':  #mine
+                        classified[owner]['MIN'][stock] = None
                 done = True
         if not done:
             if UI.QueryDatabase('sonobuoy',stock,'ClassificationId').GetRow(0).GetString(0) == '132':  #sonobuoy
-                classified['Parent']['BUI'][stock] = None
+                classified[owner]['BUI'][stock] = None
                 done = True
         if not done:
-            classified['Parent']['UNK'][stock] = None
+            classification = UI.QueryDatabase('cm',stock,'ClassificationId').GetRow(0).GetString(0)
+            if classification in  ['36', '136']:
+                classified[owner]['CM'][stock] = None
+                done = True
+        if not done:
+            classified[owner]['UNK'][stock] = None
     if children:
         for stock in child_stocks:
             done = False
+            owner = 'Child'
             #just primary categories for now.
             if not done:
-                if ('Nuclear' in UI.QueryDatabase('missile',stock,'DamageModel').GetRow(0).GetString(0) or
-                   'Nuclear' in UI.QueryDatabase('ballistic',stock,'DamageModel').GetRow(0).GetString(0) or
-                   'Nuclear' in UI.QueryDatabase('torpedo',stock,'DamageModel').GetRow(0).GetString(0)):  #nuke
-                    classified['Child']['NUC'][stock] = None
+                classification = UI.QueryDatabase('missile',stock,'ClassificationId').GetRow(0).GetString(0)
+                if classification == '64':  #missile
+                    if 'Nuclear' in UI.QueryDatabase('missile',stock,'DamageModel').GetRow(0).GetString(0):
+                        classified[owner]['NUC'][stock] = None
+                    else:
+                        classified[owner]['MIS'][stock] = None
                     done = True
             if not done:
-                if UI.QueryDatabase('missile',stock,'ClassificationId').GetRow(0).GetString(0) == '64':  #missile
-                    classified['Child']['MIS'][stock] = None
+                ballistic_type = UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0)
+                if ballistic_type != 'Error':
+                    if 'Nuclear' in UI.QueryDatabase('ballistic',stock,'DamageModel').GetRow(0).GetString(0):
+                        classified[owner]['NUC'][stock] = None
+                    else:
+                        if ballistic_type == '1':  #unguided bomb
+                            classified[owner]['UBU'][stock] = None
+                        elif ballistic_type == '3':  #guided bomb
+                            classified[owner]['GBU'][stock] = None
+                        elif ballistic_type == '0':  #Gun Round
+                            classified[owner]['GUN'][stock] = None
+                        elif ballistic_type == '2':  #Gun round
+                            classified[owner]['GUN'][stock] = None
+                        elif ballistic_type == '5':  #rockets
+                            classified[owner]['ROC'][stock] = None
+                        elif ballistic_type == '4':  #gun fired cm
+                            classified[owner]['CM'][stock] = None
                     done = True
             if not done:
-                if UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '1':  #unguided bomb
-                    classified['Child']['UBU'][stock] = None
-                    done = True
-                elif UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '3':  #guided bomb
-                    classified['Child']['GBU'][stock] = None
-                    done = True
-            if not done:
-                if UI.QueryDatabase('torpedo',stock,'ClassificationId').GetRow(0).GetString(0) == '130':  #torpedo
-                    classified['Parent']['TRP'][stock] = None
-                    done = True
-                elif UI.QueryDatabase('torpedo',stock,'ClassificationId').GetRow(0).GetString(0) == '138':  #mine
-                    classified['Parent']['MIN'][stock] = None
-                    done = True
-            if not done:
-                if (UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '0' or
-                UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '2'):  #gun round, autocannon round
-                    classified['Child']['GUN'][stock] = None
-                    done = True
-            if not done:
-                if (UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '4' or
-                    UI.QueryDatabase('cm',stock,'ClassificationId').GetRow(0).GetString(0) == '36' or
-                    UI.QueryDatabase('cm',stock,'ClassificationId').GetRow(0).GetString(0) == '136'):  #gun cm, air cm, water cm
-                    classified['Child']['CM'][stock] = None
-                    done = True
-            if not done:
-                if UI.QueryDatabase('ballistic',stock,'BallisticType').GetRow(0).GetString(0) == '5':  #rockets
-                    classified['Child']['ROC'][stock] = None
+                torpedo_type = UI.QueryDatabase('torpedo',stock,'ClassificationId').GetRow(0).GetString(0)
+                if torpedo_type != 'Error':
+                    if 'Nuclear' in UI.QueryDatabase('torpedo',stock,'DamageModel').GetRow(0).GetString(0):
+                        classified[owner]['NUC'][stock] = None
+                    else:
+                        if torpedo_type == '130':  #torpedo
+                            classified[owner]['TRP'][stock] = None
+                        elif torpedo_type == '138':  #mine
+                            classified[owner]['MIN'][stock] = None
                     done = True
             if not done:
                 if UI.QueryDatabase('sonobuoy',stock,'ClassificationId').GetRow(0).GetString(0) == '132':  #sonobuoy
-                    classified['Child']['BUI'][stock] = None
+                    classified[owner]['BUI'][stock] = None
                     done = True
             if not done:
-                classified['Child']['UNK'][stock] = None
+                classification = UI.QueryDatabase('cm',stock,'ClassificationId').GetRow(0).GetString(0)
+                if classification in  ['36', '136']:
+                    classified[owner]['CM'][stock] = None
+                    done = True
+            if not done:
+                classified[owner]['UNK'][stock] = None
     return classified                        
 
 def ToggleFilterByYear(SM, state):
@@ -1682,7 +1709,6 @@ def MenuLaunchCommand(interface, *args):
     if want_shoot:
         UI.DisplayMessage('%s did not shoot, reasons:%s' % (name, excuses))    
         
-
 def GetAllUnits(SM, date):
     #iterative climb through the entire run of id's from 0 through 1e6
     #repeated for all three alliances
@@ -1950,8 +1976,13 @@ def check_service(UI, className, date):
                     UI.DisplayMessage('This Unit(%s : %s) failed to classify, please report this' % (UI.GetPlatformName(), className, ))
             else:
                 return True
+
+def BuildEditMenu(UnitMenu, SM):                
+    prof = hotshot.Profile("log/EditMenu.prof")
+    prof.runcall(BuildEditMenu2, UnitMenu, SM)
+    prof.close()
      
-def BuildEditMenu(UnitMenu, SM):
+def BuildEditMenu2(UnitMenu, SM):
     UnitMenu.Clear()
     UnitMenu.AddItem('Scenario', '')
     UnitMenu.BeginSubMenu()
@@ -2033,52 +2064,9 @@ def BuildEditMenu(UnitMenu, SM):
             UnitMenu.AddItemWithParam(SM.GetTemplateName(n), 'SetSonarTemplate', n)
     UnitMenu.AddItem('Edit SVP', '*ShowSonarPanel')
     UnitMenu.EndSubMenu()
-    
+
     UnitMenu.EndSubMenu()
 
-def TestFormation(UI):
-    position = UI.GetFormationPosition()
-    UI.DisplayMessage('%s %s' % (type(position.bearing_rad), position.bearing_rad))
-    UI.DisplayMessage('%s %s' % (type(position.range_km), position.range_km))
-    UI.DisplayMessage('%s %s' % (type(position.span_km), position.span_km))
-    UI.DisplayMessage('%s %s' % (type(position.span_rad), position.span_rad))
-    formation_position = [position.bearing_rad, position.range_km, position.span_km, position.span_rad]
-    formation_altitude = UI.GetFormationAltitudeOffset()
-    formation_north = UI.IsFormationUsingNorthBearing()
-    UI.DisplayMessage('position: %s' % formation_position)
-    UI.DisplayMessage('altitude: %s' % formation_altitude)
-    UI.DisplayMessage('north: %s' % formation_north)
-    leader = UI.GetFormationLeader()
-    
-def test_waypoint_read(UI):
-    waypoint = UI.EditNavWaypoint()
-    UI.DisplayMessage('waypoint(%s) = type(%s)' % (waypoint, type(waypoint)))
-    
-def test_child_armaments(UI):
-    FP = UI.GetFlightPortInfo()
-    for n in xrange(FP.GetUnitCount()):
-        UIn = FP.GetUnitPlatformInterface(n)
-        UIx = UI.GetUnitInterface(UIn.GetPlatformName())
-        for x in xrange(UIx.GetLauncherCount()):
-            weapon_name = UIx.GetLauncherWeaponName(x)
-            if x==1:
-                UI.DisplayMessage('Unloading #1')
-                UIx.UnloadLauncher(x)
-#                UI.DisplayMessage('Loading #1')
-#                UIx.LoadLauncher(x, 'Mk-40 Mod5')
-        
-def test_child_armaments2(UI):
-    FP = UI.GetFlightPortInfo()
-    for n in xrange(FP.GetUnitCount()):
-        UIn = FP.GetUnitPlatformInterface(n)
-        UIx = UI.GetUnitInterface(UIn.GetPlatformName())
-        for x in xrange(UIx.GetLauncherCount()):
-            weapon_name = UIx.GetLauncherWeaponName(x)
-            if x==1:
-                UI.DisplayMessage('Loading #1')
-                UIx.LoadLauncher(x, 'Mk-40 Mod5')
-        
-        
 #       
 #
 #

@@ -718,7 +718,7 @@ def queryDB(UI, table, name, fields):
     The values will be strings, unless there were more than two fields.
     """
     array = UI.QueryDatabase(table, name, fields)
-    if array.Size() > 1 and ',' not in fields:
+    if array.Size() == 1 and ',' not in fields:
         return array.GetRow(0).GetString(0)
     else:
         info = {}
@@ -773,9 +773,9 @@ def get_compatible_items(UI):
                 wild_list = [item]
             for item in wild_list:
                 if qty > 0:
-                    if item not in compatible_items:
+                    try:
                         compatible_items[item] += qty
-                    else:
+                    except KeyError:
                         compatible_items[item] = qty
     return compatible_items
     
