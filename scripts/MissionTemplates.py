@@ -2,46 +2,64 @@ from math import *
 
 deg_to_rad = 0.01745329252
 
-# find closest corner of patrol area
-def GetClosestCorner(lon1, lat1, lon2, lat2, base_track):
-    dlon1 = abs(lon1-base_track.Lon)
-    if (dlon1 > pi):
-        dlon1 = 2*pi - dlon1
-    dlon2 = abs(lon2-base_track.Lon)
-    if (dlon2 > pi):
-        dlon2 = 2*pi - dlon2
-    if (dlon1 < dlon2):
-        lon_closest = lon1
-    else:
-        lon_closest = lon2
-    dlat1 = abs(lat1-base_track.Lat)
-    dlat2 = abs(lat2-base_track.Lat)
-    if (dlat1 < dlat2):
-        lat_closest = lat1
-    else:
-        lat_closest = lat2
-    return (lon_closest, lat_closest)
+# find closest corner of patrol area described in string [lon0,lat0,lon1,lat1,...]
+def GetClosestCornerOfString(area_string, base_track):
+    points_str = area_string.split(',')
+    if (len(points_str[-1]) == 0):
+        points_str = points_str[0:-1] # remove empty last element
+    points = [float(x) for x in points_str] # convert list of string numbers to list of floats
+    return GetClosestCorner(points, base_track)
+
+# points is list of radian coords [lon0,lat0,lon1,lat1,...]
+def GetClosestCorner(points, base_track):
+    lon_points = points[0::2]
+    lat_points = points[1::2]
+    nPoints = min(len(lon_points), len(lat_points))
+    lon_closest = 0
+    lat_closest = 0
+    dist_closest = 999
+    for n in range(0, nPoints):
+        lon = lon_points[n]
+        lat = lat_points[n]
+        dlon = abs(lon - base_track.Lon)
+        if (dlon > pi):
+            dlon = 2*pi - dlon
+        dlon = dlon / cos(lat)
+        dlat = abs(lat - base_track.Lat)
+        dist = sqrt(dlon*dlon + dlat*dlat)
+        if (dist < dist_closest):
+            lon_closest = lon
+            lat_closest = lat
+            dist_closest = dist
+    return (lon_closest, lat_closest)    
     
+# takes 4 corner box input
+def SetAreaPatrolMissionBox(UI, lon1, lat1, lon2, lat2, mission_id):  
+    if ((not UI.HasFlightPort()) or (mission_id == -1)):
+        return
+    area_string = '%f,%f,%f,%f,%f,%f,%f,%f' % (lon1, lat1, lon1, lat2, lon2, lat2, lon2, lat1)
+    FP = UI.GetFlightPortInfo()
+    FP.ClearMissionWaypoints(mission_id)
+    mission_type = FP.GetMissionType(mission_id)
+    if (mission_type == 'ASW-Helo'):
+        SetASWHeloPatrolMission(UI, area_string, mission_id)
+        return
+    else:
+        SetAreaPatrolMission(UI, area_string, mission_id)
+
     
-def SetAreaPatrolMission(UI, lon1, lat1, lon2, lat2, mission_id):    
+def SetAreaPatrolMission(UI, area_string, mission_id):
     if ((not UI.HasFlightPort()) or (mission_id == -1)):
         return
     FP = UI.GetFlightPortInfo()
-    mission_type = FP.GetMissionType(mission_id)
-    if (mission_type == 'ASW-Helo'):
-        SetASWHeloPatrolMission(UI, lon1, lat1, lon2, lat2, mission_id)
-        return
-    
-    FP.ClearMissionWaypoints(mission_id)
-    
-    area_string = '%f,%f,%f,%f,%f,%f,%f,%f' % (lon1, lat1, lon1, lat2, lon2, lat2, lon2, lat1)
+
     FP.SetMissionPatrolArea(mission_id, area_string)
     
     base_id = UI.GetPlatformId()
     base_track = UI.GetTrackById(base_id)
     
     # find closest corner of patrol area
-    lonc, latc = GetClosestCorner(lon1, lat1, lon2, lat2, base_track)
+    lonc, latc = GetClosestCornerOfString(area_string, base_track)
 
     FP.AddMissionWaypointAdvanced(mission_id, base_track.Lon+0.001, base_track.Lat+0.001, 2000, 200)
     FP.AddMissionWaypointTask(mission_id, 0, 'WaitForGroup')
@@ -63,7 +81,7 @@ def SetAreaPatrolMission(UI, lon1, lat1, lon2, lat2, mission_id):
     UI.UpdateMissionEditGraphics()
     
 
-def SetASWHeloPatrolMission(UI, lon1, lat1, lon2, lat2, mission_id):    
+def SetASWHeloPatrolMission(UI, area_string, mission_id):    
     if ((not UI.HasFlightPort()) or (mission_id == -1)):
         return
     FP = UI.GetFlightPortInfo()
@@ -71,14 +89,13 @@ def SetASWHeloPatrolMission(UI, lon1, lat1, lon2, lat2, mission_id):
     
     FP.ClearMissionWaypoints(mission_id)
     
-    area_string = '%f,%f,%f,%f,%f,%f,%f,%f' % (lon1, lat1, lon1, lat2, lon2, lat2, lon2, lat1)
     FP.SetMissionPatrolArea(mission_id, area_string)
     
     base_id = UI.GetPlatformId()
     base_track = UI.GetTrackById(base_id)
     
     # find closest corner of patrol area
-    lonc, latc = GetClosestCorner(lon1, lat1, lon2, lat2, base_track)
+    lonc, latc = GetClosestCornerOfString(area_string, base_track)
 
     FP.AddMissionWaypointAdvanced(mission_id, base_track.Lon+0.001, base_track.Lat+0.001, 500, 100)
     FP.AddMissionWaypointTask(mission_id, 0, 'EngageAll')
@@ -111,7 +128,8 @@ def SetBarrierPatrolMission(UI, lon1, lat1, lon2, lat2, mission_id):
     base_track = UI.GetTrackById(base_id)
     
     # find closest corner of patrol area
-    lonc, latc = GetClosestCorner(lon1, lat1, lon2, lat2, base_track)
+    
+    lonc, latc = GetClosestCorner([lon1, lat1, lon2, lat2], base_track)
 
     FP.AddMissionWaypointAdvanced(mission_id, base_track.Lon+0.001, base_track.Lat+0.001, 2000, 200)
     FP.AddMissionWaypointTask(mission_id, 0, 'WaitForGroup')
@@ -207,5 +225,20 @@ def SetStrikeMission(UI, target_id, mission_id):
     
     UI.UpdateMissionEditGraphics()        
     
-    
+# called after changing something in mission in editor (e.g. mission type for area patrol)
+def RebuildMission(UI, mission_id):
+    if ((not UI.HasFlightPort()) or (mission_id == -1)):
+        return
+    FP = UI.GetFlightPortInfo()
+    area_string = FP.GetMissionPatrolArea(mission_id)
+    if (len(area_string) > 0):
+        FP.TransformToAbsolutePatrolArea(mission_id)
+        area_string = FP.GetMissionPatrolArea(mission_id)
+        FP.ClearMissionWaypoints(mission_id)
+        mission_type = FP.GetMissionType(mission_id)
+        if (mission_type == 'ASW-Helo'):
+            SetASWHeloPatrolMission(UI, area_string, mission_id)
+            return
+        else:
+            SetAreaPatrolMission(UI, area_string, mission_id)
     

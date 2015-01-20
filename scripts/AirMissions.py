@@ -4,8 +4,6 @@ from UnitCommands import *
 
 import math
 
-
-
 # patrol relative to airbase or carrier location
 def CAP(TI):
     UI = TI.GetPlatformInterface()

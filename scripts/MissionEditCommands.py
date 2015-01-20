@@ -13,7 +13,6 @@ def AutoConfigurePlatform(UI, setupName):
 def MovePlatform(UI, lon, lat):
     UI.MovePlatform(lon, lat)
 
-    
 def split_multi(s, separators):
     rr = [s]
     for sep in separators:
@@ -111,7 +110,6 @@ def RotateGroup(GI, angle_rad):
         rot_lat = lat_cen + dlat*cos(angle_rad) - cos_latc*dlon*sin(angle_rad)
         UI.MovePlatform(rot_lon, rot_lat)
 
-        
 def DeletePlatform(UI):
     UI.DeletePlatform()
 
@@ -196,7 +194,6 @@ def ToggleAlliance(SM):
             return
     
     SM.SetUserAlliance(1)
-
 
 # Adds new platform at specified coordinates
 def AddNewPlatform(SM, lon, lat, className):
@@ -304,7 +301,6 @@ def RenameGroup(GI, new_root):
     for n in range(0, unit_count):
         UI = GetPlatformOrWeaponInterface(GI, n)
         UI.RenamePlatform('%s%s%d' % (root, separator, start_id+n))
-        
         
 def AddNewPlatformToFlightDeck(SM, host_id, className):
     group_name = SM.GetAirGroupName()
@@ -431,7 +427,6 @@ def ChangePassTime(SM, time_minutes, goal_id):
     time_goal.SetPassTimeout(60.0*float(time_minutes))
     time_goal.SetFailTimeout(31556926.0)
 
-
 def ChangeFailTime(SM, time_minutes, goal_id):
     goal = SM.GetGoalById(goal_id)
     if (goal.GetTypeString() != 'Time'):
@@ -540,7 +535,6 @@ def RemoveGoalTarget(SM, param_str):
         return
     goal.RemoveTarget(targetName)
        
-   
 def SetGoalQuantity(SM, param_str):
     goal_id = int(param_str[0:8])
     quantity = int(param_str[8:])
@@ -584,7 +578,6 @@ def DeleteAllRandomBoxes(UI):
 
 def SetDateTimeString(SM, str):
     SM.SetDateTimeByString(str)
-
 
 def SetAlwaysVisible(UI, state):
     UI.SetAlwaysVisible(state)

@@ -46,8 +46,6 @@ def RadarRandom(TI):
         if (sens_info.type == 1): 
             UI.SetSensorState(n, state)
     
-    
-                
 def RadarOff(TI):
     UI = TI.GetPlatformInterface()
     BB = TI.GetBlackboardInterface()
@@ -113,7 +111,6 @@ def WaitForGroup(TI):
     else:
         TI.EndTask()  
  
-    
 # randomly move throughout area
 def AirPatrolArea(TI):
     BB = TI.GetBlackboardInterface()
@@ -127,7 +124,7 @@ def AirPatrolArea(TI):
         #UI.DisplayMessage('Not an aircraft')
         TI.EndTask()
         return
-        
+    
     state = TI.GetMemoryValue(2) # 0 - uninit, 1 - moving to new waypoint
     if (state == 0):
         TI.SetMemoryValue(2, 1)
@@ -158,8 +155,6 @@ def AirPatrolArea(TI):
         
     hdg_deg = UI.GetHeadingToDatum(lon_rad, lat_rad)  
     UI.SetHeading(hdg_deg)
-    
-    
     
 # For ASW helicopter, randomly move throughout area, stopping to drop sonobuoys and use dipping sonar
 def ASWPatrolArea(TI):
@@ -470,7 +465,6 @@ def BarrierPatrol(TI):
     if (current_waypoint > start_waypoint+1):
         UI.SetCurrentWaypoint(int(start_waypoint))
 
-            
 # Look for nearby sub target to engage
 def GetSubTarget(UI):
     # anAffiliation: UNKNOWN = 0, FRIENDLY = 1, NEUTRAL = 2, HOSTILE = 3
@@ -519,7 +513,6 @@ def GetSubTarget(UI):
                 
     UI.SetTarget(best_target)
     return (best_target, best_launcher)            
-            
             
 # @return 1 if within box of range_km on a half side
 def IsSonobuoyWithin(UI, range_km):  

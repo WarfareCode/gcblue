@@ -6,6 +6,7 @@ sys.path.append(abspath(join(dirname(__file__), 'Magazine_Generator_Module')))
     #script data in, well, script data, '..' to gain access to logs, and logs to access the scenario report file.
 from Amram_Utilities import *
 from Amram_AI_Weapon_Lists import *
+from magazine_generator import *
 from Alliances import *
 
 #importing from stock
@@ -22,37 +23,37 @@ from StockMenu import *
 
 #scenario report log file path    
 reportfile_path = 'log/scenario_script_report.txt'
-import hotshot, hotshot.stats
-import pstats
+#import hotshot, hotshot.stats
+#import pstats
 
 
 def BuildUnitEditMenu(UnitMenu, UnitInfo):
     UnitMenu.Clear()
-    #BuildAmramMenu(UnitMenu, UnitInfo, EditMode=True)
-    prof = hotshot.Profile("log/UnitEditMenu.prof")
-    prof.runcall(BuildAmramMenu, UnitMenu, UnitInfo, EditMode=True)
-    prof.close()
+    BuildAmramMenu(UnitMenu, UnitInfo, EditMode=True)
+    #prof = hotshot.Profile("log/UnitEditMenu.prof")
+    #prof.runcall(BuildAmramMenu, UnitMenu, UnitInfo, EditMode=True)
+    #prof.close()
     
 def BuildGroupEditMenu(GroupMenu, GroupInfo):
     GroupMenu.Clear()
-    #BuildAmramMenu(GroupMenu, GroupInfo, EditMode=True)
-    prof = hotshot.Profile("log/GroupEditMenu.prof")
-    prof.runcall(BuildAmramMenu, GroupMenu, GroupInfo, EditMode=True)
-    prof.close()
+    BuildAmramMenu(GroupMenu, GroupInfo, EditMode=True)
+    #prof = hotshot.Profile("log/GroupEditMenu.prof")
+    #prof.runcall(BuildAmramMenu, GroupMenu, GroupInfo, EditMode=True)
+    #prof.close()
 
 def BuildGroupMenu(GroupMenu, GroupInfo):
     GroupMenu.Clear()
-    #BuildAmramMenu(GroupMenu, GroupInfo)
-    prof = hotshot.Profile("log/GroupMenu.prof")
-    prof.runcall(BuildAmramMenu, GroupMenu, GroupInfo)
-    prof.close()
+    BuildAmramMenu(GroupMenu, GroupInfo)
+    #prof = hotshot.Profile("log/GroupMenu.prof")
+    #prof.runcall(BuildAmramMenu, GroupMenu, GroupInfo)
+    #prof.close()
     
 def BuildUnitMenu(UnitMenu, UnitInfo):
     UnitMenu.Clear()
-    #BuildAmramMenu(UnitMenu, UnitInfo)
-    prof = hotshot.Profile("log/UnitMenu.prof")
-    prof.runcall(BuildAmramMenu, UnitMenu, UnitInfo)
-    prof.close()
+    BuildAmramMenu(UnitMenu, UnitInfo)
+    #prof = hotshot.Profile("log/UnitMenu.prof")
+    #prof.runcall(BuildAmramMenu, UnitMenu, UnitInfo)
+    #prof.close()
 
 def BuildAmramMenu(Menu, interface, EditMode = False):
     Menu.Clear()
@@ -141,7 +142,6 @@ def BuildAmramMenu(Menu, interface, EditMode = False):
         
 def Get_Alliance_Members(SM, side_name):
     current_year = DateString_DecimalYear(SM.GetScenarioDateAsString())
-    
     members = []
     def iterate_snapshots(alliance):
         for dates in Alliance_List[alliance]:
@@ -165,6 +165,7 @@ def Get_Alliance_Members(SM, side_name):
     return sorted(members)
 
 def AmramCreateAllianceUnitMenu(Menu, SM):
+    debug = open('log/names.txt','w')
     page_count = 25
     side_name = SM.GetAllianceCountry(SM.GetUserAlliance())
     country_filter = SM.GetFilterByCountry()
@@ -191,7 +192,10 @@ def AmramCreateAllianceUnitMenu(Menu, SM):
                 for n in xrange(nPlatformsPage):
                     className = Units[country][category][n+sm*page_count]
                     NatoName = SM.GetDisplayName(className)
-                    qty = GetUnitQty(className)
+                    if category in ['Surface', 'Submarine']:
+                        qty = GetUnitQty(className)
+                    else:
+                        qty = ''
                     if SM.IsUsingNATONames() and ClassName != NatoName:
                         Menu.AddItemUIWithTextParam('%s%s (%s)' % (qty, className, NatoName), 'AddNewPlatform', 'Datum', className)
                     else:
@@ -207,15 +211,27 @@ def AmramCreateAllianceUnitMenu(Menu, SM):
                     Menu.AddItemUIWithTextParam('%s%s' % (qty, className), 'AddNewPlatform', 'Datum', className)
                     
     def GetUnitQty(unit_class):
-        if SM.QueryDatabase('platform_names',unit_class,'Name').GetRow(0).GetString(0) != 'Error':
-            array = SM.QueryDatabase('platform_names',unit_class,'Name')
-        else:
+        names_array = SM.QueryDatabase('platform_names',unit_class,'DateInService, DateOutService')
+        if names_array.GetRow(0).GetString(0) == 'Error':
             return ''
-        for x in xrange(array.Size()):
-            row = array.GetRow(x)
-            for y in xrange(row.Size()):
-                entry = row.GetString(y)
-        return '%s - ' % array.Size()
+        else:
+            filter = SM.GetFilterByYear()
+            if filter:
+                current_year = DateString_DecimalYear(SM.GetScenarioDateAsString())
+                names = 0
+                for name in xrange(names_array.Size()):
+                    try:
+                        date1 = float(names_array.GetRow(name).GetString(0))
+                        date2 = float(names_array.GetRow(name).GetString(1))
+                    except ValueError:
+                        #some units have notes instead, see burkes for example
+                        date1 = 2999
+                        date2 = 1000
+                    if date1 <= current_year <= date2:
+                        names += 1
+                return '%s - ' % names
+            else:
+                return '%s - ' % names_array.Size()
 
     
     if side_name in Aliases:
@@ -1390,12 +1406,12 @@ def PerformInventory(UI, Selected):
     Selected['UnitCount'] = Selected['UnitCount']+1
     return Selected
 
-def Get_Relevant_Stock(UI, loadouts_dict):
-    prof = hotshot.Profile("log/GetRelevantStock.prof")
-    prof.runcall(Get_Relevant_Stock2, UI, loadouts_dict)
-    prof.close()    
+#def Get_Relevant_Stock(UI, loadouts_dict):
+#    prof = hotshot.Profile("log/GetRelevantStock.prof")
+#    prof.runcall(Get_Relevant_Stock2, UI, loadouts_dict)
+#    prof.close()    
     
-def Get_Relevant_Stock2(UI, loadouts_dict):
+def Get_Relevant_Stock(UI, loadouts_dict):
     #do we have children?
     children = 0
     if UI.HasFlightPort():
@@ -1977,12 +1993,12 @@ def check_service(UI, className, date):
             else:
                 return True
 
-def BuildEditMenu(UnitMenu, SM):                
-    prof = hotshot.Profile("log/EditMenu.prof")
-    prof.runcall(BuildEditMenu2, UnitMenu, SM)
-    prof.close()
+#def BuildEditMenu(UnitMenu, SM):                
+#    prof = hotshot.Profile("log/EditMenu.prof")
+#    prof.runcall(BuildEditMenu2, UnitMenu, SM)
+#    prof.close()
      
-def BuildEditMenu2(UnitMenu, SM):
+def BuildEditMenu(UnitMenu, SM):
     UnitMenu.Clear()
     UnitMenu.AddItem('Scenario', '')
     UnitMenu.BeginSubMenu()

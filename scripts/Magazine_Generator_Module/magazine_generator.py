@@ -6,21 +6,6 @@ from service_period import *
 from wildcard_items_list import *
 
 
-def flatten(xs):
-    """
-    flatten(xs):
-    expand_wildcard causes lists to become nested lists.  Flatten() flattens them again.
-    """
-    res = []
-    def loop(ys):
-        for i in ys:
-            if isinstance(i, list):
-                loop(i)
-            else:
-                res.append(i)
-    loop(xs)
-    return res
-
 def Get_Aircraft_Weapon_Stocks(UI, aircraft, airwing, current_year):
     """
     Get_Aircraft_Weapon_Stocks(aircraft, airwing, item_dict, current_year):
@@ -142,11 +127,13 @@ def Get_Own_Stock(UI, unit, current_year, country):
         LauncherId = own_launchers.GetRow(launcher_num).GetString(0)
         LauncherClass = own_launchers.GetRow(launcher_num).GetString(1)
         Reloadable = int(own_launchers.GetRow(launcher_num).GetString(2))
-        Launcher_Config = UI.QueryDatabase('launcher_configuration',LauncherClass,'ChildClass, ChildCapacity')
+        #Launcher_Config = UI.QueryDatabase('launcher_configuration',LauncherClass,'ChildClass, ChildCapacity')
+        Launcher_Config = UI.GetCompatibleItemList(launcher_num)
         launcher_items = {}
         wild_names = []
         for item_x in xrange(Launcher_Config.Size()):
-            item = Launcher_Config.GetRow(item_x).GetString(0)
+            #item = Launcher_Config.GetRow(item_x).GetString(0)
+            item = Launcher_Config.GetString(item_x)
             #item may be a wildcard, check for that now!
             if '*' in item:
                 #wildcard
@@ -174,7 +161,7 @@ def Get_Own_Stock(UI, unit, current_year, country):
                         service_mod = Get_Weapon_Service_Mod(item, current_year, date1, date2)        
             
                 if not date1 > current_year and not date2 < current_year:
-                    qty = float(Launcher_Config.GetRow(item_x).GetString(1)) * service_mod
+                    qty = float(UI.GetItemCapacityForLauncher(launcher_num, item_x)) * service_mod
                     launcher_items[item] = qty
 
         #keep the item with the highest stock value, load that for now
@@ -271,47 +258,38 @@ def generate_airwing(UI):
             airwing[name] = {}
             airwing[name]['count'] = 1
             if UIn.HasThrottle():
-                airwing[name]['date1'] = UI.QueryDatabase('air',name, 'InitialYear').GetRow(0).GetString(0)
-                airwing[name]['date2'] = UI.QueryDatabase('air',name, 'FinalYear').GetRow(0).GetString(0)
-                airwing[name]['fuelcap'] = UI.QueryDatabase('air',name, 'FuelCapacity_kg').GetRow(0).GetString(0)
-                airwing[name]['mass'] = UI.QueryDatabase('air',name, 'Weight_kg').GetRow(0).GetString(0)
-                airwing[name]['MTOW'] = UI.QueryDatabase('air',name, 'MaxTakeoffWeight_kg').GetRow(0).GetString(0)
-                airwing[name]['designation'] = UI.QueryDatabase('air',name, 'Designation').GetRow(0).GetString(0)
+                table = 'air'
             else:
-                airwing[name]['date1'] = UI.QueryDatabase('simpleair',name, 'InitialYear').GetRow(0).GetString(0)
-                airwing[name]['date2'] = UI.QueryDatabase('simpleair',name, 'FinalYear').GetRow(0).GetString(0)
-                airwing[name]['fuelcap'] = UI.QueryDatabase('simpleair',name, 'FuelCapacity_kg').GetRow(0).GetString(0)
-                airwing[name]['mass'] = UI.QueryDatabase('simpleair',name, 'Weight_kg').GetRow(0).GetString(0)
-                airwing[name]['MTOW'] = UI.QueryDatabase('simpleair',name, 'MaxTakeoffWeight_kg').GetRow(0).GetString(0)
-                airwing[name]['designation'] = UI.QueryDatabase('simpleair',name, 'Designation').GetRow(0).GetString(0)
+                table = 'simpleair'
+                
+            aircraft_data = UI.QueryDatabase(table,name, 'InitialYear, FinalYear, FuelCapacity_kg, Weight_kg, MaxTakeoffWeight, Designation').GetRow(0)
+            airwing[name]['date1'] = aircraft_data.GetString(0)
+            airwing[name]['date2'] = aircraft_data.GetString(1)
+            airwing[name]['fuelcap'] = aircraft_data.GetString(2)
+            airwing[name]['mass'] = aircraft_data.GetString(3)
+            airwing[name]['MTOW'] = aircraft_data.GetString(4)
+            airwing[name]['designation'] = aircraft_data.GetString(5)
+            
             airwing[name]['payload'] = float(airwing[name]['MTOW']) - float(airwing[name]['mass']) - float(airwing[name]['fuelcap'])
 
             #replace dependence on data_dict with QueryDatabase when able to perform multi-line lookup
             airwing[name]['launchers'] = {}
             
-            own_launchers = UI.QueryDatabase('platform_launcher', name, 'LauncherId, LauncherClass, IsReloadable')
-            for launcher_num in xrange(own_launchers.Size()):
+            #own_launchers = UI.QueryDatabase('platform_launcher', name, 'LauncherClass')
+            for launcher_num in xrange(UIn.GetLauncherCount()):
                 airwing[name]['launchers'][launcher_num] = {}
-                LauncherId = own_launchers.GetRow(launcher_num).GetString(0)
-                if LauncherId != 'Error':
-                    LauncherClass = own_launchers.GetRow(launcher_num).GetString(1)
-                    try:
-                        Reloadable = int(own_launchers.GetRow(launcher_num).GetString(2))
-                    except:
-                        Reloadable = 0
-                    Launcher_Config = UI.QueryDatabase('launcher_configuration',LauncherClass,'ChildClass, ChildCapacity')
-                    wild_names = []
-                    for item_x in xrange(Launcher_Config.Size()):
-                        item = Launcher_Config.GetRow(item_x).GetString(0)
-                        #iterate through launcher names and append items
-                        qty = Launcher_Config.GetRow(item_x).GetString(1)
-                        if '*' in item:
-                            #wild card item, expand wildcard
-                            wild_list = expand_wildcard(item, Wild_Items)
-                            for wild_item in wild_list:
-                                airwing[name]['launchers'][launcher_num][wild_item] = qty
-                        else:
-                            airwing[name]['launchers'][launcher_num][item] = qty
+                try:
+                    Reloadable = int(own_launchers.GetRow(launcher_num).GetString(2))
+                except:
+                    Reloadable = 0
+                launcher_items = UIn.GetCompatibleItemList(launcher_num)
+                #Launcher_Config = UI.QueryDatabase('launcher_configuration',LauncherClass,'ChildClass, ChildCapacity')
+                wild_names = []
+                for item_x in xrange(launcher_items.Size()):
+                    item = Launcher_Config.GetString(item_x)
+                    #iterate through launcher names and append items
+                    qty = UIn.GetItemCapacityForLauncher(launcher_num, item)
+                    airwing[name]['launchers'][launcher_num][item] = qty
     return airwing
     
 def GetMagClasses(UI, magname):
