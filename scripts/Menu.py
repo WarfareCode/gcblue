@@ -196,8 +196,8 @@ def AmramCreateAllianceUnitMenu(Menu, SM):
                         qty = GetUnitQty(className)
                     else:
                         qty = ''
-                    if SM.IsUsingNATONames() and ClassName != NatoName:
-                        Menu.AddItemUIWithTextParam('%s%s (%s)' % (qty, className, NatoName), 'AddNewPlatform', 'Datum', className)
+                    if SM.IsUsingNATONames() and className != NatoName:
+                        Menu.AddItemUIWithTextParam('%s%s (%s)' % (qty, NatoName, className), 'AddNewPlatform', 'Datum', className)
                     else:
                         Menu.AddItemUIWithTextParam('%s%s' % (qty, className), 'AddNewPlatform', 'Datum', className)
                 Menu.EndSubMenu()
@@ -205,8 +205,8 @@ def AmramCreateAllianceUnitMenu(Menu, SM):
             for className in Units[country][category]:
                 NatoName = SM.GetDisplayName(className)
                 qty = GetUnitQty(className)
-                if SM.IsUsingNATONames() and ClassName != NatoName:
-                    Menu.AddItemUIWithTextParam('%s%s (%s)' % (qty, className, NatoName), 'AddNewPlatform', 'Datum', className)
+                if SM.IsUsingNATONames() and className != NatoName:
+                    Menu.AddItemUIWithTextParam('%s%s (%s)' % (qty, NatoName, className), 'AddNewPlatform', 'Datum', className)
                 else:
                     Menu.AddItemUIWithTextParam('%s%s' % (qty, className), 'AddNewPlatform', 'Datum', className)
                     
