@@ -2080,9 +2080,41 @@ def BuildEditMenu(UnitMenu, SM):
             UnitMenu.AddItemWithParam(SM.GetTemplateName(n), 'SetSonarTemplate', n)
     UnitMenu.AddItem('Edit SVP', '*ShowSonarPanel')
     UnitMenu.EndSubMenu()
-
     UnitMenu.EndSubMenu()
+    AlliancesMenu(UnitMenu, SM)
 
+def CreateAlliance(SM, name, n):
+    SM.CreateAlliance(n, '%s' % name)
+    
+def ToggleAffiliation(SM, param):
+    relations = ['Unknown', 'Friendly', 'Neutral', 'Hostile']
+    a, b = param.split('~')
+    affiliation = SM.GetAllianceRelationship(int(a),int(b)) + 1
+    if affiliation > 3:
+        affiliation = 1
+    SM.SetAllianceRelationship(int(a), int(b), relations[affiliation])
+    
+def AlliancesMenu(Menu, SM):
+    relations = ['Unknown', 'Friendly', 'Neutral', 'Hostile']
+    
+    Menu.AddItem('Alliance Management','');Menu.BeginSubMenu();Menu.SetStayOpen(1)
+    alliance_max = 15
+    alliances = 0
+    for n in xrange(alliance_max):
+        if SM.GetAllianceCountry(n) != 'Error':
+            Menu.AddItem('%s Relations' % SM.GetAllianceCountry(n),'');Menu.BeginSubMenu();Menu.SetStayOpen(1)
+            for x in xrange(alliance_max):
+                if x != n and SM.GetAllianceCountry(x) != 'Error':
+                    Menu.AddItemWithTextParam('%s to %s' % (relations[SM.GetAllianceRelationship(x,n)], SM.GetAllianceCountry(x)),'ToggleAffiliation','%s~%s' % (n,x))
+            Menu.EndSubMenu()
+            if n > alliances:
+                alliances = n
+    if alliances < alliance_max:
+        Menu.AddItem('===================','')
+        Menu.AddItemUIWithParam('Create New Alliance','CreateAlliance','Text Name of New Alliance?', alliances+1)
+    Menu.EndSubMenu()
+            
+            
 #       
 #
 #

@@ -185,10 +185,10 @@ def SaveGame(SM):
     SM.SaveGame('Saved')
 
 # Switch user alliance to next alliance
-# Assumes alliances range from 1 to 8
+# Assumes alliances range from 1 to 16
 def ToggleAlliance(SM):
     user_alliance = SM.GetUserAlliance()
-    for n in range(user_alliance+1, 8):
+    for n in range(user_alliance+1, 16):
         if (SM.AllianceExists(n)):
             SM.SetUserAlliance(n)
             return

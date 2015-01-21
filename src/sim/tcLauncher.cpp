@@ -1824,12 +1824,20 @@ void tcLauncher::UpdateStatus()
 
 			float range_km = C_RADTOKM * nsNav::GCDistance_rad(current, msDatum);
 			/** 2014-07-06 amram request to remove this check
-			if (range_km > weaponData->maxRange_km)
-			{
-				status = OUT_OF_RANGE;
-				return;
-			}
+			   amram:  I specifically meant only missiles, not ALL datum weapons.
 			*/
+			if (tcMissileDBObject* missile = dynamic_cast<tcMissileDBObject*>(mpChildDBObj))
+			{
+			}
+			else
+			{
+				if (range_km > weaponData->maxRange_km)
+				{
+					status = OUT_OF_RANGE;
+					return;
+				}
+			}
+
 			if (range_km < weaponData->minRange_km)
 			{
 				status = TOO_CLOSE;

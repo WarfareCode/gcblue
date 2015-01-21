@@ -59,5 +59,6 @@ Aliases = {
     'Hellenic':'Greece',
     'Hellenic Republic':'Greece',
     'Ellada':'Greece',
+    'Wasaw Pact':'Warsaw Pact',
         }
     

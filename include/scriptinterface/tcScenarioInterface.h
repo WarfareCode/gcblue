@@ -36,6 +36,7 @@
 #include "tcGoal.h"
 #include "tcStringArray.h"
 #include "tcStringTable.h"
+#include "tcAllianceInfo.h"
 
 class tcMapData;
 class tcMapOverlay;
@@ -285,7 +286,9 @@ namespace scriptinterface
 
 		/// queries field info from database -amram: So I can call this from SM if UI is unavailable(no units).
 		scriptinterface::tcStringTable QueryDatabase(const std::string& table, const std::string& databaseClass, const std::string& fields);
-
+		
+		/// retrieves the alliance affiliation.
+		int tcScenarioInterface::GetAllianceRelationship(unsigned char alliance_a, unsigned char alliance_b) const;
 
 		tcScenarioInterface();
 		~tcScenarioInterface();

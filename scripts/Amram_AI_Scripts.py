@@ -1112,22 +1112,19 @@ def GlideSlope(TI):
         TI.SetMemoryValue(175,UI.GetSpeed())
     
     stall_speed = UI.GetStallSpeedForAltitude(UI.GetAlt())
-    descent_speed = stall_speed * 2.2
+    descent_speed = stall_speed * 1.2
 
     last_speed = TI.GetMemoryValue(175)
     TI.SetMemoryValue(175, UI.GetSpeed())
-    if last_speed < UI.GetSpeed():
-        accelerating = True
-    else:
-        accelerating = False
-    
-    if UI.GetClimbDeg() < 0:
-        descending = True
-    else:
-        descending = False
-    
+   
+    accelerating = False
+    descending = False
     toofast = False
     tooslow = False
+    if last_speed < UI.GetSpeed():
+        accelerating = True
+    if UI.GetClimbDeg() < 0:
+        descending = True
     if UI.GetSpeed() > descent_speed:
         toofast = True
     elif UI.GetSpeed() < descent_speed:
@@ -1136,12 +1133,12 @@ def GlideSlope(TI):
     if descending and toofast and accelerating:
         #pitch up to slow our descent rate to delay the crash
         UI.SetClimbDeg(UI.GetClimbDeg() + 1)
-    if tooslow and not accelerating:
+    elif tooslow and not accelerating:
         #pitch down to increase speed to prevent stalling
         UI.SetClimbDeg(UI.GetClimbDeg() - 1)
 
     if descending:
-        UI.SetActionText('Ditching: %3.0fs' % abs((UI.GetAlt() / (asin(radians(UI.GetClimbDeg())) * UI.GetSpeed()))))
+        UI.SetActionText('Ditching: %3.0fs' % abs(UI.GetAlt() / (sin(radians(UI.GetClimbDeg())) * UI.GetSpeed())))
 
 def ValidateTargetAllowable(UI, track):
     BB = UI.GetBlackboardInterface()

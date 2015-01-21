@@ -215,6 +215,7 @@ namespace scriptinterface
 			.def("AllianceExists", &tcScenarioInterface::AllianceExists)
             .def("CreateAlliance",&tcScenarioInterface::CreateAlliance)
             .def("SetAllianceRelationship", &tcScenarioInterface::SetAllianceRelationship)
+			.def("GetAllianceRelationship", &tcScenarioInterface::GetAllianceRelationship)
             .def("SetAllianceDefaultCountry", &tcScenarioInterface::SetAllianceDefaultCountry)
             .def("GetAllianceCountry", &tcScenarioInterface::GetAllianceCountry)
             .def("SetAlliancePlayable", &tcScenarioInterface::SetAlliancePlayable)
@@ -292,11 +293,11 @@ namespace scriptinterface
             .def("GetFilterByYear", &tcScenarioInterface::GetFilterByYear)
             .def("SetFilterByCountry", &tcScenarioInterface::SetFilterByCountry)
             .def("GetFilterByCountry", &tcScenarioInterface::GetFilterByCountry)
+			.def("QueryDatabase", &tcScenarioInterface::QueryDatabase)
 
             // database management
             .def("LoadDatabaseMod", &tcScenarioInterface::LoadDatabaseMod)
             .def("RestoreDefaultDatabase", &tcScenarioInterface::RestoreDefaultDatabase)
-			.def("QueryDatabase", &tcScenarioInterface::QueryDatabase)
 
             // more scenario edit commands, started Oct 2008
             .def("SetAirGroupName", &tcScenarioInterface::SetAirGroupName)
@@ -2129,6 +2130,12 @@ namespace scriptinterface
 	void tcScenarioInterface::SetProgressReporting(wxProgressDialog* dlg)
 	{
 		progressDialog = dlg;
+	}
+
+	int tcScenarioInterface::GetAllianceRelationship(unsigned char alliance_a, unsigned char alliance_b) const
+	{
+		tcAllianceInfo* allianceInfo = tcAllianceInfo::Get();
+		return allianceInfo->GetAffiliation(alliance_a, alliance_b);
 	}
 
 	tcStringTable tcScenarioInterface::QueryDatabase(const std::string& table, const std::string& databaseClass, const std::string& fields)
