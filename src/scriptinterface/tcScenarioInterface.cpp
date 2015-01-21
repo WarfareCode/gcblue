@@ -1932,6 +1932,8 @@ namespace scriptinterface
     void tcScenarioInterface::SetFilterByYear(bool state)
     {
         filterByYear = state;
+
+		tcPlatformInterface::SetDateFiltering(state);
     }
 
     bool tcScenarioInterface::GetFilterByYear() const

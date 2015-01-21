@@ -2219,6 +2219,9 @@ void tcDatabase::ExportPlatformTables()
     fclose(fid_magazine);
 }
 
+/**
+* @param searchYear floating point year value for date filtering. Set to zero to ignore this field in search
+*/
 bool tcDatabase::FindPlatformSetups(const std::string& databaseClass, float searchYear, std::vector<std::string>& setupNames)
 {
     float maxInitialYear = searchYear;
@@ -2226,6 +2229,7 @@ bool tcDatabase::FindPlatformSetups(const std::string& databaseClass, float sear
     if (searchYear <= 0) // effectively ignore year field
     {
         maxInitialYear = 99999.0f;
+		minFinalYear = 0;
     }
 
     setupNames.clear();

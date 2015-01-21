@@ -558,6 +558,7 @@ namespace scriptinterface {
 		void ApplyAdvancedDamage(bool isPen, float kinetic_J, float explosive_kg, float blast_psi,
 			float waterBlast_psi, float thermal_J_cm2,float fragHits,float fragEnergy_J);
 
+
 		static void SetObj(tcPlatformObject *apObj) {mpStaticPlatformObj = apObj;}
 		void GetLocalObj();
 		void SetPlatform(tcPlatformObject *obj);
@@ -569,6 +570,7 @@ namespace scriptinterface {
         static void AttachScenarioInterface(tcScenarioInterface* si) {scenarioInterface = si;}
         static void SetDeveloperMode(bool state) {isDeveloperMode = state;}
         static bool GetDeveloperMode() {return isDeveloperMode;}
+		static void SetDateFiltering(bool state);
         static tcScenarioInterface* GetScenarioInterfaceStatic();
 		void GetSensorMap();
 
@@ -581,6 +583,8 @@ namespace scriptinterface {
 
 		tcPlatformObject *mpPlatformObj;
 		bool isPlatformOwnAlliance; ///< true if platform is part of user's alliance
+
+		
 		static tcPlatformObject *mpStaticPlatformObj;
 		static tcSimState *mpSimState;
 		static tcAllianceSensorMap *mpSensorMap;
@@ -590,6 +594,7 @@ namespace scriptinterface {
         static tcTacticalMapView* tacticalMap; ///< for get formation edit information
         static bool isDeveloperMode; ///< special mode for developer test
         static tcScenarioInterface* scenarioInterface; ///< to allow hooked units access in edit mode
+		static bool enableDateFiltering; ///< for GetPlatformSetups() and GetLoadoutList()
 
         ai::Nav* GetNav(); ///< helper function for other methods
         const ai::Nav* GetNav() const;

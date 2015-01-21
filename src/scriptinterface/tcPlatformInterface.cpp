@@ -2183,8 +2183,15 @@ namespace scriptinterface {
 
         if (tcAirObject* air = dynamic_cast<tcAirObject*>(mpPlatformObj))
         {
-            tcDateTime dateTime = mpSimState->GetDateTime();
-            const std::vector<tcLoadoutData>& loadoutList = air->mpDBObject->GetLoadoutList(dateTime.GetFractionalYear());
+			tcDateTime dateTime = mpSimState->GetDateTime();
+
+			double searchYear = dateTime.GetFractionalYear();
+			if (!enableDateFiltering)
+			{
+				searchYear = 0; // set year to 0 to have FindPlatformSetups ignore date filtering
+			}
+
+            const std::vector<tcLoadoutData>& loadoutList = air->mpDBObject->GetLoadoutList(searchYear);
             for (size_t n=0; n<loadoutList.size(); n++)
             {
                 stringArray.AddString(loadoutList[n].setupName);
@@ -2228,6 +2235,11 @@ namespace scriptinterface {
 
         tcDateTime current = mpSimState->GetDateTime();
         float currentYear = float(current.GetYear()) + (1.0f/12.0f)*(float(current.GetMonth()) - 0.5f);
+
+		if (!enableDateFiltering)
+		{
+			currentYear = 0; // set year to 0 to have FindPlatformSetups ignore date filtering
+		}
 
         std::vector<std::string> platformSetups;
         tcDatabase* database = tcDatabase::Get();
@@ -3971,6 +3983,11 @@ namespace scriptinterface {
 		}
     } 
 
+	void tcPlatformInterface::SetDateFiltering(bool state)
+	{
+		enableDateFiltering = state;
+	}
+
 
     tcPlatformObject* tcPlatformInterface::mpStaticPlatformObj = 0;
     tcSimState* tcPlatformInterface::mpSimState = 0;
@@ -3981,6 +3998,7 @@ namespace scriptinterface {
     tcTacticalMapView* tcPlatformInterface::tacticalMap = 0;
     bool tcPlatformInterface::isDeveloperMode = false;
     tcScenarioInterface* tcPlatformInterface::scenarioInterface = 0;
+	bool tcPlatformInterface::enableDateFiltering = false;
 
 	tcPlatformInterface::tcPlatformInterface()
 		: mpPlatformObj(0)
