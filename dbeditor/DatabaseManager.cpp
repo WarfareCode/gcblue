@@ -828,10 +828,11 @@ const std::vector<wxArrayString>& tcDatabaseManager::GetPlatformTableData(const 
         command += " and ";
         command += additionalConstraint;
     }
-    sqlite3_command sqlCmd(sqlConnection, command.ToStdString());
+    
 
     try
     {
+		sqlite3_command sqlCmd(sqlConnection, command.ToStdString());
         sqlite3_reader results = sqlCmd.executereader();
 
         while (results.read())
@@ -846,7 +847,9 @@ const std::vector<wxArrayString>& tcDatabaseManager::GetPlatformTableData(const 
     }
     catch (sqlite3x::database_error err)
     {
-        wxMessageBox(err.what(), "Database Error");
+		wxString errorDescription;
+		errorDescription.Printf("Error (%s) with command:%s", err.what(), command.c_str());
+        wxMessageBox(errorDescription, "Database Error");
     }
 
     return tableData;
