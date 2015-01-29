@@ -43,6 +43,12 @@ Alliance_List = {
         '01/01/1800':{ 'Start':1800.000, 'Stop':1945.344, 'Members':['Germany']},
         '07/05/1945':{ 'Start':1945.344, 'Stop':1990.585, 'Members':['Please Use East or West Germany for this Time Period']},
         '03/08/1990':{ 'Start':1990.585, 'Stop':2999.999, 'Members':['Germany', 'Germany, Democratic Republic', 'Germany, Federal Republic']}
+            },
+    'Vietnam': {
+        '01/01/1000':{ 'Start':1000.000, 'Stop':1884.025, 'Members':['Vietnam']},
+        '01/01/1884':{ 'Start':1884.025, 'Stop':1954.322, 'Members':['French IndoChina']},
+        '27/04/1954':{ 'Start':1954.322, 'Stop':1975.331, 'Members':['Please use North Vietnam or South Vietnam']},
+        '30/04/1975':{ 'Start':1975.331, 'Stop':2999.999, 'Members':['Vietnam', 'Vietnam, North', 'Vietnam, South']}
             }
     }
 Aliases = {

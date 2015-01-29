@@ -141,7 +141,10 @@ bool tcDamageEffect::ParseEffectString(std::vector<DamagePoint>& effect, const s
 
         DamagePoint point;
         point.effectLevel = (float)effectLevel;
-        point.damageFactor = 2.0f * (float)damageFactor; // double here to make factor in database the MEDIAN damage with uniform rand
+        //point.damageFactor = 2.0f * (float)damageFactor; // double here to make factor in database the MEDIAN damage with uniform rand
+        point.damageFactor = (float)damageFactor;
+		// Amram - calming this down, a fluctuation from 0 through 200% is a bit much?  Replacing the other piece of the random factor
+		//		   to achieve 100% ±30%, for a range from 70% through 130%.
 
         effect.push_back(point);
 

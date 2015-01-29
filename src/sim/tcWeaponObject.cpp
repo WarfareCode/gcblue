@@ -173,7 +173,10 @@ float tcWeaponObject::ApplyAdvancedDamage(const Damage& damage, tcGameObject* da
 
     if (cumulativeDamage <= 0) return 0; // no damage, exit now
 
-    float newDamage = randf() * cumulativeDamage;
+    //float newDamage = randf() * cumulativeDamage;
+    float newDamage = (0.7 + (randf() * 0.6)) * cumulativeDamage;
+	// Amram - calming this down, a fluctuation from 0 through 200% is a bit much?  The doubling factor already replaced with equivalence
+	//		   Set to achieve 100% ±30%, for a range from 70% through 130%.
 
     mfDamageLevel += newDamage;
 
