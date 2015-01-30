@@ -11,3 +11,4 @@ lib/**
 maps/tiles/tiles.7z
 *.db-journal
 xml/options.xml
+xml/options.xml

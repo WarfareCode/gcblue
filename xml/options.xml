@@ -3,11 +3,11 @@
     <CommandMode Value="0" />
     <MapMode Value="1" />
     <FillRangeCircles Value="0" />
-    <SymbologyType Value="0" />
+    <SymbologyType Value="1" />
     <CheatMode3D Value="1" />
     <SonarRayTracingEnabled Value="1" />
     <TerrainMaskingEnabled Value="1" />
-    <AccurateCrossSectionEnabled Value="0" />
+    <AccurateCrossSectionEnabled Value="1" />
     <SurfVelocityLeader Value="3" />
     <AirVelocityLeader Value="2" />
     <DrawNavPointsMode Value="0" />
