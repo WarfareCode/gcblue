@@ -1116,7 +1116,7 @@ def Use_Launcher_On_Target_Amram(UI, launcher, launch_type, *target):
         elif UI.QueryDatabase('missile',weapon_name,'ClassificationId').GetRow(0).GetString(0) == '64':
              #its a missile
              launch_type = 0
-        elif UI.QueryDatabase('ballistic',weap_name,'BallisticType').GetRow(0).GetString(0) == '5':  #rocket
+        elif UI.QueryDatabase('ballistic',weapon_name,'BallisticType').GetRow(0).GetString(0) == '5':  #rocket
             #its a rocket
             launch_type = 3
         else:
