@@ -15,8 +15,8 @@
     <FastMaintenance Value="1" />
     <FastLoad Value="1" />
     <SoundDisabled Value="0" />
-    <MusicEnabled Value="0" />
-    <MusicVolume Value="0.500000" />
+    <MusicEnabled Value="1" />
+    <MusicVolume Value="1.000000" />
     <EffectVolume Value="1.000000" />
     <WindowedMode Value="0" />
     <Max3DRange Value="0" />

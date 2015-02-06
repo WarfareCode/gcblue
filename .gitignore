@@ -12,3 +12,4 @@ maps/tiles/tiles.7z
 *.db-journal
 xml/options.xml
 xml/options.xml
+dbeditor/database_errors.txt
