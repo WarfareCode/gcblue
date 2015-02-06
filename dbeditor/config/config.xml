@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Root>
-    <LastPath LastDatabasePath="D:\gcblue\database" LastDatabaseFile="database.db" LastCSVPath="D:\blue_v26\database"/>
+    <LastPath LastDatabasePath="D:\gcblue\database" LastDatabaseFile="database.db" LastCSVPath="D:\gcblue\dbeditor\CSV's"/>
     <PageState>
         <Page Table="sub" ItemName="Hayashio"/>
         <Page Table="ship" ItemName="Murasame DDG"/>
