@@ -12,8 +12,8 @@
         <Page Table="esm" ItemName="ESM-1"/>
         <Page Table="ecm" ItemName="Jammer 100W"/>
         <Page Table="optical" ItemName="Eyeball 20/20b"/>
-        <Page Table="torpedo" ItemName="RBU Test"/>
-        <Page Table="missile" ItemName="Python 5"/>
+        <Page Table="torpedo" ItemName="RBU munition"/>
+        <Page Table="missile" ItemName="PL-7B"/>
         <Page Table="ballistic_missile" ItemName="UGM-96A"/>
         <Page Table="ballistic" ItemName="GBU-31B(v)2"/>
         <Page Table="launcher_configuration" ItemName="Hedgehog"/>

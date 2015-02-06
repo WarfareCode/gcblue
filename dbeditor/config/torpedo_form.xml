@@ -18,6 +18,7 @@
         <text value="ImageList" label="ImageList" proportion="2" multiline="yes"></text>
         <text value="IconFileName" label="IconFileName" proportion="0"></text>
         <text value="ModelFileName" label="ModelFileName" proportion="0"></text>
+        <text value="Country" label="Country" proportion="0" ></text>
     </sizer>
     <sizer orientation="vertical" proportion="1">
         <text value="InitialYear" label="InitialYear" proportion="0"></text>
