@@ -22,7 +22,6 @@
         <text value="FuelCapacity_kg" label="FuelCapacity_kg" proportion="0"></text>
         <text value="FuelRate_kgps" label="FuelRate_kgps" proportion="0"></text>
         <combobox value="DamageEffect" label="Survivability" proportion="0" update_table="damage_effect"></combobox>
-        <text value="Toughness" label="Toughness" proportion="0"></text>
         <text value="Draft_m" label="Draft_m" proportion="0"></text>
         <combobox value="FlightportClass" label="FlightportClass" proportion="0" update_table="flightport"></combobox>
     </sizer>

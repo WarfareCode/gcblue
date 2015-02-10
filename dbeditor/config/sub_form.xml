@@ -4,7 +4,7 @@
         <text value="Description" label="Description" proportion="3" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
         <text value="Notes" label="Notes" proportion="3" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
         <!--combobox value="ModelClassId" label="Model Type" proportion="0" file="config/modeltype.txt"></combobox-->
-        <!--combobox value="ClassificationId" label="Classification" proportion="0" file="config/classification.txt"></combobox-->
+        <combobox value="ClassificationId" label="Classification" proportion="0" file="config/classification.txt"></combobox>
         <!--text value="Volume_m3" label="Volume_m3" proportion="0"></text-->
         <text value="ImageList" label="ImageList" proportion="2" multiline="yes"></text>
         <!--text value="IconFileName" label="IconFileName" proportion="0"></text-->
