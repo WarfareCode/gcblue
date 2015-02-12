@@ -1,0 +1,10 @@
+    <Model File="P-3 Orion.tvm"/>
+    <Info Author="Emiliano D'Alessandri AkA Clockmaster" Notes="Lockheed P-3 Orion model"/>
+    <Submodel File="P-3 Propeller.tvm" Object="prop1" X="-8.82" Y="-2.9" Z="9.07" Yaw="0" Pitch="0" Roll="0"/>
+    <Submodel File="P-3 Propeller.tvm" Object="prop2" X="-4.57" Y="-3.255" Z="9.32" Yaw="0" Pitch="0" Roll="0"/>
+    <Submodel File="P-3 Propeller.tvm" Object="prop3" X="4.57" Y="-3.255" Z="9.32" Yaw="0" Pitch="0" Roll="0"/>
+    <Submodel File="P-3 Propeller.tvm" Object="prop4" X="8.82" Y="-2.9" Z="9.07" Yaw="0" Pitch="0" Roll="0"/>
+    <Animation Object="prop1" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="25"/>
+    <Animation Object="prop2" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="25"/>
+    <Animation Object="prop3" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="25"/>
+    <Animation Object="prop4" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="25"/>

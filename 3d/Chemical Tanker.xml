@@ -1,0 +1,6 @@
+    <Model File="Chemical Tanker.tvm"/>
+    <Info Author="Emiliano D'Alessandri AkA Clockmaster" Notes="Chemical Tanker model"/>
+    <Submodel File="Freighter Propeller.tvm" Object="propl" X="-14.0" Y="-13.40" Z="-127.50" Yaw="0" Pitch="0" Roll="0"/>
+    <Submodel File="Freighter Propeller.tvm" Object="propr" X="14.0" Y="-13.40" Z="-127.50" Yaw="0" Pitch="0" Roll="0"/>
+    <Animation Object="propl" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="-0.2"/>
+    <Animation Object="propr" Type="Propeller" AxisX="0" AxisY="0" AxisZ="1" AngleRate="0.2"/>
