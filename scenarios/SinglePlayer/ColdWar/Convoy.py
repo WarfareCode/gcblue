@@ -636,7 +636,6 @@ def CreateScenario(SM):
     SM.AddToUnitMagazine("K-209", 'SET-65', 8)
     SM.AddToUnitMagazine("K-209", '53-65M', 4)
     UI.SetSensorState(0, 0)
-    UI.SetSensorState(2, 0)
     UI.SetSensorState(4, 0)
     UI.AddTask('EngageAll', 2.000000, 0)
     UI.AddTask('Nav', 1.000000, 0)
