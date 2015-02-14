@@ -1878,8 +1878,16 @@ namespace scriptinterface {
     int tcPlatformInterface::GetMagazineQuantity(std::string item)
     {
         if (mpPlatformObj == 0) return 0;
-
         return (int)mpPlatformObj->GetMagazineQuantity(item);
+    }
+
+    int tcPlatformInterface::GetMagazineIdQuantity(std::string item, int magazine_id)
+    {
+        if (mpPlatformObj == 0) return 0;
+        tcStores* mag = mpPlatformObj->GetMagazine(magazine_id);
+        std::string matchingItem;
+        size_t nAvailable = mag->CurrentItemQuantity(item, matchingItem);
+        return nAvailable;
     }
 
     bool tcPlatformInterface::HasMagazine() const

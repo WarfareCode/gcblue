@@ -152,6 +152,7 @@ namespace scriptinterface {
             .def("GetLauncherTypeName", &tcPlatformInterface::GetLauncherTypeName)
             .def("CanMagazineAcceptItem", &tcPlatformInterface::CanMagazineAcceptItem)
             .def("GetMagazineQuantity", &tcPlatformInterface::GetMagazineQuantity)
+            .def("GetMagazineIdQuantity", &tcPlatformInterface::GetMagazineIdQuantity)
             .def("HasMagazine", &tcPlatformInterface::HasMagazine)
             .def("GetMagazineItems", &tcPlatformInterface::GetMagazineItems)
             .def("AddItemToMagazine", &tcPlatformInterface::AddItemToMagazine)
