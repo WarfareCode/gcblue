@@ -345,6 +345,8 @@ namespace scriptinterface {
         int GetMagazineQuantity(std::string item);
         /// quantity of item available in specific magazine
         int GetMagazineIdQuantity(std::string item, int magazine_id);
+        /// Set specified magazine to empty
+        void tcPlatformInterface::SetMagazineEmpty(int magazine_id);
         /// list of items in all platform magazines
         tcStringArray GetMagazineItems();
         bool HasMagazine() const;

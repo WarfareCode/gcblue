@@ -1890,6 +1890,13 @@ namespace scriptinterface {
         return nAvailable;
     }
 
+    void tcPlatformInterface::SetMagazineEmpty(int magazine_id)
+    {
+        if (mpPlatformObj == 0) return;
+		tcStores* stores = mpPlatformObj->GetMagazine(magazine_id);
+		stores->RemoveAllItems();
+    }
+
     bool tcPlatformInterface::HasMagazine() const
     {
         if (mpPlatformObj == 0) return false;
