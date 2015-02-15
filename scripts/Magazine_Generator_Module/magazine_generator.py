@@ -43,6 +43,7 @@ def check_limits(UI, stocks):
     """
     mass = 0
     qty = 0
+    volume = 0
     if type(stocks) == type({}):
         for item in stocks:
             if item != 'mass':
@@ -54,10 +55,13 @@ def check_limits(UI, stocks):
                 qty += item_qty
                 if item == 'Fuel':
                     item_mass = 1.0
+                    item_volume = 0.32906
                 else:
                     table = determine_item_table(UI, item)
-                    item_mass = float(UI.QueryDatabase(table,item,'Weight_kg').GetString(0))
+                    item_mass = float(UI.QueryDatabase(table,item,'Weight_kg').GetRow(0).GetString(0))
+                    item_volume = float(UI.QueryDatabase(table,item,'Volume_m3').GetRow(0).GetString(0))
                 mass += item_mass * item_qty
+                volume += item_volume * item_qty
     else:
         for line in stocks:
             item = line[1]
@@ -69,11 +73,14 @@ def check_limits(UI, stocks):
             qty += item_qty
             if item == 'Fuel':
                 item_mass = 1.0
+                item_volume = 0.32906
             else:
                 table = determine_item_table(UI, item)
-                item_mass = float(UI.QueryDatabase(table,item,'Weight_kg').GetString(0))
-                mass += item_mass * item_qty
-    return qty, mass
+                item_mass = float(UI.QueryDatabase(table,item,'Weight_kg').GetRow(0).GetString(0))
+                item_volume = float(UI.QueryDatabase(table,item,'Volume_m3').GetRow(0).GetString(0))
+            mass += item_mass * item_qty
+            volume += item_volume * item_qty
+    return qty, mass, volume
 
 def Get_Weapon_Service_Mod(item, year, date1, date2):
     """
@@ -124,87 +131,87 @@ def Get_Own_Stock(UI, unit, current_year, country):
     loadout_entry = {}
     own_launchers = UI.QueryDatabase('platform_launcher', unit, 'LauncherId, LauncherClass, IsReloadable')
     for launcher_num in xrange(own_launchers.Size()):
-        LauncherId = own_launchers.GetRow(launcher_num).GetString(0)
-        LauncherClass = own_launchers.GetRow(launcher_num).GetString(1)
-        Reloadable = int(own_launchers.GetRow(launcher_num).GetString(2))
-        #Launcher_Config = UI.QueryDatabase('launcher_configuration',LauncherClass,'ChildClass, ChildCapacity')
-        Launcher_Config = UI.GetCompatibleItemList(launcher_num)
-        launcher_items = {}
-        wild_names = []
-        for item_x in xrange(Launcher_Config.Size()):
-            #item = Launcher_Config.GetRow(item_x).GetString(0)
-            item = Launcher_Config.GetString(item_x)
-            #item may be a wildcard, check for that now!
-            if '*' in item:
-                #wildcard
-                wild_names.append(item)
-                wild_list = expand_wildcard(item, Wild_Items)
-            else:
-                wild_list = [item]
-            for item in wild_list:
-                if country in servicekit:
-                    if item in servicekit[country]:
-                        date1 = float(servicekit[country][item]['Entry'])
-                        date2 = float(servicekit[country][item]['Exit'])
-                        service_mod = Get_Weapon_Service_Mod(item, current_year, date1, date2)
-                    else:
-                        date1 = 2999
-                        date2 = 1900
-                        service_mod = 0
-                else:
-                    table = determine_item_table(UI, item)
-                    date1 = float(UI.QueryDatabase(table,item,'InitialYear').GetRow(0).GetString(0))
-                    date2 = float(UI.QueryDatabase(table,item,'FinalYear').GetRow(0).GetString(0))
-                    if table in ['fueltank']:
-                        service_mod = 1
-                    else:
-                        service_mod = Get_Weapon_Service_Mod(item, current_year, date1, date2)        
-            
-                if not date1 > current_year and not date2 < current_year:
-                    qty = float(UI.GetItemCapacityForLauncher(launcher_num, item_x)) * service_mod
-                    launcher_items[item] = qty
-
-        #keep the item with the highest stock value, load that for now
-        #need to make something better for choosing stock to load.
-        high_val = 0
-        has_load_item = False
-        for item in launcher_items:
-            if launcher_items[item] > high_val:
-                high_val = launcher_items[item]
-                load_item = item
-                has_load_item = True
-
-        #build reload stock list
-        is_wild = False
-        for wild_name in wild_names:
-            if wild_name in load_item:
-                #then we were a wildcard in the launcher config, not the full name, so lookup the wildcard name
-                is_wild = True
-                for item_x in xrange(Launcher_Config.Size()):
-                    item = Launcher_Config.GetRow(item_x).GetString(0)
-                    if item == wild_name:
-                        load_item_qty = Launcher_Config.GetRow(item_x).GetString(1)
-                        break
-                break
-        if not is_wild:
+        if own_launchers.GetRow(launcher_num).GetString(0) != "Error":
+            LauncherId = own_launchers.GetRow(launcher_num).GetString(0)
+            LauncherClass = own_launchers.GetRow(launcher_num).GetString(1)
+            Reloadable = int(own_launchers.GetRow(launcher_num).GetString(2))
+            Launcher_Config = UI.GetCompatibleItemList(launcher_num)
+            launcher_items = {}
+            wild_names = []
             for item_x in xrange(Launcher_Config.Size()):
-                item = Launcher_Config.GetRow(item_x).GetString(0)
-                if item == load_item:
-                    load_item_qty = Launcher_Config.GetRow(item_x).GetString(1)
-                    break
-                    
-        if has_load_item:
-            #build loadout list
-            loadout_entry[launcher_num] = [load_item, load_item_qty]
-            #Add stock if reloadable
-            if Reloadable:
-                stock_lvl = {'torpedo':4,'ballistic':5,'missile':3}
-                stock = stock_lvl.get(determine_item_table(UI, load_item),5)
-                qty = float(load_item_qty) * stock
-                if load_item in own_stock_list:
-                    own_stock_list[load_item] += qty
+                #item = Launcher_Config.GetRow(item_x).GetString(0)
+                item = Launcher_Config.GetString(item_x)
+                #item may be a wildcard, check for that now!
+                if '*' in item:
+                    #wildcard
+                    wild_names.append(item)
+                    wild_list = expand_wildcard(item, Wild_Items)
                 else:
-                    own_stock_list[load_item] = qty
+                    wild_list = [item]
+                for item in wild_list:
+                    if country in servicekit:
+                        if item in servicekit[country]:
+                            date1 = float(servicekit[country][item]['Entry'])
+                            date2 = float(servicekit[country][item]['Exit'])
+                            service_mod = Get_Weapon_Service_Mod(item, current_year, date1, date2)
+                        else:
+                            date1 = 2999
+                            date2 = 1900
+                            service_mod = 0
+                    else:
+                        table = determine_item_table(UI, item)
+                        date1 = float(UI.QueryDatabase(table,item,'InitialYear').GetRow(0).GetString(0))
+                        date2 = float(UI.QueryDatabase(table,item,'FinalYear').GetRow(0).GetString(0))
+                        if table in ['fueltank']:
+                            service_mod = 1
+                        else:
+                            service_mod = Get_Weapon_Service_Mod(item, current_year, date1, date2)        
+                
+                    if not date1 > current_year and not date2 < current_year:
+                        qty = float(UI.GetItemCapacityForLauncher(launcher_num, item)) * service_mod
+                        launcher_items[item] = qty
+
+            #keep the item with the highest stock value, load that for now
+            #need to make something better for choosing stock to load.
+            high_val = 0
+            has_load_item = False
+            for item in launcher_items:
+                if launcher_items[item] > high_val:
+                    high_val = launcher_items[item]
+                    load_item = item
+                    has_load_item = True
+
+            #build reload stock list
+            is_wild = False
+            for wild_name in wild_names:
+                if wild_name in load_item:
+                    #then we were a wildcard in the launcher config, not the full name, so lookup the wildcard name
+                    is_wild = True
+                    for item_x in xrange(Launcher_Config.Size()):
+                        item = Launcher_Config.GetString(item_x)
+                        if item == wild_name:
+                            load_item_qty = int(UI.GetItemCapacityForLauncher(launcher_num, item))
+                            break
+                    break
+            if not is_wild:
+                for item_x in xrange(Launcher_Config.Size()):
+                    item = Launcher_Config.GetString(item_x)
+                    if item == load_item:
+                        load_item_qty = int(UI.GetItemCapacityForLauncher(launcher_num, item))
+                        break
+                        
+            if has_load_item:
+                #build loadout list
+                loadout_entry[launcher_num] = [load_item, load_item_qty]
+                #Add stock if reloadable
+                if Reloadable:
+                    stock_lvl = {'torpedo':4,'ballistic':5,'missile':3}
+                    stock = stock_lvl.get(determine_item_table(UI, load_item),5)
+                    qty = float(load_item_qty) * stock
+                    if load_item in own_stock_list:
+                        own_stock_list[load_item] += qty
+                    else:
+                        own_stock_list[load_item] = qty
 
     return own_stock_list, loadout_entry
 
@@ -262,34 +269,35 @@ def generate_airwing(UI):
             else:
                 table = 'simpleair'
                 
-            aircraft_data = UI.QueryDatabase(table,name, 'InitialYear, FinalYear, FuelCapacity_kg, Weight_kg, MaxTakeoffWeight, Designation').GetRow(0)
-            airwing[name]['date1'] = aircraft_data.GetString(0)
-            airwing[name]['date2'] = aircraft_data.GetString(1)
-            airwing[name]['fuelcap'] = aircraft_data.GetString(2)
-            airwing[name]['mass'] = aircraft_data.GetString(3)
-            airwing[name]['MTOW'] = aircraft_data.GetString(4)
-            airwing[name]['designation'] = aircraft_data.GetString(5)
-            
-            airwing[name]['payload'] = float(airwing[name]['MTOW']) - float(airwing[name]['mass']) - float(airwing[name]['fuelcap'])
+            aircraft_data = UI.QueryDatabase(table,name, 'InitialYear, FinalYear, FuelCapacity_kg, Weight_kg, MaxTakeoffWeight_kg, Designation').GetRow(0)
+            if aircraft_data.GetString(0) != 'Error' and aircraft_data.Size() == 6:
+                airwing[name]['date1'] = aircraft_data.GetString(0)
+                airwing[name]['date2'] = aircraft_data.GetString(1)
+                airwing[name]['fuelcap'] = aircraft_data.GetString(2)
+                airwing[name]['mass'] = aircraft_data.GetString(3)
+                airwing[name]['MTOW'] = aircraft_data.GetString(4)
+                airwing[name]['designation'] = aircraft_data.GetString(5)
+                
+                airwing[name]['payload'] = float(airwing[name]['MTOW']) - float(airwing[name]['mass']) - float(airwing[name]['fuelcap'])
 
-            #replace dependence on data_dict with QueryDatabase when able to perform multi-line lookup
-            airwing[name]['launchers'] = {}
-            
-            #own_launchers = UI.QueryDatabase('platform_launcher', name, 'LauncherClass')
-            for launcher_num in xrange(UIn.GetLauncherCount()):
-                airwing[name]['launchers'][launcher_num] = {}
-                try:
-                    Reloadable = int(own_launchers.GetRow(launcher_num).GetString(2))
-                except:
-                    Reloadable = 0
-                launcher_items = UIn.GetCompatibleItemList(launcher_num)
-                #Launcher_Config = UI.QueryDatabase('launcher_configuration',LauncherClass,'ChildClass, ChildCapacity')
-                wild_names = []
-                for item_x in xrange(launcher_items.Size()):
-                    item = Launcher_Config.GetString(item_x)
-                    #iterate through launcher names and append items
-                    qty = UIn.GetItemCapacityForLauncher(launcher_num, item)
-                    airwing[name]['launchers'][launcher_num][item] = qty
+                #replace dependence on data_dict with QueryDatabase when able to perform multi-line lookup
+                airwing[name]['launchers'] = {}
+                
+                #own_launchers = UI.QueryDatabase('platform_launcher', name, 'LauncherClass')
+                for launcher_num in xrange(UIn.GetLauncherCount()):
+                    airwing[name]['launchers'][launcher_num] = {}
+                    try:
+                        Reloadable = int(own_launchers.GetRow(launcher_num).GetString(2))
+                    except:
+                        Reloadable = 0
+                    launcher_items = UIn.GetCompatibleItemList(launcher_num)
+                    #Launcher_Config = UI.QueryDatabase('launcher_configuration',LauncherClass,'ChildClass, ChildCapacity')
+                    wild_names = []
+                    for item_x in xrange(launcher_items.Size()):
+                        item = launcher_items.GetString(item_x)
+                        #iterate through launcher names and append items
+                        qty = UIn.GetItemCapacityForLauncher(launcher_num, item)
+                        airwing[name]['launchers'][launcher_num][item] = qty
     return airwing
     
 def GetMagClasses(UI, magname):
@@ -304,6 +312,22 @@ def GetMagClasses(UI, magname):
                 classlist.append(item)
     return classlist
 
+def get_mag_stock_mod(UI, mag, mag_items, mag_weight, mag_volume, mag_weight_limit, mag_item_limit, mag_volume_limit):
+    if mag_weight > 0:
+        weight_mod = (0.95 * mag_weight_limit) / mag_weight
+    else:
+        weight_mod = 4.29e9
+    if mag_items > 0:
+        qty_mod = mag_item_limit / mag_items
+    else:
+        qty_mod = 4.29e9
+    if mag_volume > 0:
+        volume_mod = mag_volume_limit / mag_volume
+    else:
+        volume_mod = 4.29e9
+        
+    return min(weight_mod, qty_mod, volume_mod)
+    
 def MagGenerator(UI):
     """
     MagGenerator(UI):
@@ -321,8 +345,8 @@ def MagGenerator(UI):
     unit = UI.GetPlatformClass()
     name = UI.GetPlatformName()
     UI.DisplayMessage('Configuring %s for year %0.3f' % (name, current_year))
-    set_mag_items = float(100000000000000000000)
-    set_mag_tonnage = float(100000000000000000000)
+    set_mag_items = float(4.29e9)
+    set_mag_tonnage = float(4.29e9)
     if BB.KeyExists('MagTonnage'):
         set_mag_tonnage = float(BB.ReadMessage('MagTonnage')) * 1000
         if UI.HasFlightPort():
@@ -347,6 +371,7 @@ def MagGenerator(UI):
         magazines = {}
         magazines['limited'] = {}
         magazines['unlimited'] = {}
+        all_items = UI.GetMagazineItems()
         for mag in xrange(mag_info.Size()):
             magname = mag_info.GetRow(mag).GetString(1)
             mag_id = mag_info.GetRow(mag).GetString(0)
@@ -371,6 +396,7 @@ def MagGenerator(UI):
             mag_assignments[mag] = {}
             mag_assignments[mag]['Max Items'] = UI.QueryDatabase('stores',magname,'Capacity').GetRow(0).GetString(0)
             mag_assignments[mag]['Max Weight'] = UI.QueryDatabase('stores',magname,'MaxWeight_kg').GetRow(0).GetString(0)
+            mag_assignments[mag]['Max Volume'] = UI.QueryDatabase('stores',magname,'MaxVolume_m3').GetRow(0).GetString(0)
             mag_assignments[mag]['items'] = {}
             for item in airwing_stock_list:
                 if item in classes:
@@ -395,6 +421,10 @@ def MagGenerator(UI):
                 mag_assignments[mag]['Max Items'] = set_mag_items
             else:
                 mag_assignments[mag]['Max Items'] = UI.QueryDatabase('stores',magname,'Capacity').GetRow(0).GetString(0)
+            if BB.KeyExists('MaxVolume'):
+                mag_assignments[mag]['Max Volume'] = set_mag_volume
+            else:
+                mag_assignments[mag]['Max Volume'] = UI.QueryDatabase('stores',magname,'MaxVolume_m3').GetRow(0).GetString(0)
             mag_assignments[mag]['items'] = {}
             for item in airwing_stock_list:
                 if item not in assigned_items:
@@ -410,69 +440,23 @@ def MagGenerator(UI):
         for mag in mag_assignments:
             mag_weight_limit = float(mag_assignments[mag]['Max Weight'])
             mag_item_limit = float(mag_assignments[mag]['Max Items'])
-            mag_items, mag_weight = check_limits(UI, mag_assignments[mag]['items'])
-            if mag_weight_limit == 0:
-                #unrestricted, set it to something absurdly huge
-                mag_weight_limit = float(1e20)
-            if mag_item_limit == 0:
-                #unrestricted, set it to something absurdly huge
-                mag_item_limit = float(1e20)
-            if mag_weight_limit > set_mag_tonnage and mag in magazines['unlimited']:
-                mag_weight_limit = set_mag_tonnage
-            if mag_item_limit > set_mag_items and mag in magazines['unlimited']:
-                mag_item_limit = set_mag_items
-            if mag_items > mag_item_limit:
-                over_qty = True
-            else:
-                over_qty = False
-            if mag_weight > mag_weight_limit:
-                over_mass = True
-            else:
-                over_mass = False
-            if min(abs(1- mag_weight / mag_weight_limit), abs(1- mag_items / mag_item_limit)) == abs(1- mag_items / mag_item_limit):
-                #we're closest with item limit.
-                limit_closest = 'items'
-            else:
-                limit_closest = 'mass'
-            if not over_qty and not over_mass:
-                if limit_closest == 'items':
-                    #reduce by item qty
-                    if mag_items == 0:
-                        stock_mod = 0
-                    else:
-                        stock_mod = mag_item_limit / mag_items
-                else:
-                    #reduce by item mass
-                    if mag_weight == 0:
-                        stock_mod = 0
-                    else:
-                        stock_mod = (mag_weight_limit * 0.95) / mag_weight
-            elif over_qty and over_mass:
-                if limit_closest == 'mass':
-                    #reduce by item qty
-                    if mag_items == 0:
-                        stock_mod = 0
-                    else:
-                        stock_mod = mag_item_limit / mag_items
-                else:
-                    #reduce by item mass
-                    if mag_weight == 0:
-                        stock_mod = 0
-                    else:
-                        stock_mod = (mag_weight_limit * 0.95) / mag_weight
-            elif over_qty and not over_mass:
-                if mag_items == 0:
-                    stock_mod = 0
-                else:
-                    stock_mod = mag_item_limit / mag_items
-            elif not over_qty and over_mass:
-                if mag_weight == 0:
-                    stock_mod = 0
-                else:
-                    stock_mod = (mag_weight_limit * 0.95) / mag_weight
-            mag_stock_mod[mag] = stock_mod
-
-        mag_loads = []
+            mag_volume_limit = float(mag_assignments[mag]['Max Volume'])
+            for n in xrange(all_items.Size()):
+                item = all_items.GetString(n)
+                qty = UI.GetMagazineIdQuantity(item, int(mag))
+                if qty > 0:
+                    mag_assignments[mag]['items'][item] = qty
+            mag_items, mag_weight, mag_volume = check_limits(UI, mag_assignments[mag]['items'])
+            if float(mag_weight_limit) == 0:  mag_weight_limit = float(4.29e9)
+            if float(mag_item_limit)   == 0:  mag_item_limit = float(4.29e9)
+            if float(mag_volume_limit) == 0:  mag_volume_limit = float(4.29e9)
+            
+            if mag in magazines['unlimited']:
+                mag_weight_limit = min(mag_weight_limit, set_mag_tonnage)
+                mag_item_limit = min(mag_weight_limit, set_mag_items)
+            
+            mag_stock_mod[mag] = get_mag_stock_mod(UI, mag, mag_items, mag_weight, mag_volume, mag_weight_limit, mag_item_limit, mag_volume_limit)
+        mag_loads = {}
         #begin creating the magazine entry lines
         for mag_num in mag_assignments:
             stock_mod = mag_stock_mod[mag_num]
@@ -486,19 +470,23 @@ def MagGenerator(UI):
                     item_qty = 0
                 if 'Nuclear' in UI.QueryDatabase(item_table,item,'DamageModel').GetRow(0).GetString(0) and not BB.KeyExists('MagGenAllowNukes'):
                     item_qty = 0
-                if launcher_count > 0:
-                    if item in own_stock_list and item_qty < own_stock_list[item]:
-                        item_qty += int(own_stock_list[item])
+#                if launcher_count > 0:
+#                    if item in own_stock_list and item_qty < own_stock_list[item]:
+#                        item_qty += int(own_stock_list[item])
                 if item_qty > 0:
-                    mag_load = (mag_num, item, item_qty)
-                    mag_loads.append(mag_load)
-        
+                    try:
+                        mag_loads[mag_num][item] = item_qty
+                    except KeyError:
+                        mag_loads[mag_num] = {item:item_qty}
         #set magazine
-        for line in sorted(mag_loads):
-            Mnum = int(line[0])
-            item = line[1]
-            qty = int(line[2])
-            UI.AddItemToMagazine(item, qty)
+        stocked = {}
+        for magazine in sorted(mag_loads.keys()):
+            UI.SetMagazineEmpty(int(magazine))
+            for item in mag_loads[magazine]:
+                qty = int(mag_loads[magazine][item])
+                UI.AddItemToMagazine(item, qty)
+                UI.DisplayMessage('%s : %s' % (item, qty))
+                stocked[item]=qty
         
     elif launcher_count > 0:
         own_stock_list, loadout_entry = Get_Own_Stock(unit, unit_dict, current_year)
@@ -520,8 +508,11 @@ def MagGenerator(UI):
             Lnum = int(line[0])
             item = line[1]
             UI.LoadLauncher(Lnum, item)
-    
-    UI.DisplayMessage('%0.1f tons of munitions provided to <%d> %s (%s)' % (check_limits(UI, mag_loads)[1]/1000, UI.GetPlatformId(), UI.GetPlatformName(), unit))
+    #tonnage = 0
+    #for mag in mag_loads:
+    #    tonnage += check_limits(UI, mag_loads[mag])[1]/1000
+    tonnage = check_limits(UI, stocked)[1]/1000
+    UI.DisplayMessage('%0.1f tons of munitions provided to <%d> %s (%s)' % (tonnage, UI.GetPlatformId(), UI.GetPlatformName(), unit))
 
 def stock_rate(UI, aircraft, item):
     qty = 0
