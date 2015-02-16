@@ -53,3 +53,5 @@ dbeditor/CSV's/sonar.csv
 dbeditor/CSV's/torpedo.csv
 dbeditor/CSV's/weapon_damage.csv
 dbeditor/config/config.xml
+dbeditor/config/config.xml
+xml/options.xml
