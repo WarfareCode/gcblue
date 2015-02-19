@@ -1788,11 +1788,12 @@ def GetAllUnits(SM, date):
                 items = UI.GetMagazineItems()
                 for item_n in xrange(items.Size()):
                     item = items.GetString(item_n)
-                    qty = UI.GetMagazineQuantity(item)
-                    service = check_service(UI, item, date)
-                    if not service:
-                        #are weapons/items in the magazines in service?
-                        problems = recordprob(problems, alliance, 'Magazine', UnitName, item, 'Supplied Item Not in service')
+                    if item != 'Fuel':
+                        qty = UI.GetMagazineQuantity(item)
+                        service = check_service(UI, item, date)
+                        if not service:
+                            #are weapons/items in the magazines in service?
+                            problems = recordprob(problems, alliance, 'Magazine', UnitName, item, 'Supplied Item Not in service')
     if len(problems.keys()) == 0:
         problems  =  '\n'.join(('Nothing to Report.',
                                 'Everything this script can currently',
@@ -1953,27 +1954,19 @@ def check_service(UI, className, date):
             return True
     else:
         country = ''
-        if className == UI.GetPlatformClass():
-            if UI.HasThrottle():
-                tab = 'air'
-            elif UI.IsSurface():
-                tab = 'ship'
-            elif UI.IsFixed() or UI.IsGroundVehicle():
-                tab = 'ground'
-            elif UI.IsSub():
-                tab = 'sub'
-            else:
-                tab = 'simpleair'
+        if UI.HasThrottle():
+            tab = 'air'
+        elif UI.IsSurface():
+            tab = 'ship'
+        elif UI.IsFixed() or UI.IsGroundVehicle():
+            tab = 'ground'
+        elif UI.IsSub():
+            tab = 'sub'
+        else:
+            tab = 'simpleair'
         #if not UI.IsGroundVehicle() or not UI.IsFixed() or not tab == 'ground':
         if UI.IsSurface() or UI.IsFixed() and UI.HasFlightPort():
-            try:
-                country = UI.QueryDatabase(tab, className, 'Country').GetRow(0).GetString(0)
-            except UnboundLocalError:
-                if UI.IsSurface():
-                    tab = 'ship'
-                elif UI.IsFixed() or UI.IsGroundVehicle():
-                    tab = 'ground'
-                country = UI.QueryDatabase(tab, className, 'Country').GetRow(0).GetString(0)
+            country = UI.QueryDatabase(tab, UI.GetPlatformClass(), 'Country').GetRow(0).GetString(0)
         if country in servicekit:
             if className in servicekit[country]:
                 date1 = servicekit[country][className]['Entry']
