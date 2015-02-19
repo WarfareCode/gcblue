@@ -59,7 +59,11 @@ def check_limits(UI, stocks):
                 else:
                     table = determine_item_table(UI, item)
                     item_mass = float(UI.QueryDatabase(table,item,'Weight_kg').GetRow(0).GetString(0))
-                    item_volume = float(UI.QueryDatabase(table,item,'Volume_m3').GetRow(0).GetString(0))
+                    item_volume = UI.QueryDatabase(table,item,'Volume_m3').GetRow(0).GetString(0)
+                    if item_volume == '':
+                        item_volume = 0.0
+                    else:
+                        item_volume = float(UI.QueryDatabase(table,item,'Volume_m3').GetRow(0).GetString(0))
                 mass += item_mass * item_qty
                 volume += item_volume * item_qty
     else:
@@ -485,7 +489,6 @@ def MagGenerator(UI):
             for item in mag_loads[magazine]:
                 qty = int(mag_loads[magazine][item])
                 UI.AddItemToMagazine(item, qty)
-                UI.DisplayMessage('%s : %s' % (item, qty))
                 stocked[item]=qty
         
     elif launcher_count > 0:
