@@ -46,10 +46,11 @@
     <LibraryPath>D:\Python27\libs;D:\libogg-1.3.2\win32\VS2010\Win32\Release;D:\libvorbis-1.3.4\win32\VS2010\Win32\Release;D:\boost_1_57_0\stage\lib;D:\wxWidgets-3.0.2\lib\vc_lib;D:\OpenAL 1.1 SDK\libs\Win32;D:\openalpp\lib;D:\TV3D65;..\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <OutDir>bin\dbeditor\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <IncludePath>..\include;D:\TV3D65;D:\wxWidgets-3.0.2\include\msvc;D:\wxWidgets-3.0.2\include\;D:\boost_1_57_0;D:\Python27\include;D:\openalpp\include;D:\OpenAL 1.1 SDK\include;D:\OpenSceneGraph-3.2.1\OpenSceneGraph\include;D:\sqlite-3.8.7;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;..\include\sim;..\include\common;..\include\database;..\include\graphics;..\include\network;..\include\scriptinterface;..\include\ai;$(IncludePath)</IncludePath>
     <LibraryPath>D:\Python27\libs;D:\libogg-1.3.2\win32\VS2010\Win32\Release;D:\libvorbis-1.3.4\win32\VS2010\Win32\Release;D:\boost_1_57_0\stage\lib;D:\wxWidgets-3.0.2\lib\vc_lib;D:\OpenAL 1.1 SDK\libs\Win32;D:\openalpp\lib;D:\TV3D65;..\lib;$(LibraryPath)</LibraryPath>
+    <TargetName>EditGCB</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -82,7 +83,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>python27.lib;boost_python-vc110-mt-1_57.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wxmsw30u_adv.lib;wxmsw30u_core.lib;wxbase30u.lib;wxbase30u_net.lib;wxbase30u_xml.lib;wxzlib.lib;wxpng.lib;wxjpeg.lib;wxtiff.lib;wxexpat.lib;libogg_static.lib;libvorbis_static.lib;libvorbisfile_static.lib;OpenAL32.lib;ALut.lib;oalpp_gcb.lib;TV3D65.lib;Version.lib;gcblue-lib.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(ProjectDir)/bin/EditGCB.exe</OutputFile>
+      <OutputFile>$(ProjectDir)/bin/dbeditor/EditGCB.exe</OutputFile>
       <IgnoreSpecificDefaultLibraries>libc.lib;libci.lib;msvcrtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
