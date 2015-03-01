@@ -95,7 +95,7 @@ def CreateScenario(SM):
     SM.SetUnitLauncherItem(unit.unitName, 1, 'AGM-65D', 2)
     SM.SetUnitLauncherItem(unit.unitName, 2, 'AIM-120D', 2)
     SM.SetUnitLauncherItem(unit.unitName, 3, 'GBU-12/B', 4)
-    SM.SetUnitLauncherItem(unit.unitName, 4, 'GBU-39 SDB', )
+    SM.SetUnitLauncherItem(unit.unitName, 4, 'GBU-39 SDB', 6)
     SM.SetUnitLauncherItem(unit.unitName, 5, 'AGM-65D', 2)
     SM.SetUnitLauncherItem(unit.unitName, 6, 'ALE-45 Flare', 120)
     SM.SetUnitLauncherItem(unit.unitName, 7, 'ALE-45 Chaff', 120)
@@ -293,7 +293,7 @@ def CreateScenario(SM):
     
     unit = SM.GetDefaultUnit()
     unit.className = 'F-15C'
-    unit.unitName = "Escort Eagle-4"
+    unit.unitName = "Escort Eagle-4"
     unit.SetPosition(22.509507, 59.148897, 10000.0)
     unit.heading = 90.00
     unit.speed = 334.6
@@ -334,7 +334,7 @@ def CreateScenario(SM):
     
     unit = SM.GetDefaultUnit()
     unit.className = 'F-15C'
-    unit.unitName = "Escort Eagle-3"
+    unit.unitName = "Escort Eagle-3"
     unit.SetPosition(22.484927, 59.335108, 10000.0)
     unit.heading = 90.00
     unit.speed = 334.6
@@ -620,7 +620,7 @@ def CreateScenario(SM):
     
     unit = SM.GetDefaultUnit()
     unit.className = 'F-15C'
-    unit.unitName = "Escort Eagle-1"
+    unit.unitName = "Escort Eagle-1"
     unit.SetPosition(23.010100, 59.314425, 10000.0)
     unit.heading = 90.00
     unit.speed = 334.6
@@ -661,7 +661,7 @@ def CreateScenario(SM):
     
     unit = SM.GetDefaultUnit()
     unit.className = 'F-15C'
-    unit.unitName = "Escort Eagle-2"
+    unit.unitName = "Escort Eagle-2"
     unit.SetPosition(22.993713, 59.135032, 10000.0)
     unit.heading = 90.00
     unit.speed = 334.6

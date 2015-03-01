@@ -17,7 +17,7 @@ def CreateScenario(SM):
 
     SM.SetDateTime(2013,8,13,0,0,0)
     SM.SetStartTheater(123.029167, 24.970835) # (lon, lat) in degrees, negative is West or South
-    SM.SetScenarioLoaded(1)
+    SM.SetScenarioLoaded(2)
 
     SM.SetSeaState(3)
 

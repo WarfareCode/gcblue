@@ -517,8 +517,8 @@ def CreateScenario(SM):
     SM.SetFlightDeckUnitLoadout('HMS Southampton', 'Type 42 B2 Lynx 1', '1 Stingray;1 Stingray;')
     
     unit = SM.GetDefaultUnit()
-    unit.className = 'Lutjens DDG'
-    unit.unitName = "Lutjens"
+    unit.className = 'Luetjens DDG'
+    unit.unitName = "Luetjens"
     unit.SetPosition(12.295216, 54.555437, 0.0)
     unit.heading = 90.00
     unit.speed = 5.3
@@ -531,12 +531,12 @@ def CreateScenario(SM):
     SM.SetUnitLauncherItem(unit.unitName, 4, 'Mk-46 Mod5', 3)
     SM.SetUnitLauncherItem(unit.unitName, 5, 'Mk-46 Mod5', 3)
     UI = SM.GetUnitInterface(unit.unitName)
-    SM.AddToUnitMagazine("Lutjens", '127mm mk 41 AAC', 360)
-    SM.AddToUnitMagazine("Lutjens", '127mm mk 41 HC', 140)
-    SM.AddToUnitMagazine("Lutjens", 'RIM-66A', 32)
-    SM.AddToUnitMagazine("Lutjens", 'RGM-84C Harpoon', 8)
-    SM.AddToUnitMagazine("Lutjens", 'Mk-46 Mod5', 12)
-    SM.AddToUnitMagazine("Lutjens", 'RUR-5 ASROC', 16)
+    SM.AddToUnitMagazine("Luetjens", '127mm mk 41 AAC', 360)
+    SM.AddToUnitMagazine("Luetjens", '127mm mk 41 HC', 140)
+    SM.AddToUnitMagazine("Luetjens", 'RIM-66A', 32)
+    SM.AddToUnitMagazine("Luetjens", 'RGM-84C Harpoon', 8)
+    SM.AddToUnitMagazine("Luetjens", 'Mk-46 Mod5', 12)
+    SM.AddToUnitMagazine("Luetjens", 'RUR-5 ASROC', 16)
     UI.AddTask('MissileWarning', 3.000000, 3)
     UI.AddTask('Nav', 1.000000, 0)
     UI.AddNavWaypointAdvanced(0.219661, 0.953844, 0.000000, 12.000000)
@@ -2059,7 +2059,7 @@ def CreateScenario(SM):
     unit = SM.GetDefaultUnit()
     unit.className = 'Osprey MHC'
     unit.unitName = "USS Osprey"
-    UI = SM.GetUnitInterface('Lutjens')
+    UI = SM.GetUnitInterface('Luetjens')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
     lon_deg = 57.296*leader_track.Lon + 0.1871
     lat_deg = 57.296*leader_track.Lat + 0.0587
@@ -2074,7 +2074,7 @@ def CreateScenario(SM):
     UI.AddTask('MissileWarning', 3.000000, 3)
     UI.AddTask('PointDefense', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
-    leader_id = UI.LookupFriendlyId('Lutjens')
+    leader_id = UI.LookupFriendlyId('Luetjens')
     UI.SetFormationLeader(leader_id)
     UI.SetFormationMode(1)
     UI.SetFormationPosition(13.500, 1.143, 1.106, 0.085)
@@ -2082,9 +2082,9 @@ def CreateScenario(SM):
     UI.SetFormationUseNorthBearing(1)
     
     unit = SM.GetDefaultUnit()
-    unit.className = 'Lutjens DDG'
+    unit.className = 'Luetjens DDG'
     unit.unitName = "Molders"
-    UI = SM.GetUnitInterface('Lutjens')
+    UI = SM.GetUnitInterface('Luetjens')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
     lon_deg = 57.296*leader_track.Lon + 0.0697
     lat_deg = 57.296*leader_track.Lat + 0.0253
@@ -2109,7 +2109,7 @@ def CreateScenario(SM):
     UI.AddTask('MissileWarning', 3.000000, 3)
     UI.AddTask('PointDefense', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
-    leader_id = UI.LookupFriendlyId('Lutjens')
+    leader_id = UI.LookupFriendlyId('Luetjens')
     UI.SetFormationLeader(leader_id)
     UI.SetFormationMode(1)
     UI.SetFormationPosition(5.035, 0.733, 1.095, 0.163)
@@ -2119,7 +2119,7 @@ def CreateScenario(SM):
     unit = SM.GetDefaultUnit()
     unit.className = 'Bremen FFGHM (1982)'
     unit.unitName = "Niedersachsen"
-    UI = SM.GetUnitInterface('Lutjens')
+    UI = SM.GetUnitInterface('Luetjens')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
     lon_deg = 57.296*leader_track.Lon + 0.1519
     lat_deg = 57.296*leader_track.Lat + 0.0489
@@ -2146,7 +2146,7 @@ def CreateScenario(SM):
     UI.AddTask('PointDefense', 3.000000, 3)
     UI.AddTask('RefuelAllAircraft', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
-    leader_id = UI.LookupFriendlyId('Lutjens')
+    leader_id = UI.LookupFriendlyId('Luetjens')
     UI.SetFormationLeader(leader_id)
     UI.SetFormationMode(1)
     UI.SetFormationPosition(11.026, 0.649, 1.092, 0.076)
@@ -2159,7 +2159,7 @@ def CreateScenario(SM):
     unit = SM.GetDefaultUnit()
     unit.className = 'Bremen FFGHM (1982)'
     unit.unitName = "Rheinlan-Pfalz"
-    UI = SM.GetUnitInterface('Lutjens')
+    UI = SM.GetUnitInterface('Luetjens')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
     lon_deg = 57.296*leader_track.Lon + 0.0981
     lat_deg = 57.296*leader_track.Lat + 0.0610
@@ -2186,7 +2186,7 @@ def CreateScenario(SM):
     UI.AddTask('PointDefense', 3.000000, 3)
     UI.AddTask('RefuelAllAircraft', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
-    leader_id = UI.LookupFriendlyId('Lutjens')
+    leader_id = UI.LookupFriendlyId('Luetjens')
     UI.SetFormationLeader(leader_id)
     UI.SetFormationMode(1)
     UI.SetFormationPosition(8.981, 0.587, 0.778, 0.069)
@@ -2199,7 +2199,7 @@ def CreateScenario(SM):
     unit = SM.GetDefaultUnit()
     unit.className = 'Bremen FFGHM (1982)'
     unit.unitName = "Koln"
-    UI = SM.GetUnitInterface('Lutjens')
+    UI = SM.GetUnitInterface('Luetjens')
     leader_track = UI.GetTrackById(UI.GetPlatformId())
     lon_deg = 57.296*leader_track.Lon + 0.1387
     lat_deg = 57.296*leader_track.Lat + 0.0150
@@ -2226,7 +2226,7 @@ def CreateScenario(SM):
     UI.AddTask('PointDefense', 3.000000, 3)
     UI.AddTask('RefuelAllAircraft', 3.000000, 3)
     BB = UI.GetBlackboardInterface()
-    leader_id = UI.LookupFriendlyId('Lutjens')
+    leader_id = UI.LookupFriendlyId('Luetjens')
     UI.SetFormationLeader(leader_id)
     UI.SetFormationMode(1)
     UI.SetFormationPosition(9.025, 0.830, 1.430, 0.088)

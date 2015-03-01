@@ -18,7 +18,7 @@ def CreateScenario(SM):
     SM.SetAlliancePlayable(3, 0)
     SM.SetAllianceRelationship(1, 3, 'Neutral')
     SM.SetAllianceRelationship(2, 3, 'Neutral')
-    SM.SetUserAlliance(2)
+    SM.SetUserAlliance(1)
 
     SM.SetDateTime(1988,8,4,12,0,0)
     SM.SetStartTheater(15.029165, 68.470833) # (lon, lat) in degrees, negative is West or South
