@@ -387,6 +387,7 @@ void tcPlatformGui::Draw()
 		if (isMouseOver)
 		{
 			const Vec4 color(1.0f, 1.0f, 1.0f, 1.0f);
+			int nrows = 1;
 			wxString caption;
 			if (item)
 			{
@@ -411,15 +412,17 @@ void tcPlatformGui::Draw()
 			}
 			else if (n < nLaunchers)
 			{
-				GetLauncherCompatibilityCaption(n, caption, platform);
+				nrows = GetLauncherCompatibilityCaption(n, caption, platform);
 			}
 			else
 			{
 				caption = "";
 			}
 			
-			DrawTextR(caption.c_str(), slot.loc.GetLeft(), slot.loc.GetTop() + 17.0f, defaultFont.get(),
-				color, 14.0f, LEFT_BASE_LINE);
+			//DrawTextR(caption.c_str(), slot.loc.GetLeft(), slot.loc.GetTop() + 17.0f + ntypes * 12.0f, defaultFont.get(),
+			//	color, 14.0f, LEFT_BASE_LINE);
+			DrawTextR(caption.c_str(), 10, 122 + nrows * 16, monospacedFont.get(),
+				color, 12.0f, LEFT_BASE_LINE);
 
 
 		}
@@ -482,9 +485,11 @@ tcFlightOpsObject* tcPlatformGui::GetFlightOps()
 /**
 * Creates caption that describes compatible items for launcher
 */
-void tcPlatformGui::GetLauncherCompatibilityCaption(unsigned int launcherIdx, wxString& caption, tcPlatformObject* platform)
+int tcPlatformGui::GetLauncherCompatibilityCaption(unsigned int launcherIdx, wxString& caption, tcPlatformObject* platform)
 {
 	caption = "";
+	int MaxWideWrap = 68;
+	int WrapLines = 0;
 
 	tcLauncher* launcher = platform->GetLauncher(launcherIdx);
 	wxASSERT(launcher);
@@ -492,10 +497,16 @@ void tcPlatformGui::GetLauncherCompatibilityCaption(unsigned int launcherIdx, wx
 	unsigned int nTypes = launcher->GetCompatibleCount();
 	for (unsigned int n=0; n<nTypes; n++)
 	{
-		wxString s = wxString::Format("%s(%d) ", launcher->GetCompatibleName(n).c_str(),
+		wxString s = wxString::Format("%s( %d)  ", launcher->GetCompatibleName(n).c_str(),
 			            launcher->GetCompatibleQuantity(n));
+		if((caption.Len() + s.Len()) / MaxWideWrap > WrapLines)
+		{
+			caption += wxString::Format("\n");
+			WrapLines += 1;
+		}
 		caption += s;
 	}
+	return WrapLines;
 }
 
 tcPlatformObject* tcPlatformGui::GetPlatform()
