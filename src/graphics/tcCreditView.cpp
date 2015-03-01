@@ -61,6 +61,12 @@ void tcCreditView::Init()
     AddCredit(s, 25.0f, 1);
 
     s = "Lead Developer\n";
+    AddCredit(s, 40.0f, 0);
+
+    s = "Amram";
+    AddCredit(s, 25.0f, 1);
+
+    s = "Assistant Meddler\n";
     AddCredit(s, 80.0f, 0);
 
     s = "- - - 3D art - - -"; 
@@ -97,10 +103,23 @@ void tcCreditView::Init()
     AddCredit(s, 25.0f, 1);
 
     s = "Urwumpe"; 
+    AddCredit(s, 25.0f, 1);
+
+    s = "ClockMaster"; 
     AddCredit(s, 60.0f, 1);
 
 
     s = "- - - Database - - -"; 
+    AddCredit(s, 25.0f, 1);
+
+    s = "Amram"; 
+    AddCredit(s, 60.0f, 1);
+
+
+    s = "- - - Python Scripts - - -"; 
+    AddCredit(s, 25.0f, 1);
+
+    s = "Dewitt"; 
     AddCredit(s, 25.0f, 1);
 
     s = "Amram"; 
