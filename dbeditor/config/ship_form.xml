@@ -3,37 +3,45 @@
     <sizer orientation="vertical" proportion="1">
         <text value="NATO_ASCC" label="NATO/ASCC Name" proportion="0" expand_sizer="yes"></text>
         <text value="Description" label="Description" proportion="3" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
-        <text value="Notes" label="Notes" proportion="3" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
         <combobox value="ModelClassId" label="Model Type" proportion="0" file="config/modeltype.txt"></combobox>
         <combobox value="ClassificationId" label="Classification" proportion="0" file="config/classification.txt"></combobox>
-        <text value="ImageList" label="ImageList" proportion="2" multiline="yes"></text>
         <text value="ModelFileName" label="ModelFileName" proportion="0"></text>
         <text value="Cost" label="Cost" proportion="0"></text>
-        <text value="Weight_kg" label="Weight_kg" proportion="0" expand_sizer="yes"></text>        
-        <text value="InitialYear" label="InitialYear" proportion="0"></text>
-        <text value="FinalYear" label="FinalYear" proportion="0"></text>
-        <text value="Country" label="Country" proportion="0"></text>
-        <text value="Designation" label="Designation" proportion="0"></text>
+        <text value="Weight_kg" label="Weight_kg" proportion="0" expand_sizer="yes"></text>
+        <text value="Length_m" label="Length_m" proportion="0" expand_sizer="yes"></text>
+        <text value="Beam_m" label="Beam_m" proportion="0" expand_sizer="yes"></text>
+        <text value="Draft_m" label="Draft_m" proportion="0"></text>
+        <text value="PowerPlantType" label="PowerPlantType" proportion="0"></text>
+        <text value="TotalShaft_HP" label="TotalShaft_HP" proportion="0"></text>
+        <text value="ExhaustStacks" label="ExhaustStacks" proportion="0"></text>
+        <text value="PropulsionShafts" label="PropulsionShafts" proportion="0"></text>
+        <text value="PropulsiveEfficiency" label="PropulsiveEfficiency" proportion="0"></text>
+        <text value="CivilianPaintScheme" label="CivilianPaintScheme" proportion="0"></text>
+        <text value="FlashyPaintScheme" label="FlashyPaintScheme" proportion="0"></text>
     </sizer>
     <sizer orientation="vertical" proportion="1">
+        <text value="Notes" label="Notes" proportion="2" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
+        <text value="Country" label="Country" proportion="0"></text>
+        <text value="Designation" label="Designation" proportion="0"></text>
+        <text value="InitialYear" label="InitialYear" proportion="0"></text>
+        <text value="FinalYear" label="FinalYear" proportion="0"></text>
         <text value="MaxSpeed_kts" label="MaxSpeed_kts" proportion="0"></text>
         <text value="Accel_ktsps" label="Accel_ktsps" proportion="0"></text>
         <text value="TurnRate_degps" label="TurnRate_degps" proportion="0"></text>
         <text value="FuelCapacity_kg" label="FuelCapacity_kg" proportion="0"></text>
         <text value="FuelRate_kgps" label="FuelRate_kgps" proportion="0"></text>
         <combobox value="DamageEffect" label="Survivability" proportion="0" update_table="damage_effect"></combobox>
-        <text value="Draft_m" label="Draft_m" proportion="0"></text>
         <combobox value="FlightportClass" label="FlightportClass" proportion="0" update_table="flightport"></combobox>
     </sizer>
     <sizer orientation="vertical" proportion="1">
+        <text value="ImageList" label="ImageList" proportion="2" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
         <text value="EffectiveHeight_m" label="EffectiveHeight_m" proportion="0"></text>
         <text value="RCS_dBsm" label="RCS_dBsm" proportion="0"></text>
-        <combobox value="RCS_Model" label="RCS Pattern" proportion="0" update_table="signature"></combobox>
         <text value="OpticalCrossSection_dBsm" label="OpticalCrossSection_dBsm" proportion="0"></text>
         <text value="IRSignature_dB" label="IRSignature_dB" proportion="0"></text>
-        <combobox value="IR_ModelA" label="IR Pattern" proportion="0" update_table="signature"></combobox>
-        <!--combobox value="IR_ModelB" label="IR Pattern (B)" proportion="0" update_table="signature"></combobox> -->
         <text value="TS" label="TS" proportion="0"></text>
+        <combobox value="RCS_Model" label="RCS Pattern" proportion="0" update_table="signature"></combobox>
+        <combobox value="IR_ModelA" label="IR Pattern" proportion="0" update_table="signature"></combobox>
         <combobox value="TS_Model" label="TS Pattern" proportion="0" update_table="signature"></combobox>
         <combobox value="AcousticModel" label="Acoustic Model" proportion="0" update_table="acoustic_noise"></combobox>
         <combobox value="SL_Model" label="SL Pattern" proportion="0" update_table="signature"></combobox>

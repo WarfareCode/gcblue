@@ -105,7 +105,17 @@ void tcShipDBObject::AddSqlColumns(std::string& columnString)
 
     columnString += "Draft_m real,";
 
+	columnString += "Length_m real";
+	columnString += "Beam_m real";
+	columnString += "PowerPlantType text";
+	columnString += "TotalShaft_HP real";
+	columnString += "ExhaustStacks real";
+	columnString += "PropulsionShafts real";
+	columnString += "PropulsiveEfficiency real";
+	columnString += "CivilianPaintScheme real";
+	columnString += "FlashyPaintScheme real";
     columnString += "FlightportClass varchar(30)";
+    
 
     tcAirDetectionDBObject::AddSqlColumns(columnString);
 
@@ -120,6 +130,15 @@ void tcShipDBObject::ReadSql(tcSqlReader& entry)
 
     draft_m = (float)entry.GetDouble("Draft_m");
 
+    length_m = (float)entry.GetDouble("Length_m");
+    beam_m = (float)entry.GetDouble("Beam_m");
+    PowerPlantType = (float)entry.GetDouble("PowerPlantType");
+    TotalShaft_HP = (float)entry.GetDouble("TotalShaft_HP");
+    ExhaustStacks = (float)entry.GetDouble("ExhaustStacks");
+    PropulsionShafts = (float)entry.GetDouble("PropulsionShafts");
+    PropulsiveEfficiency = (float)entry.GetDouble("PropulsiveEfficiency");
+    CivilianPaintScheme = (float)entry.GetDouble("CivilianPaintScheme");
+    FlashyPaintScheme = (float)entry.GetDouble("FlashyPaintScheme");
 	flightportClass = entry.GetString("FlightportClass").c_str();
 
     tcAirDetectionDBObject::ReadSql(entry);
@@ -138,6 +157,15 @@ void tcShipDBObject::WriteSql(std::string& valueString)
 	s << ",";
 
     s << draft_m << ",";
+    s << length_m << ",";
+    s << beam_m << ",";
+    s << PowerPlantType << ",";
+    s << TotalShaft_HP << ",";
+    s << ExhaustStacks << ",";
+    s << PropulsionShafts << ",";
+    s << PropulsiveEfficiency << ",";
+    s << CivilianPaintScheme << ",";
+    s << FlashyPaintScheme << ",";
 
 	s << "'" << flightportClass.c_str() << "'";
 
@@ -162,6 +190,15 @@ tcShipDBObject::tcShipDBObject(const tcShipDBObject& obj)
   tcAirDetectionDBObject(obj), 
   tcWaterDetectionDBObject(obj),
   draft_m(obj.draft_m),
+  length_m(obj.length_m),
+  beam_m(obj.beam_m),
+  PowerPlantType(obj.PowerPlantType),
+  TotalShaft_HP(obj.TotalShaft_HP),
+  ExhaustStacks(obj.ExhaustStacks),
+  PropulsionShafts(obj.PropulsionShafts),
+  PropulsiveEfficiency(obj.PropulsiveEfficiency),
+  CivilianPaintScheme(obj.CivilianPaintScheme),
+  FlashyPaintScheme(obj.FlashyPaintScheme),
   flightportClass(obj.flightportClass)
 {
 }

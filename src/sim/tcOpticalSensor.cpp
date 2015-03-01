@@ -44,6 +44,8 @@
 #include "tcGameObjIterator.h"
 #include "common/tcObjStream.h"
 #include "tcEventManager.h"
+#include "tcSonarEnvironment.h"
+#include "tcMessageInterface.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -122,9 +124,17 @@ float tcOpticalSensor::CalculateTargetSignature(const tcGameObject* target, floa
     }
     else
     {
-        signature = target->GetOpticalCrossSection(); // no aspect dependence for EO yet
+		unsigned int targetClassification = target->mpDBObject->mnType;
+		if (targetClassification & PTYPE_SURFACE)
+		{
+			signature = target->GetOpticalCrossSection(parent_kin->mfAlt_m, parent_kin->RangeToKm(tgt_kin->mfLon_rad,tgt_kin->mfLat_rad));
+		}
+		else
+		{
+			signature = target->GetOpticalCrossSection();
+		}
     }
-
+	
     return signature;
     
 }
@@ -223,10 +233,22 @@ bool tcOpticalSensor::CanDetectTarget(const tcGameObject* target, float& range_k
     }
 
     // add 0.25 dB/km atmospheric attenuation
-    float atmosphericAtten_dB = 0.25 * (mpDBObj->mfRefRange_km - targetRange_km);
+	//amram:  increasing this significantly at low altitudes, and including a sea state factor.
+	//		  boosting extinction to 0.5*(Rho/1.225)+0.25, so 0.75 at sea level, 0.25 at very high alt.
+	//		  further, the extinction will be the averaged value as determined by both target and search platform altitudes.
+	int SeaState = tcSonarEnvironment::Get()->GetSeaState();
+	float extinction1 = Aero::GetAirDensity(tgt_kin->mfAlt_m) / 1.255 * 0.75;
+	float extinction2 = Aero::GetAirDensity(parent_kin->mfAlt_m) / 1.225 * 0.75;
+	float extinction = (extinction1 + extinction2) * 0.5;
+	extinction = (mpDBObj->isIR)? 0.25: extinction;  //not modifying IR yet
+	float atmosphericAtten_dB = extinction * (mpDBObj->mfRefRange_km - targetRange_km);
 
     // calculate night penalty
     float nightPenalty = CalculateNightPenalty(target);
+
+    //wxString msg = wxString::Format("refRange %0.4f tgtRange %0.4f, extinction: %0.4f, atmospheric_atten_db: %0.4f",
+	//	mpDBObj->mfRefRange_km, targetRange_km, extinction, atmosphericAtten_dB);
+	//tcMessageInterface::Get()->ConsoleMessage(msg.ToStdString());
 
     float margin_dB = 
             20.0f*(log10f(nightPenalty * mpDBObj->mfRefRange_km) - log10f(targetRange_km)) + targetCrossSection_dBsm + atmosphericAtten_dB;

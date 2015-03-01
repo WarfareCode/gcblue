@@ -50,6 +50,15 @@ namespace database
     {
     public:
         float draft_m; ///< max navigational draft
+        float length_m; ///< vessel Length at Waterline
+        float beam_m; ///< vessel Beam
+        float PowerPlantType; ///< vessel powerplant type
+        float TotalShaft_HP; ///< vessel propulsion power
+        float ExhaustStacks; ///< vessel exhaust stacks
+        float PropulsionShafts; ///< vessel drive shafts
+        float PropulsiveEfficiency; ///< vessel power efficiency
+        float CivilianPaintScheme; ///< vessel has civilian paint job
+        float FlashyPaintScheme; ///< vessel has flashy paintjob
         tcDBString flightportClass; ///< database class name of flightport (or empty if none)
 
 		tcDatabaseObject* AsDatabaseObject();

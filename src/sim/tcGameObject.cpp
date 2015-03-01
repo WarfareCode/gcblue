@@ -329,6 +329,14 @@ float tcGameObject::GetOpticalCrossSection() const
     return -999.0f;	
 }
 
+/**
+* @return optical cross-section of object in dBsm as viewed from the air
+*/
+float tcGameObject::GetOpticalCrossSection(float view_alt_m, float view_dist_km) const
+{
+    return -999.0f;	
+}
+
 
 /**
 * @return IR signature of object in relative dB as viewed from the air

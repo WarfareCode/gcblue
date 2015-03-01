@@ -206,6 +206,7 @@ public:
 	
     virtual float GetSonarSourceLevel(float az_deg) const;
     virtual float GetOpticalCrossSection() const;
+    virtual float GetOpticalCrossSection(float view_alt_m, float view_dist_km) const;
     virtual float GetIRSignature(float az_deg) const;
 
 	float GetSpan() const;

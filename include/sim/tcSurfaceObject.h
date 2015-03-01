@@ -65,7 +65,7 @@ public:
 	void LoadFromFile(tcFile& file);
 	virtual void Serialize(tcFile& file, bool mbLoad);
 
-    virtual float GetOpticalCrossSection() const;
+    virtual float GetOpticalCrossSection(float view_alt_m, float view_dist_km) const;
     virtual float GetIRSignature(float az_deg) const;
 
     const std::deque<tcPoint>& GetPositionHistory() const;

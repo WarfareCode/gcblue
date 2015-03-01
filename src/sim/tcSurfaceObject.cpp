@@ -39,6 +39,8 @@
 #include "tcGameStream.h"
 #include "ai/Brain.h"
 #include "ai/Task.h"
+#include <math.h>
+#include "tcSonarEnvironment.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -117,14 +119,40 @@ void tcSurfaceObject::ApplyRestrictions()
     {
         mcGS.mfGoalSpeed_kts = std::min(mcGS.mfGoalSpeed_kts, (1.0f - 0.5f*mfDamageLevel)*mpDBObject->mfMaxSpeed_kts);
     }
-
-
 }
 
 
-float tcSurfaceObject::GetOpticalCrossSection() const
+float tcSurfaceObject::GetOpticalCrossSection(float view_alt_m, float view_dist_km) const
 {
-    return mpDBObject->opticalCrossSection_dBsm;
+	float wake_horizon_km = 3.57*sqrt(view_alt_m);
+	float viewable_wake_dbsm = 0;
+	if (view_dist_km < wake_horizon_km) //calculate the wake dBsm if we can see it
+	{
+		float speed_mps = mcKin.mfSpeed_kts * 0.5144444;
+		float speed_kts = mcKin.mfSpeed_kts;
+		float tonnage = mpDBObject->weight_kg * 0.001;
+		float beam_m = mpDBObject->beam_m;
+		if (beam_m == 0)
+		{
+			float beam = 0.1 * pow(log10f(tonnage) / log10(1.4),1.65);
+		}
+		float wake_m2 = speed_mps * pow(1.6873323, 0.1 * (speed_kts - 9)) * 0.05 * beam_m * (log10f(speed_kts * speed_kts) / log10f(2.3403474)*100+100);
+		float above_horizon_m = view_alt_m - pow(view_dist_km / 3.57,2);
+		float slant_range = sqrt(pow(view_alt_m * .001,2) + pow(view_dist_km,2));
+		float sin_view_fraction = (above_horizon_m * 0.001) / slant_range;
+		float viewable_wake_m2 = sin_view_fraction * wake_m2;
+		viewable_wake_dbsm = 10*log10f(viewable_wake_m2);
+
+	}
+	int SeaState = tcSonarEnvironment::Get()->GetSeaState();
+	float SeaStateHullFactor = 10*log10f(std::max(4, SeaState)-3);
+	float SeaStateWakeFactor = 10*log10(pow(std::max(2,SeaState)-1,2));
+	float opticalCrossSection = mpDBObject->opticalCrossSection_dBsm;
+	float opticalCrossSection_m2 = pow(10,0.1*(opticalCrossSection - SeaStateHullFactor));
+	float viewable_wake_m2 = pow(10,0.1*(viewable_wake_dbsm - SeaStateWakeFactor));
+	float total_cross_section = 10*log10f(opticalCrossSection_m2 + viewable_wake_m2);
+
+    return total_cross_section;
 }
 
 const std::deque<tcPoint>& tcSurfaceObject::GetPositionHistory() const
