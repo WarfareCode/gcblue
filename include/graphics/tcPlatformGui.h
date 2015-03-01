@@ -114,7 +114,7 @@ private:
     
     void AddOrUpdateLauncherItem(tcContainerSlot& slot, tcDatabaseObject* child,
              tcLauncher* launcher, unsigned int launcherIdx, unsigned int quantity);
-	void GetLauncherCompatibilityCaption(unsigned int launcherIdx, wxString& caption, tcPlatformObject* platform);
+	int GetLauncherCompatibilityCaption(unsigned int launcherIdx, wxString& caption, tcPlatformObject* platform);
 	tcFlightOpsObject* GetFlightOps();
 	tcPlatformObject* GetPlatform();
 
