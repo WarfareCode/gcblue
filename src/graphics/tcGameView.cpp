@@ -773,7 +773,7 @@ void tcGameView::AddTruthTracks(unsigned int anAlliance,
 
             // dont show heading if in a steep dive (? this doesnt do this, 20080720)
 			if ((mpMapView->maMapObj[rnIndex].meSymbol != SYMBOL_FIXED) &&
-                (po->mcKin.mfSpeed_kts > 0))
+                (po->mcKin.mfSpeed_kts != 0))  //should enable negative speeds now?
 			{
 				mpMapView->maMapObj[rnIndex].mfHeading = po->mcKin.mfHeading_rad;
 				mpMapView->maMapObj[rnIndex].mnFlags = TRACK_ALLVALID;

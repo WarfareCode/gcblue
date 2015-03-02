@@ -50,6 +50,8 @@
 #include "tcScenarioRandomizer.h"
 #include "tcDatabase.h"
 #include "tcEventManager.h"
+#include "tcShipDBObject.h"
+#include "tcMessageInterface.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -249,12 +251,52 @@ void tcPlatformObject::UpdateSpeed(float dt_s)
     float ds_kts = mcGS.mfGoalSpeed_kts - mcKin.mfSpeed_kts;
     float ds_max = mpDBObject->mfAccel_ktsps*dt_s;
     float ds_min = -ds_max;
+    unsigned int classification = mpDBObject->mnType;
+    bool isSurface = ((classification & PTYPE_SURFACE) != 0);
+	if (isSurface)
+	{
+		if (abs(mcGS.mfGoalSpeed_kts) > abs(mcKin.mfSpeed_kts)) //accelerating
+		{
+			if (mcGS.mfGoalSpeed_kts > mcKin.mfSpeed_kts) //forwards acceleration
+			{
+				ds_kts = std::max(0.001, 1 - (pow(abs(mcKin.mfSpeed_kts), 0.9) / pow(mpDBObject->mfMaxSpeed_kts, 0.9))) * mpDBObject->mfAccel_ktsps * dt_s;
+			}
+			else
+			{
+				ds_kts = std::max(0.001, 1 - (pow(abs(mcKin.mfSpeed_kts)*0.5, 0.9) / pow(mpDBObject->mfMaxSpeed_kts*0.5, 0.9))) * 0.5 * mpDBObject->mfAccel_ktsps * dt_s * -1;
+			}
+		}
+		else if (abs(mcGS.mfGoalSpeed_kts) < abs(mcKin.mfSpeed_kts)) //slowing to stop
+		{
+			tcDatabaseObject* databaseObject = tcDatabase::Get()->GetObject(mpDBObject->mzClass.c_str());
+			tcShipDBObject* shipDBObj = dynamic_cast<tcShipDBObject*>(databaseObject);
+			float hullSpeed_kts		= sqrt(shipDBObj->length_m) * 5.07;
+			float refSpeed_kts  	= std::min(hullSpeed_kts, mpDBObject->mfMaxSpeed_kts);
+			float fineness			= shipDBObj->beam_m / shipDBObj->length_m;
+			float block_coefficient = shipDBObj->weight_kg / (shipDBObj->draft_m * shipDBObj->length_m * shipDBObj->beam_m * 1030);
+			float water_force		= 0.1f * shipDBObj->beam_m * shipDBObj->draft_m * pow(mcKin.mfSpeed_kts * 0.514444f, 2) * 1030 * fineness;
+			float water_accel		= (water_force / mpDBObject->weight_kg) / 0.514444;
+			float scalar = std::max(0.001, 1 - (pow(abs(mcKin.mfSpeed_kts), 0.9) / pow(mpDBObject->mfMaxSpeed_kts, 0.9))) * mpDBObject->mfAccel_ktsps;
 
-    if (ds_kts < ds_min) {ds_kts = ds_min;} // restrict to acceleration
-    else if (ds_kts > ds_max) {ds_kts = ds_max;}
+			ds_kts = (mpDBObject->mfAccel_ktsps * scalar + water_accel) * dt_s;
+			if (mcGS.mfGoalSpeed_kts < mcKin.mfSpeed_kts) //slowing from forwards velocity
+			{
+				ds_kts *= -1;
+			}
+		}
+		else
+		{
+			ds_kts = 0;
+		}
+	}
+	else
+	{
+		if (ds_kts < ds_min) {ds_kts = ds_min;} // restrict to acceleration
+		else if (ds_kts > ds_max) {ds_kts = ds_max;}
+	}
+
     mcKin.mfSpeed_kts += ds_kts;
 
-	if (mcKin.mfSpeed_kts < 0) mcKin.mfSpeed_kts = 0;
 
 	// if a fuel capacity is indicated then update fuel consumption
 	if (!mpDBObject->HasInfiniteFuel())

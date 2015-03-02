@@ -397,9 +397,13 @@ namespace scriptinterface
         if (platObj != 0)
         {
             // limit speed to max
-            if (kin.mfSpeed_kts > platObj->mpDBObject->mfMaxSpeed_kts)
+            if (kin.mfSpeed_kts > platObj->mpDBObject->mfMaxSpeed_kts && kin.mfSpeed_kts > 0)
             {
                 platObj->mcKin.mfSpeed_kts = platObj->mpDBObject->mfMaxSpeed_kts;
+            }
+			else if (kin.mfSpeed_kts < platObj->mpDBObject->mfMaxSpeed_kts * -0.5 && kin.mfSpeed_kts < 0)
+            {
+                platObj->mcKin.mfSpeed_kts = platObj->mpDBObject->mfMaxSpeed_kts * -0.5;
             }
             platObj->SetSpeed(kin.mfSpeed_kts);
         }

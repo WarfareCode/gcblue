@@ -51,6 +51,8 @@
 #include "tcSimState.h"
 #include "tcSound.h"
 #include "tcSubObject.h"
+#include "tcGroundVehicleObject.h"
+#include "tcSurfaceObject.h"
 #include "tcSubDBObject.h"
 #include "tcTime.h"
 #include "tcTorpedoDBObject.h"
@@ -1394,7 +1396,11 @@ void tcObjectControl::DrawBarObject(tsBarObjectInfo *apBOI,
 
     float valueRange = apBOI->mfmaxvalue - apBOI->mfminvalue;
     float fractionalValue = (afValue - apBOI->mfminvalue) / valueRange;
-
+	float zeroPoint;
+	if (apBOI->mfminvalue != 0)
+		{zeroPoint = -(apBOI->mfminvalue / valueRange) * (apBOI->mrectbar.Width());}
+	else
+		{zeroPoint = 0;}
     if (apBOI->mbVertical) 
     {
         rcurrent.top = apBOI->mrectbar.GetTop();
@@ -1402,7 +1408,15 @@ void tcObjectControl::DrawBarObject(tsBarObjectInfo *apBOI,
     }
     else 
     {
-        rcurrent.right = rcurrent.left + (fractionalValue)*(apBOI->mrectbar.Width());
+		if (apBOI->mfminvalue == 0)
+		{
+	        rcurrent.right = rcurrent.left + (fractionalValue)*(apBOI->mrectbar.Width());
+		}
+		else
+		{
+		    rcurrent.right = rcurrent.left + (fractionalValue)*(apBOI->mrectbar.Width());
+			rcurrent.left = rcurrent.left + zeroPoint;
+		}
     }
 	color.set(0.4f, 1.0f, 0.4f, 1.0f);
 
@@ -1418,7 +1432,7 @@ void tcObjectControl::DrawBarObject(tsBarObjectInfo *apBOI,
         {
             y1 = rcurrent.GetBottom() - 2.0f;
             y2 = rcurrent.GetTop() + 2.0f;
-            x1 = rcurrent.left + (fractionalGoalValue)*(apBOI->mrectbar.Width());
+            x1 = rcurrent.left + (fractionalGoalValue)*(apBOI->mrectbar.Width()) - zeroPoint;
             x2 = x1;
         }
         else 
@@ -1441,7 +1455,7 @@ void tcObjectControl::DrawBarObject(tsBarObjectInfo *apBOI,
         {
             y1 = rcurrent.GetBottom() - 2.0f;
             y2 = rcurrent.GetTop() + 2.0f;
-            x1 = rcurrent.left + (fractionalRedLineValue)*(apBOI->mrectbar.Width());
+            x1 = rcurrent.left + (fractionalRedLineValue)*(apBOI->mrectbar.Width()) - zeroPoint;
             x2 = x1;
         }
         else 
@@ -1463,19 +1477,29 @@ void tcObjectControl::DrawBarObject(tsBarObjectInfo *apBOI,
         else if (xDraw < apBOI->mfminvalue) {xDraw = apBOI->mfminvalue;}
 
         float fractionalMouseValue = (xDraw - apBOI->mfminvalue) / valueRange;
+		float zeroPoint;
+		if (apBOI->mfminvalue != 0)
+			{zeroPoint = -(apBOI->mfminvalue / valueRange) * (apBOI->mrectbar.Width());}
+		else
+			{zeroPoint = 0;}
 
 		color.set(1, 1, 1, 0.63f);
 
         if (apBOI->mbVertical) 
         {
 			rcurrent.top = apBOI->mrectbar.GetTop();
-			rcurrent.bottom = rcurrent.top - 
-				(fractionalMouseValue)*(apBOI->mrectbar.Height());
+			rcurrent.bottom = rcurrent.top - (fractionalMouseValue)*(apBOI->mrectbar.Height());
         }
         else
         {
-			rcurrent.right = rcurrent.left + 
-				(fractionalMouseValue)*(apBOI->mrectbar.Width());
+			if (apBOI->mfminvalue == 0)
+			{
+				rcurrent.right = rcurrent.left + (fractionalMouseValue)*(apBOI->mrectbar.Width());
+			}
+			else
+			{
+				rcurrent.right = rcurrent.left + (fractionalMouseValue)*(apBOI->mrectbar.Width()) - zeroPoint;
+			}
         }
         DrawRectangleR(rcurrent, color, FILL_ON);
 
@@ -2365,15 +2389,24 @@ void tcObjectControl::UpdateControlObjects()
         //tcPlatformObject *pPlatformObj = dynamic_cast<tcPlatformObject*> (mpHookedGameObj);
         if (platformObj == NULL) {return;}
         
-        msSOI.mfminvalue = 0;
 
         tcPlatformDBObject *pGenericData = platformObj->mpDBObject;
         if (pGenericData == NULL) {return;}
 
         float maxSpeed_kts = pGenericData->mfMaxSpeed_kts;
+        msSOI.mfminvalue = 0;
         if (tcSubObject* sub = dynamic_cast<tcSubObject*>(mpHookedGameObj))
         {
             maxSpeed_kts = std::max(maxSpeed_kts, sub->mpDBObject->surfaceSpeed_kts); // to handle rare case where surfaced speed is greater
+			msSOI.mfminvalue = pGenericData->mfMaxSpeed_kts * -0.5f; //subs and ships and ground can reverse
+        }
+        if (tcSurfaceObject* ship = dynamic_cast<tcSurfaceObject*>(mpHookedGameObj))
+        {
+			msSOI.mfminvalue = pGenericData->mfMaxSpeed_kts * -0.5f; //subs and ships and ground can reverse
+        }
+		if (tcGroundVehicleObject* vehicle = dynamic_cast<tcGroundVehicleObject*>(mpHookedGameObj))
+        {
+			msSOI.mfminvalue = pGenericData->mfMaxSpeed_kts * -0.5f; //subs and ships and ground can reverse
         }
 
         msSOI.mfmaxvalue = units->UserSpeedUnits(maxSpeed_kts);

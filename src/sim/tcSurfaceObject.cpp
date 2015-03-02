@@ -117,7 +117,10 @@ void tcSurfaceObject::ApplyRestrictions()
     }
     else
     {
-        mcGS.mfGoalSpeed_kts = std::min(mcGS.mfGoalSpeed_kts, (1.0f - 0.5f*mfDamageLevel)*mpDBObject->mfMaxSpeed_kts);
+		if (mcGS.mfGoalSpeed_kts < 0)
+			{ mcGS.mfGoalSpeed_kts = std::min(mcGS.mfGoalSpeed_kts, (1.0f - 0.5f*mfDamageLevel)*mpDBObject->mfMaxSpeed_kts);}
+		else
+			{ mcGS.mfGoalSpeed_kts = std::max(mcGS.mfGoalSpeed_kts, (1.0f - 0.5f*mfDamageLevel)*-0.5f*mpDBObject->mfMaxSpeed_kts);}
     }
 }
 

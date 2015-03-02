@@ -326,7 +326,7 @@ void ObjectUpdater::UpdateAnimations(tcGameObject* obj)
                 /* for subs and surface ships change rate with speed (omega is radians per second per knot)
                 ** aircraft including helos use a fixed rate (omega is radians per second)
                 */
-                if (gameObject->mcKin.mfSpeed_kts < 50.0f)
+                if (gameObject->mcKin.mfSpeed_kts < 50.0f) //hack method, improve this to isolate ships and subs, some ptbs exceed 70kts.
                 {
                     theta *= gameObject->mcKin.mfSpeed_kts;
                 }
@@ -371,7 +371,7 @@ void ObjectUpdater::UpdateTrackAnimations()
 				/* for subs and surface ships change rate with speed (omega is radians per second per knot)
 				** aircraft including helos use a fixed rate (omega is radians per second)
 				*/
-				if (track->mfSpeed_kts < 50.0f)
+				if (track->mfSpeed_kts < 50.0f)//hack method, improve this to isolate ships and subs, some ptbs exceed 70kts.
 				{
 					theta *= track->mfSpeed_kts ;
 				}

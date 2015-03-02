@@ -425,14 +425,25 @@ void tcSubObject::ApplyRestrictions()
         SetRadarMastState(false);
 		SetSnorkelState(false);
 
-        mcKin.mfSpeed_kts = std::min(mcKin.mfSpeed_kts, mpDBObject->mfMaxSpeed_kts); // restrict speed for case where surface speed > submerged
+		if (mcKin.mfSpeed_kts > 0)
+		{
+			mcKin.mfSpeed_kts = std::min(mcKin.mfSpeed_kts, mpDBObject->mfMaxSpeed_kts); // restrict speed for case where surface speed > submerged
+		}
+		else
+		{
+			mcKin.mfSpeed_kts = std::max(mcKin.mfSpeed_kts, mpDBObject->mfMaxSpeed_kts * -0.5f); // restrict speed for case where surface speed > submerged
+		}
     }
     else if (mcKin.mfAlt_m <= 0) // restrict speed near surface
     {
         float maxSpeed_kts = GetMaxSpeedForDepth(mcKin.mfAlt_m);
-        if (mcKin.mfSpeed_kts > maxSpeed_kts)
+		if (mcKin.mfSpeed_kts > 0 && mcKin.mfSpeed_kts > maxSpeed_kts)
         {
             mcKin.mfSpeed_kts = maxSpeed_kts;
+        }
+		else if (mcKin.mfSpeed_kts < 0 && mcKin.mfSpeed_kts < maxSpeed_kts * 0.5)
+        {
+            mcKin.mfSpeed_kts = maxSpeed_kts * -0.5;
         }
     }
     else if (mcKin.mfAlt_m > 0)
@@ -607,7 +618,7 @@ void tcSubObject::UpdateClimb(float dt_s)
     mcKin.mfPitch_rad = mcKin.mfClimbAngle_rad; 
 
     // add slow vertical ascent/descent component near surface or for near stopped sub (e.g. out of battery)
-	if ((mcKin.mfAlt_m > -5) || (mcKin.mfSpeed_kts < 1))
+	if ((mcKin.mfAlt_m > -5) || (abs(mcKin.mfSpeed_kts) < 1))
     {
         float dz = (dalt_m > 0) ? 0.5f * dt_s : -0.5f * dt_s;
         mcKin.mfAlt_m += dz;
@@ -760,7 +771,7 @@ void tcSubObject::UpdateSpeed(float dt_s)
 	else if (ds_kts > ds_max) {ds_kts = ds_max;}
 	mcKin.mfSpeed_kts += ds_kts;
 
-	if (mcKin.mfSpeed_kts < 0) mcKin.mfSpeed_kts = 0;
+	//if (mcKin.mfSpeed_kts < 0) mcKin.mfSpeed_kts = 0;  amram - allowing subs to reverse
 
 	if (!IsDieselElectric()) return;
 
@@ -781,7 +792,7 @@ void tcSubObject::UpdateSpeed(float dt_s)
 		batteryCharge = 0;
 		if (mcKin.mfSpeed_kts > 0) mcKin.mfSpeed_kts -= 2*ds_max;
 
-		if (mcKin.mfSpeed_kts < 0) mcKin.mfSpeed_kts = 0;
+		if (mcKin.mfSpeed_kts < 0) mcKin.mfSpeed_kts += 2*ds_max;  //amram - permitting recharge while backing up for subs
 	}
 	else if (batteryCharge > mpDBObject->batteryCapacity_kJ)
 	{

@@ -2484,13 +2484,13 @@ void tcTacticalMapView::DrawSymbol2(tcMapObj* pMO)
 	{
 		wxString s;
 
-        if ((trackInfoMode == 1) || (pMO->speed_kts <= 0))
+        if ((trackInfoMode == 1) || (pMO->speed_kts == 0))
         {
             s = wxString::Format("%04d", pMO->mnID);
         }
         else
         { 
-            s = wxString::Format("%04d\n %03.0f", pMO->mnID, units->UserSpeedUnits(pMO->speed_kts));
+            s = wxString::Format("%04d\n %03.0f", pMO->mnID, units->UserSpeedUnits(abs(pMO->speed_kts)));
         }
 
 		//DrawTextR(s.c_str(), x-9.0f, y+16.0f, defaultFont.get(), symbolColor, 11.0, LEFT_TOP);
