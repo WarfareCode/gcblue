@@ -1,10 +1,16 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2012 for Windows Desktop
+# Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BlueII", "GCblue.vcxproj", "{76C3883D-96DD-4A32-91C5-2ADA4CA505E7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{13B3F189-73E5-4E91-911C-B9D38A2554B9} = {13B3F189-73E5-4E91-911C-B9D38A2554B9}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gcblue-lib", "gcblue-lib.vcxproj", "{13B3F189-73E5-4E91-911C-B9D38A2554B9}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dbeditor", "dbeditor\dbeditor.vcxproj", "{7CEC7D5F-78F9-43E4-903D-05B45A4F2104}"
+	ProjectSection(ProjectDependencies) = postProject
+		{13B3F189-73E5-4E91-911C-B9D38A2554B9} = {13B3F189-73E5-4E91-911C-B9D38A2554B9}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
