@@ -471,7 +471,7 @@ float tcSubObject::GetMaxQuietSpeedKts() const
 float tcSubObject::GetMaxSpeedForDepth(float altitude_m) const
 {
     float alpha = -invPeriscopeDepth * altitude_m; // 0 at surface, 1 at periscope depth
-    float maxSpeed_kts = alpha * mpDBObject->mfMaxSpeed_kts + (1.0f - alpha) * mpDBObject->surfaceSpeed_kts;
+    float maxSpeed_kts = std::min(alpha * mpDBObject->mfMaxSpeed_kts + (1.0f - alpha) * mpDBObject->surfaceSpeed_kts,mpDBObject->mfMaxSpeed_kts);
 
     return maxSpeed_kts;
 }
