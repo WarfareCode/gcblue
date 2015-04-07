@@ -51,17 +51,34 @@ namespace database
     class tcSubDBObject : public tcPlatformDBObject, public tcAirDetectionDBObject, public tcWaterDetectionDBObject
     {
     public:
-        float draft_m;                    ///< max navigational draft on surface
-        float surfaceSpeed_kts;           ///< speed while surfaced
+        float draft_m;                      ///< max navigational draft on surface
+        float length_m;                    
+        float beam_m;                    
+        float surfaceSpeed_kts;             ///< speed while surfaced
         float mfMaxDepth_m;
 
-        bool isDieselElectric;            ///< true if diesel electric
-        float batteryCapacity_kJ;         ///< battery capacity when fully charged
-        float batteryRate_kW;             ///< battery drain rate at min thrust, scaled to 4x at max thrust
-        float batteryCharge_kW;           ///< charge rate when snorkeling on generators
+        float Primary_ShaftHP;				///< Nuke/Diesel propulsion power
+        bool isDieselElectric;				///< true if diesel electric
+        float Electric_ShaftHP;				///< Electrical propulsion power
+        float batteryCapacityRated_kWhr;	///< battery capacity when fully charged
+        float batteryRate_kW;               ///< battery drain rate at rated measure
+        float batteryCharge_kW;             ///< charge rate when snorkeling on generators
+        float batteryRatedHours;            ///< rated endurance of battery at stated draw rate and and capacity
+        float batteryPeukert;               ///< peukert constant for the battery
+        bool isAIP;				            ///< true if has AIP system
+        float AIP_ShaftHP;				    ///< AIP propulsion power
+        float AIP_Capacity_kg;				///< AIP capacity when fully charged
+        float AIP_Rate_kgps;				///< AIP drain rate
+        int PropulsionShafts;			    ///< PropulsionShafts
+        float electricalAcceleration_ktsps;	///< acceleration value under battery power
+        float aipAcceleration_ktsps;		///< acceleration value under AIP power
+        float electricalLoadAdjustment;	    ///< load adjustment to coerce reasonable outcomes.
 
-        float GetBatteryRate(float speed_mps) const;
-
+		float GetBatteryRate(float speed_kts) const;
+	    float GetBatteryRate(float speed_kts, bool snorkel) const;
+		float GetAIPBatteryRate(float speed_kts) const;
+		float GetAIPRate(float speed_kts) const;
+		float GetAIPSpeed() const;
         float GetMaxNonCavitatingSpeed(float depth_m) const;
         float GetNoiseLevelForSpeed(float speed_mps) const;  
         float GetNoiseLevelForSpeedKts(float speed_kts) const;      

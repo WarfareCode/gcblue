@@ -242,6 +242,48 @@ void tcPlatformObject::UpdateHeading(float dt_s)
 	mcKin.mfYaw_rad = mcKin.mfHeading_rad;
 }
 
+float tcPlatformObject::ShipAccel() 
+{
+	if ((mcGS.mfGoalSpeed_kts - mcKin.mfSpeed_kts < 0.005) || (mcKin.mfSpeed_kts - mcGS.mfGoalSpeed_kts < 0.005))//at goal, return zero
+	{
+		return 0;
+	}
+
+	float accel = std::max(0.001, 1 - (pow(abs(mcKin.mfSpeed_kts), 0.9) / pow(mpDBObject->mfMaxSpeed_kts, 0.9))) * mpDBObject->mfAccel_ktsps;
+	if (abs(mcGS.mfGoalSpeed_kts) > abs(mcKin.mfSpeed_kts)) //accelerating
+	 {
+		if (mcGS.mfGoalSpeed_kts > mcKin.mfSpeed_kts) //forwards acceleration
+		{
+			return accel;
+		}
+		else
+		{
+			return accel * -1;
+		}
+	}
+	else if (abs(mcGS.mfGoalSpeed_kts) < abs(mcKin.mfSpeed_kts)) //slowing to stop
+	{
+		tcDatabaseObject* databaseObject = tcDatabase::Get()->GetObject(mpDBObject->mzClass.c_str());
+		tcShipDBObject* shipDBObj = dynamic_cast<tcShipDBObject*>(databaseObject);
+		//float block_coefficient = shipDBObj->weight_kg / (shipDBObj->draft_m * shipDBObj->length_m * shipDBObj->beam_m * 1030);
+		float water_force = shipDBObj->beam_m * shipDBObj->draft_m * pow(mcKin.mfSpeed_kts * 0.514444f, 2) * 1030;
+		float water_accel = (water_force / mpDBObject->weight_kg) / 0.514444;
+
+		if (mcGS.mfGoalSpeed_kts < mcKin.mfSpeed_kts) //slowing from forwards velocity
+		{
+			return accel * -1 - water_accel;
+		}
+		else
+		{
+			return accel - water_accel;
+		}
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 /**
 * Adjust speed to goal speed, limited by max acceleration
 * Also updates fuel state (setting fuel capacity to 0 in db gives infinite fuel)
@@ -255,6 +297,7 @@ void tcPlatformObject::UpdateSpeed(float dt_s)
     bool isSurface = ((classification & PTYPE_SURFACE) != 0);
 	if (isSurface)
 	{
+
 		if (abs(mcGS.mfGoalSpeed_kts) > abs(mcKin.mfSpeed_kts)) //accelerating
 		{
 			if (mcGS.mfGoalSpeed_kts > mcKin.mfSpeed_kts) //forwards acceleration
@@ -273,7 +316,7 @@ void tcPlatformObject::UpdateSpeed(float dt_s)
 			float hullSpeed_kts		= sqrt(shipDBObj->length_m) * 5.07;
 			float refSpeed_kts  	= std::min(hullSpeed_kts, mpDBObject->mfMaxSpeed_kts);
 			float fineness			= shipDBObj->beam_m / shipDBObj->length_m;
-			float block_coefficient = shipDBObj->weight_kg / (shipDBObj->draft_m * shipDBObj->length_m * shipDBObj->beam_m * 1030);
+			//float block_coefficient = shipDBObj->weight_kg / (shipDBObj->draft_m * shipDBObj->length_m * shipDBObj->beam_m * 1030);
 			float water_force		= 0.1f * shipDBObj->beam_m * shipDBObj->draft_m * pow(mcKin.mfSpeed_kts * 0.514444f, 2) * 1030 * fineness;
 			float water_accel		= (water_force / mpDBObject->weight_kg) / 0.514444;
 			float scalar = std::max(0.001, 1 - (pow(abs(mcKin.mfSpeed_kts), 0.9) / pow(mpDBObject->mfMaxSpeed_kts, 0.9))) * mpDBObject->mfAccel_ktsps;
@@ -301,7 +344,8 @@ void tcPlatformObject::UpdateSpeed(float dt_s)
 	// if a fuel capacity is indicated then update fuel consumption
 	if (!mpDBObject->HasInfiniteFuel())
 	{
-		fuel_kg -= dt_s * mpDBObject->GetFuelConsumptionConstant(mcKin.mfSpeed_kts) * mcKin.mfSpeed_kts;
+		fuel_rate = mpDBObject->GetFuelConsumptionConstant(mcKin.mfSpeed_kts) * mcKin.mfSpeed_kts;
+		fuel_kg -= dt_s * fuel_rate;
 		if (fuel_kg < 0) fuel_kg = 0;
 
 		if (fuel_kg == 0)

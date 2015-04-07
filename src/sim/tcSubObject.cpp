@@ -94,6 +94,7 @@ tcUpdateStream& tcSubObject::operator<<(tcUpdateStream& stream)
     tcPlatformObject::operator<<(stream);
 
     stream >> batteryCharge;
+    stream >> AIP_fuel_kg;
 
     return stream;
 }
@@ -106,6 +107,7 @@ tcUpdateStream& tcSubObject::operator>>(tcUpdateStream& stream)
     tcPlatformObject::operator>>(stream);
 
     stream << batteryCharge;
+    stream << AIP_fuel_kg;
 
     return stream;
 }
@@ -126,6 +128,7 @@ tcGameStream& tcSubObject::operator<<(tcGameStream& stream)
     stream >> lastDepth_m;
     stream >> doneSinking;
 	stream >> batteryCharge;
+	stream >> AIP_fuel_kg;
 
     return stream;
 }
@@ -146,6 +149,7 @@ tcGameStream& tcSubObject::operator>>(tcGameStream& stream)
     stream << lastDepth_m;
     stream << doneSinking;
 	stream << batteryCharge;
+	stream << AIP_fuel_kg;
 
     return stream;
 }
@@ -247,6 +251,21 @@ float tcSubObject::GetBatteryCharge() const
 	return batteryCharge;
 }
 
+float tcSubObject::GetBatteryRate() const
+{
+	return batteryRate;
+}
+
+float tcSubObject::GetAIPRate() const
+{
+	return aipRate;
+}
+
+float tcSubObject::GetAIPFuel() const
+{
+	return AIP_fuel_kg;
+}
+
 /**
 * @return periscope depth in meters (negative number)
 */
@@ -314,6 +333,11 @@ bool tcSubObject::IsDieselElectric() const
 	return mpDBObject->isDieselElectric;
 }
 
+bool tcSubObject::IsAIP() const
+{
+	return mpDBObject->isAIP;
+}
+
 /**
 * @return true if snorkeling, false otherwise
 */
@@ -327,7 +351,6 @@ bool tcSubObject::IsSurfaced() const
 {
     return mcKin.mfAlt_m >= 0;
 }
-
 
 void tcSubObject::SetAltitude(float new_altitude_m)
 {
@@ -476,7 +499,6 @@ float tcSubObject::GetMaxSpeedForDepth(float altitude_m) const
     return maxSpeed_kts;
 }
 
-
 float tcSubObject::GetOpticalCrossSection() const
 {
     if (mcKin.mfAlt_m < -GetPeriscopeDepth())
@@ -510,8 +532,6 @@ float tcSubObject::GetOpticalCrossSection() const
     }
 }
 
-
-
 float tcSubObject::GetIRSignature(float az_deg) const
 {
     if (mcKin.mfAlt_m < -GetPeriscopeDepth())
@@ -537,6 +557,49 @@ float tcSubObject::GetIRSignature(float az_deg) const
     return signature;
 }
 
+float tcSubObject::SubAccel(float accel_kts) 
+{
+	if (std::max(mcGS.mfGoalSpeed_kts, mcKin.mfSpeed_kts) - std::min(mcGS.mfGoalSpeed_kts, mcKin.mfSpeed_kts) < 0.005)
+	//if (abs((abs(mcGS.mfGoalSpeed_kts) - abs(mcKin.mfSpeed_kts)) < 0.005) || (abs(abs(mcKin.mfSpeed_kts) - abs(mcGS.mfGoalSpeed_kts)) > 0.005))//at goal, return zero
+	{
+		return 0;
+	}
+	//water drag will sort itself out and be negative for negative speeds, always subtract and it will counter velocity
+	//inherent accel requires a modifier to make it negative when appaopriate.
+	float accel = std::max(0.001, 1 - (pow(abs(mcKin.mfSpeed_kts), 0.9) / pow(mpDBObject->mfMaxSpeed_kts, 0.9))) * accel_kts;
+	if (abs(mcGS.mfGoalSpeed_kts) > abs(mcKin.mfSpeed_kts)) //accelerating
+	 {
+		if (mcGS.mfGoalSpeed_kts > mcKin.mfSpeed_kts) //forwards acceleration
+		{
+			return accel;
+		}
+		else
+		{
+			return accel * -1;
+		}
+	}
+	else if (abs(mcGS.mfGoalSpeed_kts) < abs(mcKin.mfSpeed_kts)) //slowing to stop
+	{
+		//float block_coefficient = shipDBObj->weight_kg / (shipDBObj->draft_m * shipDBObj->length_m * shipDBObj->beam_m * 1030);
+		float water_force = mpDBObject->beam_m * mpDBObject->draft_m * pow(mcKin.mfSpeed_kts * 0.514444f, 2) * 515;  //1030
+		float water_accel = (water_force / mpDBObject->weight_kg) / 0.514444;
+
+		if (mcGS.mfGoalSpeed_kts < mcKin.mfSpeed_kts) //slowing from forwards velocity
+		{
+			return accel * -1 - water_accel;
+		}
+		else
+		{
+			return accel - water_accel;
+		}
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+
 /**
 * Update climb related parameters. This has problems for large time 
 * steps, > about 1 sec
@@ -560,7 +623,7 @@ void tcSubObject::UpdateClimb(float dt_s)
         mcGS.mfGoalAltitude_m = 0;
     }
 
-    float dalt_m = mcGS.mfGoalAltitude_m - mcKin.mfAlt_m;
+    float dalt_m = (mcGS.mfGoalAltitude_m - mcKin.mfAlt_m) * abs(mcKin.mfSpeed_kts) / mcKin.mfSpeed_kts;
 
     const float levelThresh_rad = 0.0035f; // 0.2 deg
     if ((dalt_m > -0.05f)&&(dalt_m < 0.05f)&&
@@ -636,7 +699,6 @@ void tcSubObject::UpdateClimb(float dt_s)
 
 }
 
-
 void tcSubObject::UpdateDestroyed(double t)
 {
     float dt_s = (float)(t - mfStatusTime);
@@ -657,8 +719,7 @@ void tcSubObject::UpdateDestroyed(double t)
 
     mcKin.mfPitch_rad = mcKin.mfClimbAngle_rad;
 
-
-    if (mcKin.mfAlt_m <= mcTerrain.mfHeight_m + 5.0f)
+    if ((mcKin.mfAlt_m <= mcTerrain.mfHeight_m + 5.0f) || (mcKin.mfAlt_m <= mpDBObject->mfMaxDepth_m * 1.1f))
     {
         doneSinking = true;
     }
@@ -764,41 +825,105 @@ void tcSubObject::UpdateSensors(double t)
 void tcSubObject::UpdateSpeed(float dt_s)
 {
 	float ds_kts = mcGS.mfGoalSpeed_kts - mcKin.mfSpeed_kts;
-	float ds_max = mpDBObject->mfAccel_ktsps*dt_s;
-	float ds_min = -ds_max;
+	if (IsDieselElectric() || IsAIP())
+	{
+		if (!IsSnorkeling())
+			//battery and/or AIP control things
+			if (batteryCharge > 0)
+			{
+				//battery charge is good, use battery acceleration
+				ds_kts = SubAccel(mpDBObject->electricalAcceleration_ktsps);
+			}
+			else if ((batteryCharge <= 0) && (AIP_fuel_kg > 0))
+			{
+				//batteries dead and we're dived, use AIP acceleration
+				mcGS.mfGoalSpeed_kts = std::min(mcGS.mfGoalSpeed_kts, mpDBObject->GetAIPSpeed());  //do not permit goal speed above aip speed if limited to AIP
+				mcGS.mfGoalSpeed_kts = std::max(mcGS.mfGoalSpeed_kts, -mpDBObject->GetAIPSpeed());  //do not permit goal speed above aip speed if limited to AIP
+				if (abs(mcKin.mfSpeed_kts) > abs(mcGS.mfGoalSpeed_kts))
+				{
+					ds_kts = SubAccel(0);
+				}
+				else
+				{
+					ds_kts = SubAccel(mpDBObject->aipAcceleration_ktsps);
+				}
+			}
+			else
+			{
+				//no battery, no aip, and we're dived, bad shape to be in.
+				mcGS.mfGoalSpeed_kts = 0;
+				ds_kts = SubAccel(0);
+			}
+		else
+		{
+			//snorkelling, use diesels and recharge at full rate if fuel provides.
+			ds_kts = SubAccel(mpDBObject->mfAccel_ktsps);
+		}
+	}
+	else
+	{
+		ds_kts = SubAccel(mpDBObject->electricalAcceleration_ktsps);
+	}
 
-	if (ds_kts < ds_min) {ds_kts = ds_min;} // restrict to acceleration
-	else if (ds_kts > ds_max) {ds_kts = ds_max;}
-	mcKin.mfSpeed_kts += ds_kts;
 
-	//if (mcKin.mfSpeed_kts < 0) mcKin.mfSpeed_kts = 0;  amram - allowing subs to reverse
+	mcKin.mfSpeed_kts += ds_kts * dt_s;
 
 	if (!IsDieselElectric()) return;
 
 	// update battery and fuel state for diesel electric subs
+	// also AIP system status for AIP capable subs
+	batteryRate = 0;
+	aipRate = 0;
 
-	float speed_mps = C_KTSTOMPS * mcKin.mfSpeed_kts;
-	float batteryRate = -mpDBObject->GetBatteryRate(speed_mps);
-	
-	if (isSnorkeling && (fuel_kg > 0)) 
+	if (isSnorkeling && (fuel_kg > 0))
 	{
-		batteryRate += mpDBObject->batteryCharge_kW;
+		batteryRate = mpDBObject->GetBatteryRate(abs(mcKin.mfSpeed_kts), true);
+		batteryRate += batteryRate;
 	    fuel_kg -= dt_s * mpDBObject->mfFuelRate_kgps;
 	}
+	else if (IsAIP() && (AIP_fuel_kg > 0))
+	{
+		float aip_speed = mpDBObject->GetAIPSpeed();
+		if ((mcKin.mfSpeed_kts > aip_speed) || ((mpDBObject->batteryCapacityRated_kWhr - batteryCharge) * 3600 > mpDBObject->batteryCharge_kW))
+		{
+			batteryRate = mpDBObject->GetAIPBatteryRate(abs(mcKin.mfSpeed_kts));
+		}
+		if (batteryRate > 0)
+		{
+			//aip is recharging battery, assume full rate AIP draw
+			aipRate = mpDBObject->GetAIPRate(aip_speed);
+		}
+		else
+		{
+			aipRate = mpDBObject->GetAIPRate(abs(mcKin.mfSpeed_kts));
+		}
+	}
+	else
+	{
+		batteryRate = mpDBObject->GetBatteryRate(abs(mcKin.mfSpeed_kts));
+		batteryRate += batteryRate;
+	}
 
-	batteryCharge += dt_s * batteryRate; 
+	AIP_fuel_kg += dt_s * aipRate;  //aiprate should be negative
+	batteryCharge += dt_s * batteryRate;   //battery rate will be negative unless charging
 	if (batteryCharge <= 0)
 	{
 		batteryCharge = 0;
-		if (mcKin.mfSpeed_kts > 0) mcKin.mfSpeed_kts -= 2*ds_max;
-
-		if (mcKin.mfSpeed_kts < 0) mcKin.mfSpeed_kts += 2*ds_max;  //amram - permitting recharge while backing up for subs
 	}
-	else if (batteryCharge > mpDBObject->batteryCapacity_kJ)
+	if ((batteryCharge <= 0) && ((AIP_fuel_kg <= 0) || (!IsAIP() && !IsDieselElectric())))
 	{
-		batteryCharge = mpDBObject->batteryCapacity_kJ;
+		batteryCharge = 0;
+		if (mcKin.mfSpeed_kts > 0) mcGS.mfGoalSpeed_kts = 0;
+	}
+	else if (batteryCharge > mpDBObject->batteryCapacityRated_kWhr)
+	{
+		batteryCharge = mpDBObject->batteryCapacityRated_kWhr;
 	}
 
+	if (AIP_fuel_kg <= 0)
+	{
+		AIP_fuel_kg = 0;
+	}
 
 	if (fuel_kg <= 0)
 	{
@@ -892,7 +1017,10 @@ tcSubObject::tcSubObject(tcSubDBObject* obj)
   doneSinking(false),
   isSnorkeling(false),
   mpDBObject(obj),
-  batteryCharge(obj->batteryCapacity_kJ)
+  batteryCharge(obj->batteryCapacityRated_kWhr),
+  AIP_fuel_kg(obj->AIP_Capacity_kg),
+  batteryRate(0),
+  aipRate(0)
 {
     mnModelType = MTYPE_SUBMARINE;
     

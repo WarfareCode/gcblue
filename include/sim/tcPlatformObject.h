@@ -222,6 +222,8 @@ protected:
 	bool isRefueling; ///< true if refuel is in progress
 	std::string loadoutTag; ///< string to identify current loadout type
     float reducedTurnRate_degps; ///< for slower turns, use for current turn only then reset
+	float ShipAccel();
+	float fuel_rate;
 
     virtual void ApplyRestrictions();
     virtual void SetFireControlSensors();

@@ -63,14 +63,17 @@ public:
     virtual void Serialize(tcFile& file, bool mbLoad);
 
 	float GetBatteryCharge() const;
+	float GetAIPFuel() const;
     float GetPeriscopeDepth() const;
     bool GetPeriscopeState() const;
     bool GetRadarMastState() const;
 	float GetMaxSpeedForDepth(float altitude_m) const;
+	float SubAccel(float accel_rate);
 
     virtual float GetSonarSourceLevel(float az_deg) const;
     bool IsAtPeriscopeDepth() const;
 	bool IsDieselElectric() const;
+	bool IsAIP() const;
 	bool IsSnorkeling() const;
     bool IsSurfaced() const;
     void SetPeriscopeState(bool state);
@@ -78,6 +81,9 @@ public:
 	void SetSnorkelState(bool state);
     virtual void SetAltitude(float new_altitude_m);
     float GetMaxQuietSpeedKts() const;
+	float tcSubObject::GetBatteryRate() const;
+	float tcSubObject::GetAIPRate() const;
+
 
     virtual float GetOpticalCrossSection() const;
     virtual float GetIRSignature(float az_deg) const;
@@ -118,6 +124,9 @@ protected:
     float lastDepth_m; ///< for depth notification messages
     bool doneSinking;
 	float batteryCharge; ///< current battery charge (DE subs only)
+	float AIP_fuel_kg; ///< current AIP fuel, for AIP subs only.
+	float aipRate;	//current rate of AIP depletion
+	float batteryRate;	///current rate of battery depletion
 
     void UpdateDestroyed(double t);
     virtual void UpdateEffects();

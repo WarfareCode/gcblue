@@ -58,7 +58,7 @@ namespace scriptinterface {
 
 		if (subObj->IsDieselElectric())
 		{
-			float batteryCapacity = subObj->mpDBObject->batteryCapacity_kJ;
+			float batteryCapacity = subObj->mpDBObject->batteryCapacityRated_kWhr;
 			if (batteryCapacity > 0)
 			{
 				return subObj->GetBatteryCharge() / batteryCapacity;

@@ -951,13 +951,9 @@ void tcObjectControl::DrawFuelInfo()
 		return;
 	}
 
-	if (!sub->IsDieselElectric())
+	if (sub->IsDieselElectric())
 	{
-		return; 
-	}
-
-
-	float batteryFraction = sub->GetBatteryCharge() / sub->mpDBObject->batteryCapacity_kJ;
+	float batteryFraction = sub->GetBatteryCharge() / sub->mpDBObject->batteryCapacityRated_kWhr;
 
 	barFrame.Offset(2*barWidth, 0);
 	color.set(0.1f, 0.25f, 0.1f, 1.0f);
@@ -981,20 +977,67 @@ void tcObjectControl::DrawFuelInfo()
 
 	DrawRectangleR(barFill, color, FILL_ON);
 
+	if (sub->IsAIP())
+		{
+		barFrame.Set(xbar, xbar + barWidth, ybar, ybar + barHeight);
+		barFill.Set(xbar, xbar + barWidth, ybar + barHeight*(1-fuelFraction), ybar + barHeight);
+
+		float aipFraction = sub->GetAIPFuel() / sub->mpDBObject->AIP_Capacity_kg;
+
+		barFrame.Offset(4*barWidth, 0);
+		color.set(0.1f, 0.25f, 0.1f, 1.0f);
+		DrawRectangleR(barFrame, color, FILL_OFF);
+
+		barFill.Set(xbar, xbar + barWidth, ybar + barHeight*(1-aipFraction), ybar + barHeight);
+		barFill.Offset(4*barWidth, 0);
+
+		if (aipFraction > 0.5f)
+		{
+			color.set(0.4f, 1.0f, 0.4f, 1.0f);
+		}
+		else if (aipFraction > 0.1f)
+		{
+			color.set(1.0f, 1.0f, 0.4f, 1.0f);
+		}
+		else
+		{
+ 			color.set(1.0f, 0.4f, 0.4f, 1.0f);
+		}
+
+		DrawRectangleR(barFill, color, FILL_ON);
+	}
 	wxString fuelText;
-	if (sub->IsSnorkeling())
+	wxString fuelText2;
+	if (sub->IsAIP())
 	{
-		fuelText = fuelText.Format("FUEL: %.1f%% BATT: %.1f%% (Diesels active)",
-			fuelFraction * 100.0f, batteryFraction * 100.0f);
+		float aipFraction = sub->GetAIPFuel() / sub->mpDBObject->AIP_Capacity_kg;
+		if (sub->IsSnorkeling())
+		{
+			fuelText = fuelText.Format("FUEL: %.1f%% BATT: %.1f%% (Diesels active) AIP: %.1f%% ",
+				fuelFraction * 100.0f, batteryFraction * 100.0f, aipFraction * 100.0f);
+		}
+		else
+		{
+			fuelText = fuelText.Format("FUEL: %.1f%% BATT: %.1f%% AIP: %.1f%% ",
+				fuelFraction * 100.0f, batteryFraction * 100.0f, aipFraction * 100.0f);
+		}
 	}
 	else
 	{
-		fuelText = fuelText.Format("FUEL: %.1f%% BATT: %.1f%%",
-			fuelFraction * 100.0f, batteryFraction * 100.0f);
+		if (sub->IsSnorkeling())
+		{
+			fuelText = fuelText.Format("FUEL: %.1f%% BATT: %.1f%% (Diesels active)",
+				fuelFraction * 100.0f, batteryFraction * 100.0f);
+		}
+		else
+		{
+			fuelText = fuelText.Format("FUEL: %.1f%% BATT: %.1f%%",
+				fuelFraction * 100.0f, batteryFraction * 100.0f);
+		}
 	}
 	DrawTextR(fuelText.c_str(), xbar-15, ybar+barHeight+12, defaultFont.get(),
 		color, fontSize, LEFT_BASE_LINE);
-
+	}
 }
 
 /**
