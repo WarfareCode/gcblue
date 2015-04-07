@@ -63,7 +63,6 @@ def AirEvade(TI):
     range_km = UI.GetRangeToTrack(track)
     bearing_deg = UI.GetHeadingToDatum(track.Lon, track.Lat)
 
-    #UI.DisplayMessage('Missile %.1f km' % range_km)
 
     if (range_km < 4.0):
         LaunchChaffAndFlare(UI)
@@ -292,9 +291,8 @@ def EngageAllWrapper(TI, mtype):
             best_target, best_launcher = GetImmediateAirTarget(UI)
         else:
             best_target, best_launcher = GetImmediateTarget(UI)
-            
+
         if (best_target != -1):
-            #UI.DisplayMessage('%s: targ: %d, lau: %d' % (UI.GetName(), best_target, best_launcher))
             launcher_info = UI.GetLauncherInfo(best_launcher)
             if (launcher_info.IsValid()):
                 TI.SetMemoryValue(10, best_target)
@@ -330,6 +328,7 @@ def EngageAllWrapper(TI, mtype):
             RejoinFormation(TI, UI)
             return
         UI.SetTarget(target_id)
+
         launcher = long(TI.GetMemoryValue(11))
         launcher_angle = TI.GetMemoryValue(12)
         sector_width = TI.GetMemoryValue(13)
@@ -371,7 +370,6 @@ def EngageAllWrapper(TI, mtype):
         engagement_angle = ((engagement_angle + 180) % 360) - 180 # force to -180 to 180
         
         if (engagement_angle <= 0.5 * sector_width) and launcher_info.Status == 0:
-            #UI.DisplayMessage('Engaging target with launcher %d' % launcher)
             EngageTargetWithLauncher(UI, launcher)
             TI.SetMemoryValue(2, 0)
             RejoinFormation(TI, UI)
@@ -380,7 +378,6 @@ def EngageAllWrapper(TI, mtype):
             #ReleaseConnControl(BB) # don't release conn control until after verifying that radar guidance is not needed in search state
         else:
             pass
-            #UI.DisplayMessage('Out of sector')
 
 
 # Used by Engage tasks
@@ -463,7 +460,6 @@ def BombTarget(TI):
         UI.SetHeading(UI.GetHeading() + 180)
         TI.SetUpdateInterval(120.0) # try flying 2 min in opposite direction to open up range
         TI.SetMemoryValue(2, 1)    
-        #UI.DisplayMessage('Bomb run failed. Too close, too fast or too high')
         return
 
     # calculate time to release
@@ -555,7 +551,6 @@ def BombDatum(TI):
         UI.SetHeading(UI.GetHeading() + 180)
         TI.SetUpdateInterval(120.0) # try flying 2 min in opposite direction to open up range
         TI.SetMemoryValue(2, 1)
-        #UI.DisplayMessage('Bomb run failed. Too close, too fast or too high')
         return
 
     # calculate time to release
@@ -750,7 +745,7 @@ def MaxRangeForAir(UI):
     nLaunchers = UI.GetLauncherCount()
     for n in range(0, nLaunchers):
         launcher_info = UI.GetLauncherInfo(n)
-        if ((launcher_info.TargetFlags & 0x09) != 0):
+        if ((launcher_info.TargetFlags & 0x02) != 0):
             targetFlags = targetFlags | launcher_info.TargetFlags
             maxRange_km = max(maxRange_km, launcher_info.MaxRange_km)
     
@@ -775,7 +770,6 @@ def GetImmediateTarget(UI):
     if ((targetFlags & 16) != 0):
         classMask = classMask | 0x0080    
     
-    #UI.DisplayMessage('MR: %f, TF:%d' % (maxRange_km, targetFlags))
     
     # anAffiliation: UNKNOWN = 0, FRIENDLY = 1, NEUTRAL = 2, HOSTILE = 3, ALL NONFRIENDLY = 4, VALID ROE ONLY = 100
     #
@@ -808,7 +802,7 @@ def GetImmediateTarget(UI):
         best_target = -1
         best_launcher = -1
         best_engaged_count = 99
-    
+
     for n in range(0, nTracks):
         track_info = track_list.GetTrack(n)
         if ValidateTargetAllowable(UI, track_info):
@@ -832,13 +826,11 @@ def GetImmediateTarget(UI):
                 else:
                     missile_reject = 1
                 
-            #UI.DisplayMessage('AI815 Track %d, %.0f/%d/%d' % (track_id, staleness, bearing_only, engaged_count))
 
             if ((engaged_count < max_engaged_count) and (staleness < max_staleness) and (not bearing_only) and (not is_destroyed)):
                 UI.SetTarget(track_id)
                 launcher_info = UI.GetBestLauncher()
                 launcher_idx = launcher_info.Launcher
-                #UI.DisplayMessage('Best launcher %d' % launcher_idx)
                 if (launcher_idx != -1):
                     target_range = UI.GetRangeToTarget()
                     launch_range = launcher_info.Range_km  # reference max range, use for launch decision
@@ -886,6 +878,7 @@ def GetImmediateAirTarget(UI):
     # PTYPE_FIXED 0x0100
     # int anClassMask, float afMaxRange_km, UINT8 anAffiliation
     max_range_km, target_flags = MaxRangeForAir(UI)
+
     track_list = UI.GetTrackList(0x0060, min(max_range_km * 2, max_range_km + 200), 100)
 
     current_time = UI.GetTime()
@@ -894,7 +887,6 @@ def GetImmediateAirTarget(UI):
     best_target = -1
     best_launcher = -1
     best_engaged_count = 99
-    #UI.DisplayMessage('%s nTracks: %d' % (UI.GetName(), nTracks))
     
     for n in range(0, nTracks):
         track_info = track_list.GetTrack(n)
@@ -909,13 +901,11 @@ def GetImmediateAirTarget(UI):
                 max_engaged_count = 2
             else:
                 max_engaged_count = 5
-            #UI.DisplayMessage('Track %d, %.0f/%d/%d' % (track_id, staleness, bearing_only, engaged_count))
 
             if ((engaged_count < max_engaged_count) and (staleness < 15.0) and (not bearing_only) and (not is_destroyed)):
                 UI.SetTarget(track_id)
                 launcher_info = UI.GetBestLauncher()
                 launcher_idx = launcher_info.Launcher
-                #UI.DisplayMessage('Best launcher %d' % launcher_idx)
                 if (launcher_idx != -1):
                     # check for crossing missile case
                     missile_reject = 0
@@ -929,7 +919,6 @@ def GetImmediateAirTarget(UI):
                 
                     target_range = UI.GetRangeToTarget()
                     launch_range = launcher_info.Range_km  # reference max range, use for launch decision
-                    #UI.DisplayMessage('L%d TR: %.1f km, LR: %.1f km, MR: %d' % (launcher_idx, target_range, launch_range, missile_reject))
                     is_better = (target_range <= launch_range) and (engaged_count < best_engaged_count)
                     is_better = is_better or ((engaged_count == best_engaged_count) and (target_range < best_range))
                     is_better = is_better and (not missile_reject)
@@ -1131,9 +1120,7 @@ def GetSuitableTargetAll(UI, class_mask):
                 best_score = score
                 best_target = track_id
             
-        #info_string = '%s %d (%.1f %d)' % (info_string, track_id, score, engaged_count)
                 
-    #UI.DisplayMessage('%d: %s\n' % (class_mask, info_string))
     return (best_score, best_target)
 
 # Just air tracks
@@ -1192,7 +1179,6 @@ def ConsiderTarget(UI):
     if (launcher == -1):   # if (no effective launcher is available)
         return 0
     engaged_count = target_info.GetEngagedCount()
-    UI.DisplayMessage('target id: %d, engaged count: %d\n' % (target_id, engaged_count))
     launch_range = launcher_info.Range_km  # reference max range, use for launch decision
     target_range = UI.GetRangeToTarget()
     if (target_range > launch_range):
@@ -1378,7 +1364,6 @@ def AirFormation(TI):
     BB = TI.GetBlackboardInterface()
     
     leader = BB.ReadMessage('FormationLeader')
-    #UI.DisplayMessage('Leader is %s' % leader)
     
     UI.SetFormationLeader(long(leader))
     UI.SetFormationPosition(0.2, 0.05, 3.1416, 0.05)
@@ -1493,8 +1478,6 @@ def EngageTargetWithLauncher(UI, launcher):
         lat = target_info.Lat
         lon = target_info.Lon
         alt = target_info.Alt
-        UI.HandoffTargetToLauncher(launcher) # to store intended target
-        UI.SendDatumToLauncher(lon,lat,alt,launcher)
         UI.Launch(launcher, launch_qty)
         UI.SetActionText('Launch(D)')
         return 1
