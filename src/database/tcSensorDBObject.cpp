@@ -58,7 +58,7 @@ void tcSensorDBObject::CalculateParams()
     elevationError_rad = C_PIOVER180 * elevationError_deg;
 
 	maxElevation_deg = std::min(maxElevation_deg, 90.0f);
-	minElevation_deg = std::min(minElevation_deg, -90.0f);
+	minElevation_deg = std::max(minElevation_deg, -90.0f);  //min was a bug, caused min elevation to ALWAYS be -90, since it was smaller than everything larger than that.
 
     minElevation_rad = C_PIOVER180 * minElevation_deg;
     maxElevation_rad = C_PIOVER180 * maxElevation_deg;
