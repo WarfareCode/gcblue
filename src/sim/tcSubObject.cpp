@@ -559,15 +559,13 @@ float tcSubObject::GetIRSignature(float az_deg) const
 
 float tcSubObject::SubAccel(float accel_kts) 
 {
-	if (std::max(mcGS.mfGoalSpeed_kts, mcKin.mfSpeed_kts) - std::min(mcGS.mfGoalSpeed_kts, mcKin.mfSpeed_kts) < 0.005)
-	//if (abs((abs(mcGS.mfGoalSpeed_kts) - abs(mcKin.mfSpeed_kts)) < 0.005) || (abs(abs(mcKin.mfSpeed_kts) - abs(mcGS.mfGoalSpeed_kts)) > 0.005))//at goal, return zero
+	if (abs(std::max(mcGS.mfGoalSpeed_kts, mcKin.mfSpeed_kts) - std::min(mcGS.mfGoalSpeed_kts, mcKin.mfSpeed_kts)) < 0.005)
 	{
 		return 0;
 	}
-	//water drag will sort itself out and be negative for negative speeds, always subtract and it will counter velocity
-	//inherent accel requires a modifier to make it negative when appaopriate.
+
 	float accel = std::max(0.001, 1 - (pow(abs(mcKin.mfSpeed_kts), 0.9) / pow(mpDBObject->mfMaxSpeed_kts, 0.9))) * accel_kts;
-	if (abs(mcGS.mfGoalSpeed_kts) > abs(mcKin.mfSpeed_kts)) //accelerating
+	if ((abs(mcGS.mfGoalSpeed_kts) > abs(mcKin.mfSpeed_kts)) && ((mcGS.mfGoalSpeed_kts < 0 && mcKin.mfSpeed_kts < 0)  || (mcGS.mfGoalSpeed_kts > 0 && mcKin.mfSpeed_kts > 0)))
 	 {
 		if (mcGS.mfGoalSpeed_kts > mcKin.mfSpeed_kts) //forwards acceleration
 		{
@@ -578,11 +576,13 @@ float tcSubObject::SubAccel(float accel_kts)
 			return accel * -1;
 		}
 	}
-	else if (abs(mcGS.mfGoalSpeed_kts) < abs(mcKin.mfSpeed_kts)) //slowing to stop
+	else// if (abs(mcGS.mfGoalSpeed_kts) < abs(mcKin.mfSpeed_kts)) //slowing to stop
 	{
 		//float block_coefficient = shipDBObj->weight_kg / (shipDBObj->draft_m * shipDBObj->length_m * shipDBObj->beam_m * 1030);
 		float water_force = mpDBObject->beam_m * mpDBObject->draft_m * pow(mcKin.mfSpeed_kts * 0.514444f, 2) * 515;  //1030
 		float water_accel = (water_force / mpDBObject->weight_kg) / 0.514444;
+		float crash_stop = std::min(2.0f,std::max(1.0f, 0.3f / mcKin.mfSpeed_kts));
+		accel *= crash_stop;
 
 		if (mcGS.mfGoalSpeed_kts < mcKin.mfSpeed_kts) //slowing from forwards velocity
 		{
@@ -590,12 +590,8 @@ float tcSubObject::SubAccel(float accel_kts)
 		}
 		else
 		{
-			return accel - water_accel;
+			return accel + water_accel;
 		}
-	}
-	else
-	{
-		return 0;
 	}
 }
 

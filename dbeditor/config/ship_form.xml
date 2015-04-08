@@ -6,6 +6,7 @@
         <combobox value="ModelClassId" label="Model Type" proportion="0" file="config/modeltype.txt"></combobox>
         <combobox value="ClassificationId" label="Classification" proportion="0" file="config/classification.txt"></combobox>
         <text value="ModelFileName" label="ModelFileName" proportion="0"></text>
+        <text value="ImageList" label="ImageList" proportion="2" multiline="yes"></text>
         <text value="Cost" label="Cost" proportion="0"></text>
         <text value="Weight_kg" label="Weight_kg" proportion="0" expand_sizer="yes"></text>
         <text value="Length_m" label="Length_m" proportion="0" expand_sizer="yes"></text>

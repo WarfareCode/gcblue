@@ -244,13 +244,13 @@ void tcPlatformObject::UpdateHeading(float dt_s)
 
 float tcPlatformObject::ShipAccel() 
 {
-	if ((mcGS.mfGoalSpeed_kts - mcKin.mfSpeed_kts < 0.005) || (mcKin.mfSpeed_kts - mcGS.mfGoalSpeed_kts < 0.005))//at goal, return zero
+	if (abs(std::max(mcGS.mfGoalSpeed_kts, mcKin.mfSpeed_kts) - std::min(mcGS.mfGoalSpeed_kts, mcKin.mfSpeed_kts)) < 0.005)
 	{
 		return 0;
 	}
 
 	float accel = std::max(0.001, 1 - (pow(abs(mcKin.mfSpeed_kts), 0.9) / pow(mpDBObject->mfMaxSpeed_kts, 0.9))) * mpDBObject->mfAccel_ktsps;
-	if (abs(mcGS.mfGoalSpeed_kts) > abs(mcKin.mfSpeed_kts)) //accelerating
+	if ((abs(mcGS.mfGoalSpeed_kts) > abs(mcKin.mfSpeed_kts)) && ((mcGS.mfGoalSpeed_kts < 0 && mcKin.mfSpeed_kts < 0)  || (mcGS.mfGoalSpeed_kts > 0 && mcKin.mfSpeed_kts > 0)))
 	 {
 		if (mcGS.mfGoalSpeed_kts > mcKin.mfSpeed_kts) //forwards acceleration
 		{
@@ -261,13 +261,15 @@ float tcPlatformObject::ShipAccel()
 			return accel * -1;
 		}
 	}
-	else if (abs(mcGS.mfGoalSpeed_kts) < abs(mcKin.mfSpeed_kts)) //slowing to stop
+	else// if (abs(mcGS.mfGoalSpeed_kts) < abs(mcKin.mfSpeed_kts)) //slowing to stop
 	{
 		tcDatabaseObject* databaseObject = tcDatabase::Get()->GetObject(mpDBObject->mzClass.c_str());
 		tcShipDBObject* shipDBObj = dynamic_cast<tcShipDBObject*>(databaseObject);
 		//float block_coefficient = shipDBObj->weight_kg / (shipDBObj->draft_m * shipDBObj->length_m * shipDBObj->beam_m * 1030);
 		float water_force = shipDBObj->beam_m * shipDBObj->draft_m * pow(mcKin.mfSpeed_kts * 0.514444f, 2) * 1030;
 		float water_accel = (water_force / mpDBObject->weight_kg) / 0.514444;
+		float crash_stop = std::min(2.0f,std::max(1.0f, 0.3f / mcKin.mfSpeed_kts));
+		accel *= crash_stop;
 
 		if (mcGS.mfGoalSpeed_kts < mcKin.mfSpeed_kts) //slowing from forwards velocity
 		{
@@ -275,12 +277,8 @@ float tcPlatformObject::ShipAccel()
 		}
 		else
 		{
-			return accel - water_accel;
+			return accel + water_accel;
 		}
-	}
-	else
-	{
-		return 0;
 	}
 }
 
@@ -297,40 +295,7 @@ void tcPlatformObject::UpdateSpeed(float dt_s)
     bool isSurface = ((classification & PTYPE_SURFACE) != 0);
 	if (isSurface)
 	{
-
-		if (abs(mcGS.mfGoalSpeed_kts) > abs(mcKin.mfSpeed_kts)) //accelerating
-		{
-			if (mcGS.mfGoalSpeed_kts > mcKin.mfSpeed_kts) //forwards acceleration
-			{
-				ds_kts = std::max(0.001, 1 - (pow(abs(mcKin.mfSpeed_kts), 0.9) / pow(mpDBObject->mfMaxSpeed_kts, 0.9))) * mpDBObject->mfAccel_ktsps * dt_s;
-			}
-			else
-			{
-				ds_kts = std::max(0.001, 1 - (pow(abs(mcKin.mfSpeed_kts)*0.5, 0.9) / pow(mpDBObject->mfMaxSpeed_kts*0.5, 0.9))) * 0.5 * mpDBObject->mfAccel_ktsps * dt_s * -1;
-			}
-		}
-		else if (abs(mcGS.mfGoalSpeed_kts) < abs(mcKin.mfSpeed_kts)) //slowing to stop
-		{
-			tcDatabaseObject* databaseObject = tcDatabase::Get()->GetObject(mpDBObject->mzClass.c_str());
-			tcShipDBObject* shipDBObj = dynamic_cast<tcShipDBObject*>(databaseObject);
-			float hullSpeed_kts		= sqrt(shipDBObj->length_m) * 5.07;
-			float refSpeed_kts  	= std::min(hullSpeed_kts, mpDBObject->mfMaxSpeed_kts);
-			float fineness			= shipDBObj->beam_m / shipDBObj->length_m;
-			//float block_coefficient = shipDBObj->weight_kg / (shipDBObj->draft_m * shipDBObj->length_m * shipDBObj->beam_m * 1030);
-			float water_force		= 0.1f * shipDBObj->beam_m * shipDBObj->draft_m * pow(mcKin.mfSpeed_kts * 0.514444f, 2) * 1030 * fineness;
-			float water_accel		= (water_force / mpDBObject->weight_kg) / 0.514444;
-			float scalar = std::max(0.001, 1 - (pow(abs(mcKin.mfSpeed_kts), 0.9) / pow(mpDBObject->mfMaxSpeed_kts, 0.9))) * mpDBObject->mfAccel_ktsps;
-
-			ds_kts = (mpDBObject->mfAccel_ktsps * scalar + water_accel) * dt_s;
-			if (mcGS.mfGoalSpeed_kts < mcKin.mfSpeed_kts) //slowing from forwards velocity
-			{
-				ds_kts *= -1;
-			}
-		}
-		else
-		{
-			ds_kts = 0;
-		}
+		ds_kts = ShipAccel() * dt_s;
 	}
 	else
 	{

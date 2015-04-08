@@ -3,36 +3,49 @@
         <text value="NATO_ASCC" label="NATO/ASCC Name" proportion="0" expand_sizer="yes"></text>
         <text value="Description" label="Description" proportion="3" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
         <text value="Notes" label="Notes" proportion="3" multiline="yes" expand_control="yes" expand_sizer="yes"></text>
-        <!--combobox value="ModelClassId" label="Model Type" proportion="0" file="config/modeltype.txt"></combobox-->
         <combobox value="ClassificationId" label="Classification" proportion="0" file="config/classification.txt"></combobox>
         <!--text value="Volume_m3" label="Volume_m3" proportion="0"></text-->
         <text value="ImageList" label="ImageList" proportion="2" multiline="yes"></text>
         <!--text value="IconFileName" label="IconFileName" proportion="0"></text-->
         <text value="ModelFileName" label="ModelFileName" proportion="0"></text>
         <text value="Cost" label="Cost" proportion="0"></text>
-        <text value="Weight_kg" label="Weight_kg" proportion="0"></text>
+        <text value="Weight_kg" label="Weight_kg" proportion="0" expand_sizer="yes"></text>
+        <text value="Length_m" label="Length_m" proportion="0" expand_sizer="yes"></text>
+        <text value="Beam_m" label="Beam_m" proportion="0" expand_sizer="yes"></text>
+        <text value="Draft_m" label="Draft_m" proportion="0"></text>
         <text value="InitialYear" label="InitialYear" proportion="0"></text>
         <text value="FinalYear" label="FinalYear" proportion="0"></text>
         <text value="Country" label="Country" proportion="0"></text>
         <text value="Designation" label="Designation" proportion="0"></text>
     </sizer>
     <sizer orientation="vertical" proportion="1">
+        <text value="SurfaceSpeed_kts" label="SurfaceSpeed_kts" proportion="0"></text>
         <text value="MaxSpeed_kts" label="MaxSpeed_kts" proportion="0"></text>
-        <text value="Accel_ktsps" label="Accel_ktsps" proportion="0"></text>
         <text value="TurnRate_degps" label="TurnRate_degps" proportion="0"></text>
+        <text value="MaxDepth_m" label="MaxDepth_m" proportion="0"></text>
+        <text value="PropulsionShafts" label="PropulsionShafts" proportion="0"></text>
+        <text value="Primary_ShaftHP" label="Diesel/Nuclear_HP" proportion="0"></text>
         <text value="FuelCapacity_kg" label="FuelCapacity_kg" proportion="0"></text>
         <text value="FuelRate_kgps" label="FuelRate_kgps" proportion="0"></text>
-        <combobox value="DamageEffect" label="Survivability" proportion="0" update_table="damage_effect"></combobox>
-        <text value="Draft_m" label="Draft_m" proportion="0"></text>
-        <text value="SurfaceSpeed_kts" label="SurfaceSpeed_kts" proportion="0"></text>
-        <text value="EffectiveHeight_m" label="EffectiveHeight_m" proportion="0"></text>
-        <text value="MaxDepth_m" label="MaxDepth_m" proportion="0"></text>
+        <text value="Accel_ktsps" label="Diesel/Nuke_Accel_Ktps" proportion="0"></text>
         <checkbox value="IsDieselElectric" label="IsDieselElectric" proportion="0"></checkbox>
-        <text value="BatteryCapacity_kJ" label="BatteryCapacity_kJ" proportion="0"></text>
-        <text value="BatteryRate_kW" label="BatteryRate_kW" proportion="0"></text>
-        <text value="BatteryCharge_kW" label="BatteryCharge_kW" proportion="0"></text>
+        <text value="Electric_ShaftHP" label="Electrical_HP" proportion="0"></text>
+        <text value="Electrical_Accel_ktsps" label="Electrical_Accel_ktsps" proportion="0"></text>
+        <text value="BatteryCapacity_kJ" label="BatteryCapacityRated_kWhr" proportion="0"></text>
+        <text value="BatteryRatedHours" label="BatteryRatedHours" proportion="0"></text>
+        <text value="BatteryRate_kW" label="BatteryRate_kWps" proportion="0"></text>
+        <text value="BatteryPeukert" label="Battery_Peukert_Constant" proportion="0"></text>
+        <text value="BatteryCharge_kW" label="Battery_Charge_Rate_Kwps" proportion="0"></text>
+        <text value="ElectricalLoadAdjustment_kWps" label="Battery_Load_Adjustment_Kwps" proportion="0"></text>
+        <checkbox value="IsAIP" label="Has_AIP" proportion="0"></checkbox>
+        <text value="AIP_ShaftHP" label="AIP_HP" proportion="0"></text>
+        <text value="AIP_Accel_ktsps" label="AIP_Accel_ktsps" proportion="0"></text>
+        <text value="AIP_Capacity_kg" label="AIP_Capacity_kg" proportion="0"></text>
+        <text value="AIP_Rate_kgps" label="AIP_Rate_kgps" proportion="0"></text>
     </sizer>
     <sizer orientation="vertical" proportion="1">
+        <text value="EffectiveHeight_m" label="EffectiveHeight_m" proportion="0"></text>
+        <combobox value="DamageEffect" label="Survivability" proportion="0" update_table="damage_effect"></combobox>
         <text value="RCS_dBsm" label="RCS_dBsm" proportion="0"></text>
         <combobox value="RCS_Model" label="RCS Pattern" proportion="0" update_table="signature"></combobox>
         <text value="OpticalCrossSection_dBsm" label="OpticalCrossSection_dBsm" proportion="0"></text>

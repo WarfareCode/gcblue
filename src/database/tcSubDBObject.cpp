@@ -198,7 +198,7 @@ namespace database
         columnString += "Primary_ShaftHP number(8),";
         columnString += "IsDieselElectric number(1),";
         columnString += "Electric_ShaftHP number(8),";
-        columnString += "BatteryCapacityRated_kWhr number(8),";
+        columnString += "BatteryCapacity_kJ number(8),";
         columnString += "BatteryRate_kW number(8),";
         columnString += "BatteryCharge_kW number(8)";
         columnString += "BatteryRatedHours number(8)";
@@ -230,7 +230,7 @@ namespace database
 		Primary_ShaftHP = entry.GetDouble("Primary_ShaftHP");
         isDieselElectric = entry.GetInt("IsDieselElectric") != 0;
 		Electric_ShaftHP = entry.GetDouble("Electric_ShaftHP");
-        batteryCapacityRated_kWhr = entry.GetDouble("BatteryCapacityRated_kWhr");
+        batteryCapacityRated_kWhr = entry.GetDouble("BatteryCapacity_kJ");
         batteryRate_kW = entry.GetDouble("BatteryRate_kW");
         batteryCharge_kW = entry.GetDouble("BatteryCharge_kW");
         batteryRatedHours = entry.GetDouble("BatteryRatedHours");

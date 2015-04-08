@@ -43,7 +43,7 @@ void tcSubPanel::InitializeControls()
     tcTextEditControl* ctrl_de = new tcTextEditControl(this, wxSize(100, -1), "IsDieselElectric", "Diesel-Electric?");
     AddControl(ctrl_de);
 
-    tcTextEditControl* ctrl_batcap = new tcTextEditControl(this, wxSize(100, -1), "BatteryCapacity_kJ", "Battery Energy [kJ]");
+    tcTextEditControl* ctrl_batcap = new tcTextEditControl(this, wxSize(100, -1), "BatteryCapacity_kWhr", "Battery Energy [kWhr]");
     AddControl(ctrl_batcap);
 
     tcTextEditControl* ctrl_batdrain = new tcTextEditControl(this, wxSize(100, -1), "BatteryRate_kW", "Battery Drain [kW]");
