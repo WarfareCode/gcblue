@@ -269,7 +269,7 @@ float tcPlatformObject::ShipAccel()
 		float fineness = shipDBObj->beam_m / shipDBObj->length_m;
 		float water_force = shipDBObj->beam_m * shipDBObj->draft_m * pow(mcKin.mfSpeed_kts * 0.514444f, 2) * 1030 * block_coefficient * fineness;
 		float water_accel = (water_force / mpDBObject->weight_kg) / 0.514444;
-		float crash_stop = std::min(3.0f,std::max(1.0f, 0.4f / (abs(mcKin.mfSpeed_kts) / mpDBObject->mfMaxSpeed_kts)));
+		float crash_stop = std::min(3.0f,std::max(1.0f, 0.9f / (abs(mcKin.mfSpeed_kts) / mpDBObject->mfMaxSpeed_kts)));
 		accel *= crash_stop;
 
 		if (mcGS.mfGoalSpeed_kts < mcKin.mfSpeed_kts) //slowing from forwards velocity
