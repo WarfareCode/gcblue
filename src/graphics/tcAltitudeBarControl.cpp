@@ -287,7 +287,7 @@ void tcAltitudeBarControl::UpdateDrawParameters()
     else if (currentGoal < 0) currentGoal = 0;
 
     // update scale
-    while ((currentScale*increaseScaleThresh < currentGoal) && (currentScale < 40000))
+    while ((currentScale*increaseScaleThresh < currentGoal) && (currentScale < 400000))
     {
         currentScale *= 2.0;
     }
